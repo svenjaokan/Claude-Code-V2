@@ -1,14 +1,15 @@
 // Renders each slide to a 1080x1350 (Instagram 4:5) JPEG using Playwright.
 import { chromium } from "playwright";
-import { readFile, writeFile, mkdir } from "node:fs/promises";
+import { readFile, mkdir } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
-import { slides, COVER, TEXT, CTA } from "./slides.mjs";
+import { slides, COVER } from "./slides.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, "..");
 const W = 1080;
 const H = 1350;
+const TOP_PAD = 96;
 
 const photoBuf = await readFile(join(ROOT, "assets/photos/photo3-bw.jpeg"));
 const photoData = `data:image/jpeg;base64,${photoBuf.toString("base64")}`;
@@ -19,29 +20,31 @@ const css = `
   html, body { width: ${W}px; height: ${H}px; }
   .slide {
     position: relative; width: ${W}px; height: ${H}px; overflow: hidden;
-    color: #fff; -webkit-font-smoothing: antialiased;
+    color: #fff; -webkit-font-smoothing: antialiased; --scale: 1;
   }
   .photo {
     position: absolute; inset: 0;
     background-repeat: no-repeat;
     filter: grayscale(100%) contrast(1.02) brightness(0.92);
   }
-  /* dark wash + bottom gradient for legibility */
   .overlay {
     position: absolute; inset: 0;
     background:
       linear-gradient(180deg,
         rgba(8,8,8,0.28) 0%,
         rgba(8,8,8,0.00) 20%,
-        rgba(8,8,8,0.00) 42%,
-        rgba(8,8,8,0.30) 60%,
-        rgba(7,7,7,0.66) 76%,
-        rgba(5,5,5,0.92) 100%);
+        rgba(8,8,8,0.00) 40%,
+        rgba(8,8,8,0.32) 58%,
+        rgba(7,7,7,0.68) 76%,
+        rgba(5,5,5,0.93) 100%);
   }
   .content {
     position: absolute; inset: 0; display: flex; flex-direction: column;
-    padding: 96px 86px 0; z-index: 2;
+    justify-content: flex-end; padding: ${TOP_PAD}px 86px 0; z-index: 2;
   }
+  .slide.cover .content { padding-bottom: 180px; }
+  .slide.text  .content { padding-bottom: 118px; }
+  .fit { width: 100%; }
   .kicker {
     font-family: 'Inter', sans-serif; font-weight: 500;
     text-transform: uppercase; letter-spacing: 0.28em;
@@ -54,8 +57,8 @@ const css = `
   h1 em { font-style: italic; font-weight: 500; }
   .body {
     font-family: 'Inter', sans-serif; font-weight: 400;
-    font-size: 31px; line-height: 1.5; text-align: center;
-    color: #f3f1ee; max-width: 840px; margin: 0 auto;
+    line-height: 1.5; text-align: center;
+    color: #f3f1ee; max-width: 860px; margin: 0 auto;
   }
   .body strong { font-weight: 700; color: #ffffff; }
   .footer {
@@ -65,38 +68,32 @@ const css = `
     font-size: 22px; opacity: 0.88; text-align: center;
   }
 
-  /* COVER + CTA: bottom-anchored big headline */
-  .slide.cover .content, .slide.cta .content { justify-content: flex-end; padding-bottom: 188px; }
-  .slide.cover h1, .slide.cta h1 { font-size: 104px; line-height: 0.98; margin-top: 26px; }
+  /* COVER: bottom-anchored big headline */
+  .slide.cover h1 { font-size: calc(104px * var(--scale)); line-height: 1.0; margin-top: 26px; }
 
-  /* TEXT: headline mid-lower, body beneath */
-  .slide.text .content { justify-content: flex-end; padding-bottom: 118px; }
-  .slide.text h1 { font-size: 84px; line-height: 1.0; margin-bottom: 34px; }
+  /* TEXT: serif headline + sans body */
+  .slide.text h1 { font-size: calc(74px * var(--scale)); line-height: 1.02; margin-bottom: 30px; }
+  .slide.text .body { font-size: calc(31px * var(--scale)); }
 `;
+
+// bottom padding (px) below the text block, per slide type
+const BOT_PAD = { cover: 180, text: 118 };
 
 function slideHTML(s) {
   const bgSize = s.zoom && s.zoom !== 1 ? `${Math.round(s.zoom * 100)}%` : "cover";
   const photoStyle = `background-image:url('${photoData}');background-position:${s.bgPos};background-size:${bgSize};`;
-  let inner = "";
-  if (s.type === COVER || s.type === CTA) {
-    inner = `
-      <div class="content">
-        ${s.kicker ? `<div class="kicker">${s.kicker}</div>` : ""}
-        <h1>${s.headline}</h1>
-      </div>
-      ${s.footer ? `<div class="footer">${s.footer}</div>` : ""}`;
+  let fit = "";
+  if (s.type === COVER) {
+    fit = `${s.kicker ? `<div class="kicker">${s.kicker}</div>` : ""}<h1>${s.headline}</h1>`;
   } else {
-    inner = `
-      <div class="content">
-        <h1>${s.headline}</h1>
-        <div class="body">${s.body}</div>
-      </div>`;
+    fit = `<h1>${s.headline}</h1>${s.body ? `<div class="body">${s.body}</div>` : ""}`;
   }
   return `
     <div class="slide ${s.type}">
       <div class="photo" style="${photoStyle}"></div>
       <div class="overlay"></div>
-      ${inner}
+      <div class="content"><div class="fit">${fit}</div></div>
+      ${s.footer ? `<div class="footer">${s.footer}</div>` : ""}
     </div>`;
 }
 
@@ -109,7 +106,21 @@ for (let i = 0; i < slides.length; i++) {
   const html = `<!doctype html><html><head><meta charset="utf-8"><style>${css}</style></head><body>${slideHTML(s)}</body></html>`;
   await page.setContent(html, { waitUntil: "networkidle" });
   await page.evaluate(() => document.fonts.ready);
-  await page.waitForTimeout(150);
+
+  // Auto-fit: shrink font scale until the text block fits the available height.
+  const botPad = BOT_PAD[s.type] ?? 120;
+  await page.evaluate(({ topPad, botPad }) => {
+    const slide = document.querySelector(".slide");
+    const fit = document.querySelector(".fit");
+    const maxH = slide.clientHeight - topPad - botPad;
+    let scale = 1;
+    for (let n = 0; n < 30 && fit.offsetHeight > maxH && scale > 0.5; n++) {
+      scale -= 0.03;
+      slide.style.setProperty("--scale", scale.toFixed(3));
+    }
+  }, { topPad: TOP_PAD, botPad });
+
+  await page.waitForTimeout(120);
   const el = await page.$(".slide");
   const out = join(ROOT, "slides", `slide-${i + 1}.jpeg`);
   await el.screenshot({ path: out, type: "jpeg", quality: 92 });

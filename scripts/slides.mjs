@@ -1,63 +1,59 @@
-// Slide content + per-slide photo framing for the Instagram carousel.
-// Theme (reworded): low prices attract draining clients → premium pricing.
-// Emphasis: wrap words in *italics* with _word_  and **bold** with *word* helpers below.
+// Slide content for the Instagram carousel — verbatim copy from the user.
+// <em> = italic emphasis (serif headline), <strong> = bold (sans body),
+// <br> = intentional line break.
 
 export const COVER = "cover";
 export const TEXT = "text";
-export const CTA = "cta";
 
-// `bgPos` = CSS background-position; `zoom` = background-size scale (1 = cover).
 export const slides = [
   {
     type: COVER,
     bgPos: "66% 28%",
     zoom: 1.0,
     kicker: "HEAVENLY REMINDER",
-    // <em> = italic emphasis
-    headline: "Deine <em>niedrigen</em> Preise ziehen die <em>falschen</em> Kunden an.",
+    headline: "Deine <em>günstigste</em> Kundin bezahlst du am <em>teuersten</em>.",
     footer: "RULE NO ONE",
   },
   {
     type: TEXT,
     bgPos: "58% 22%",
     zoom: 1.08,
-    headline: "Billig fühlt sich<br>sicher an.",
-    body: "Du glaubst, ein kleiner Preis macht das Ja leichter. In Wahrheit lädst du genau die Menschen ein, <strong>die am lautesten fordern und am wenigsten vertrauen.</strong>",
+    headline: "Die, die am Anfang über jeden Euro verhandelt, hört damit nie auf.",
+    body: "Sie hat nicht in dich investiert. <strong>Sie hat einen Rabatt gesucht.</strong>",
   },
   {
     type: TEXT,
     bgPos: "72% 30%",
     zoom: 1.04,
-    headline: "Wer wenig zahlt,<br>erwartet alles.",
-    body: "Ein niedriger Preis senkt nicht die Erwartung – er steigert sie. Plötzlich diskutierst du jede Stunde <strong>und rechtfertigst jeden einzelnen Schritt.</strong>",
+    headline: "Sie schreibt dir ewig lange Nachrichten.",
+    body: "Nachts, morgens, zwischendurch.<br>Bei jedem Schritt unsicher, <strong>bei jeder Entscheidung will sie deinen Input.</strong>",
   },
   {
     type: TEXT,
     bgPos: "62% 18%",
     zoom: 1.12,
-    headline: "Discount zieht<br>Drama an.",
-    body: "Schnäppchenjäger kaufen nicht deine Arbeit, sie kaufen den Rabatt. Beim ersten Hindernis sind sie weg – <strong>und lassen dich mit dem Aufwand zurück.</strong>",
+    headline: "Sie will alles aus dir rausholen.",
+    body: "Mehr Calls, mehr Antworten, mehr von allem.<br><strong>Und zufrieden ist sie trotzdem nie.</strong>",
   },
   {
     type: TEXT,
     bgPos: "55% 26%",
     zoom: 1.06,
-    headline: "Premium ist<br>ein Filter.",
-    body: "Ein höherer Preis schreckt nicht ab, er sortiert. Er zieht Menschen an, <strong>die mitarbeiten, Verantwortung übernehmen und deinen Wert sehen.</strong>",
+    headline: "Und dann gibt es die andere.",
+    body: "Sie sucht nicht den günstigsten Preis. Sie sucht nach Wert.<br><strong>Sie trifft ihre Entscheidungen selbst und sie trifft sie schnell.</strong>",
   },
   {
     type: TEXT,
     bgPos: "68% 34%",
     zoom: 1.0,
-    headline: "Dein Preis erzählt<br>eine Geschichte.",
-    body: "Er sagt, wie sicher du in deinem eigenen Wert bist. Erhöhe ihn nicht für mehr Umsatz – <strong>sondern für die Kunden, für die du gemacht bist.</strong>",
+    headline: "Sie hat verstanden, dass sie ihr Business führt und nicht du es für sie führst.",
+    body: "<strong>Das sind die Kundinnen, die Spaß machen und erfolgreich werden.</strong>",
   },
   {
-    type: CTA,
+    type: TEXT,
     bgPos: "63% 24%",
     zoom: 1.1,
-    kicker: "HEAVENLY REMINDER",
-    headline: "Erhöhe den Preis.<br><em>Verändere</em> die Kunden.",
-    footer: "SPEICHERN & FOLGEN",
+    headline: "Irgendwo musst du dich abgrenzen.",
+    body: "Dein Preis ist kein Schild, an dem du dich entschuldigst. <strong>Dein Preis ist dein Filter.</strong>",
   },
 ];
