@@ -11,11 +11,25 @@ const W = 1080;
 const H = 1350;
 const TOP_PAD = 96;
 
-const photoBuf = await readFile(join(ROOT, "assets/photos/photo3-bw.jpeg"));
+const PHOTO = "photo4-terrace.jpeg";
+
+const photoBuf = await readFile(join(ROOT, "assets/photos", PHOTO));
 const photoData = `data:image/jpeg;base64,${photoBuf.toString("base64")}`;
 
+// Embed the real PP Editorial New fonts (Regular + Italic + Ultrabold).
+async function fontFace(file, weight, style) {
+  const b = await readFile(join(ROOT, "assets/fonts", file));
+  return `@font-face{font-family:'PP Editorial New';src:url(data:font/otf;base64,${b.toString("base64")}) format('opentype');font-weight:${weight};font-style:${style};font-display:block;}`;
+}
+const fonts = [
+  await fontFace("PPEditorialNew-Regular.otf", 400, "normal"),
+  await fontFace("PPEditorialNew-Italic.otf", 400, "italic"),
+  await fontFace("PPEditorialNew-Ultrabold.otf", 800, "normal"),
+].join("\n");
+
 const css = `
-  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Inter:wght@400;500;700&display=swap');
+  ${fonts}
+  @import url('https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;700&display=swap');
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html, body { width: ${W}px; height: ${H}px; }
   .slide {
@@ -25,18 +39,20 @@ const css = `
   .photo {
     position: absolute; inset: 0;
     background-repeat: no-repeat;
-    filter: grayscale(100%) contrast(1.02) brightness(0.92);
+    filter: grayscale(100%) contrast(1.03);
   }
+  /* Soft, pure-black legibility overlay — no grey band, smooth ramp only. */
   .overlay {
     position: absolute; inset: 0;
     background:
       linear-gradient(180deg,
-        rgba(8,8,8,0.28) 0%,
-        rgba(8,8,8,0.00) 20%,
-        rgba(8,8,8,0.00) 40%,
-        rgba(8,8,8,0.32) 58%,
-        rgba(7,7,7,0.68) 76%,
-        rgba(5,5,5,0.93) 100%);
+        rgba(0,0,0,0.18) 0%,
+        rgba(0,0,0,0.00) 18%,
+        rgba(0,0,0,0.00) 34%,
+        rgba(0,0,0,0.18) 50%,
+        rgba(0,0,0,0.45) 66%,
+        rgba(0,0,0,0.74) 84%,
+        rgba(0,0,0,0.90) 100%);
   }
   .content {
     position: absolute; inset: 0; display: flex; flex-direction: column;
@@ -46,37 +62,36 @@ const css = `
   .slide.text  .content { padding-bottom: 118px; }
   .fit { width: 100%; }
   .kicker {
-    font-family: 'Inter', sans-serif; font-weight: 500;
+    font-family: 'Hanken Grotesk', sans-serif; font-weight: 500;
     text-transform: uppercase; letter-spacing: 0.28em;
     font-size: 23px; opacity: 0.92; text-align: center;
   }
   h1 {
-    font-family: 'Cormorant Garamond', serif; font-weight: 600;
-    color: #fff; text-align: center; letter-spacing: 0.005em;
+    font-family: 'PP Editorial New', serif; font-weight: 400;
+    color: #fff; text-align: center; letter-spacing: 0.002em;
   }
-  h1 em { font-style: italic; font-weight: 500; }
+  h1 em { font-style: italic; font-weight: 400; }
   .body {
-    font-family: 'Inter', sans-serif; font-weight: 400;
+    font-family: 'Hanken Grotesk', sans-serif; font-weight: 400;
     line-height: 1.5; text-align: center;
-    color: #f3f1ee; max-width: 860px; margin: 0 auto;
+    color: #f4f2ef; max-width: 860px; margin: 0 auto;
   }
   .body strong { font-weight: 700; color: #ffffff; }
   .footer {
     position: absolute; left: 0; right: 0; bottom: 64px; z-index: 2;
-    font-family: 'Inter', sans-serif; font-weight: 500;
+    font-family: 'Hanken Grotesk', sans-serif; font-weight: 500;
     text-transform: uppercase; letter-spacing: 0.30em;
-    font-size: 22px; opacity: 0.88; text-align: center;
+    font-size: 22px; opacity: 0.90; text-align: center;
   }
 
   /* COVER: bottom-anchored big headline */
-  .slide.cover h1 { font-size: calc(104px * var(--scale)); line-height: 1.0; margin-top: 26px; }
+  .slide.cover h1 { font-size: calc(108px * var(--scale)); line-height: 1.0; margin-top: 26px; }
 
   /* TEXT: serif headline + sans body */
-  .slide.text h1 { font-size: calc(74px * var(--scale)); line-height: 1.02; margin-bottom: 30px; }
+  .slide.text h1 { font-size: calc(76px * var(--scale)); line-height: 1.03; margin-bottom: 30px; }
   .slide.text .body { font-size: calc(31px * var(--scale)); }
 `;
 
-// bottom padding (px) below the text block, per slide type
 const BOT_PAD = { cover: 180, text: 118 };
 
 function slideHTML(s) {
@@ -107,8 +122,7 @@ for (let i = 0; i < slides.length; i++) {
   await page.setContent(html, { waitUntil: "networkidle" });
   await page.evaluate(() => document.fonts.ready);
 
-  // Auto-fit: shrink font scale until the text block fits the available height.
-  const botPad = BOT_PAD[s.type] ?? 120;
+  const botPad = BOT_PAD[s.type] ?? 118;
   await page.evaluate(({ topPad, botPad }) => {
     const slide = document.querySelector(".slide");
     const fit = document.querySelector(".fit");
