@@ -11,9 +11,10 @@ create table if not exists public.allowed_users (
 
 -- Admin (Svenja) + Closer eintragen. Weitere Closer: Zeilen ergänzen.
 insert into public.allowed_users (email, is_admin) values
-  ('hello@svenjaokan.de', true)
-  -- ,('closer1@mail.de', false)
-  -- ,('closer2@mail.de', false)
+  ('hello@svenjaokan.de', true),          -- Svenja Okan (Admin)
+  ('keller.danny1990@gmail.com', false),  -- Danny Keller
+  ('deliaraphael@icloud.com', false)      -- Raphael
+  -- ,('vierter-closer@mail.de', false)
 on conflict (email) do nothing;
 
 -- Leads-Tabelle (gemeinsame Daten für das ganze Team)
