@@ -1,0 +1,9 @@
+{
+  "redirects": [
+    {
+      "source": "/partner-check",
+      "destination": "https://calendly.com/d/ds7h-nwk-6c4/3h-business-dein-partner-check",
+      "permanent": false
+    }
+  ]
+}
