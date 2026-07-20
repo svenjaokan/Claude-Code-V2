@@ -3,207 +3,245 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>💎 CLOSER PALACE 💎 Webinar CRM</title>
+<title>ClosePilot — Webinar CRM</title>
 <style>
   :root{
-    --pink:#ff2fb9; --purple:#7b2ff7; --gold:#ffd700; --cyan:#00f5ff;
-    --lime:#a8ff00; --red:#ff3355; --dark:#12002b;
+    --bg:#0b0d12; --surface:#12151d; --surface2:#181c26; --border:#232837;
+    --text:#e8eaf0; --muted:#8b93a7; --faint:#5b6273;
+    --accent:#5b8cff; --accent-soft:rgba(91,140,255,.12);
+    --green:#3ddc97; --green-soft:rgba(61,220,151,.12);
+    --red:#ff5c72; --red-soft:rgba(255,92,114,.12);
+    --amber:#ffb454; --amber-soft:rgba(255,180,84,.12);
+    --violet:#a78bfa; --violet-soft:rgba(167,139,250,.14);
+    --cyan:#4dd0e1; --cyan-soft:rgba(77,208,225,.12);
+    --radius:10px;
   }
   *{margin:0;padding:0;box-sizing:border-box}
   body{
-    font-family:'Trebuchet MS','Comic Sans MS',cursive,sans-serif;
-    color:#fff; min-height:100vh;
-    background:linear-gradient(-45deg,#2b0055,#7b2ff7,#ff2fb9,#12002b,#004e92);
-    background-size:400% 400%; animation:bgmove 14s ease infinite;
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Inter',Roboto,sans-serif;
+    background:var(--bg); color:var(--text); min-height:100vh;
+    font-size:14px; -webkit-font-smoothing:antialiased;
   }
-  @keyframes bgmove{0%{background-position:0 50%}50%{background-position:100% 50%}100%{background-position:0 50%}}
-  .sparkle{position:fixed;pointer-events:none;font-size:18px;animation:fall linear forwards;z-index:5}
-  @keyframes fall{to{transform:translateY(110vh) rotate(360deg);opacity:0}}
 
-  header{text-align:center;padding:28px 12px 10px}
-  h1{
-    font-size:clamp(30px,6vw,64px); font-weight:900; letter-spacing:2px;
-    background:linear-gradient(90deg,var(--gold),#fff,var(--gold),var(--pink),var(--gold));
-    background-size:300%; -webkit-background-clip:text;background-clip:text;color:transparent;
-    animation:shine 3s linear infinite; text-shadow:0 0 40px rgba(255,215,0,.35);
-    filter:drop-shadow(0 4px 0 rgba(0,0,0,.4));
+  .nav{
+    display:flex;align-items:center;gap:12px;padding:0 24px;height:56px;
+    border-bottom:1px solid var(--border);
+    background:rgba(11,13,18,.85); backdrop-filter:blur(8px);
+    position:sticky;top:0;z-index:20;
   }
-  @keyframes shine{to{background-position:300%}}
-  .subtitle{font-size:clamp(14px,2.5vw,20px);color:var(--cyan);text-shadow:0 0 12px var(--cyan);margin-top:6px;letter-spacing:3px;text-transform:uppercase}
-  .marquee{overflow:hidden;white-space:nowrap;background:rgba(0,0,0,.45);border-top:2px solid var(--gold);border-bottom:2px solid var(--gold);margin:14px 0;padding:8px 0;font-size:16px;letter-spacing:2px}
-  .marquee span{display:inline-block;padding-left:100%;animation:mq 18s linear infinite;color:var(--gold)}
-  @keyframes mq{to{transform:translateX(-100%)}}
-
-  .wrap{max-width:1280px;margin:0 auto;padding:0 14px 60px}
-
-  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin:18px 0}
-  .kpi{
-    background:rgba(0,0,0,.5);border:3px solid var(--pink);border-radius:18px;
-    padding:16px 10px;text-align:center;
-    box-shadow:0 0 18px rgba(255,47,185,.6), inset 0 0 20px rgba(123,47,247,.35);
+  .logo{display:flex;align-items:center;gap:10px;font-weight:600;font-size:15px;letter-spacing:-.01em}
+  .logo-mark{
+    width:26px;height:26px;border-radius:7px;display:grid;place-items:center;
+    background:linear-gradient(135deg,var(--accent),#8b5cf6);
+    font-size:13px;font-weight:700;color:#fff;
   }
-  .kpi.gold{border-color:var(--gold);box-shadow:0 0 22px rgba(255,215,0,.65), inset 0 0 20px rgba(255,215,0,.2)}
-  .kpi .num{font-size:clamp(24px,4vw,40px);font-weight:900;color:var(--gold);text-shadow:0 0 14px var(--gold)}
-  .kpi.gold .num{color:#fff;text-shadow:0 0 16px var(--gold),0 0 30px var(--gold)}
-  .kpi .lbl{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--cyan);margin-top:4px}
+  .nav .tagline{color:var(--faint);font-size:12px;border-left:1px solid var(--border);padding-left:12px}
+  .nav .spacer{flex:1}
+  .badge-live{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+  .badge-live .dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 0 3px var(--green-soft)}
 
-  .toolbar{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:10px 0 18px}
-  button{
-    font-family:inherit;font-weight:900;font-size:15px;letter-spacing:1px;cursor:pointer;
-    border:none;border-radius:999px;padding:13px 24px;min-height:44px;color:#fff;
-    text-transform:uppercase;transition:transform .12s;
-  }
-  button:hover{transform:scale(1.06) rotate(-1deg)}
-  .btn-add{background:linear-gradient(90deg,var(--pink),var(--purple));box-shadow:0 0 16px var(--pink);border:2px solid #fff;animation:pulse 1.6s infinite}
-  @keyframes pulse{0%,100%{box-shadow:0 0 12px var(--pink)}50%{box-shadow:0 0 28px var(--pink),0 0 40px var(--purple)}}
-  .btn-csv{background:linear-gradient(90deg,#0aa,#0f7);color:#03251c;box-shadow:0 0 12px rgba(0,255,170,.6)}
-  .btn-imp{background:linear-gradient(90deg,#f7b733,#fc4a1a);box-shadow:0 0 12px rgba(252,74,26,.6)}
-  input[type=file]{display:none}
+  .wrap{max-width:1200px;margin:0 auto;padding:28px 24px 64px}
+  .pagehead{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:22px}
+  h1{font-size:20px;font-weight:600;letter-spacing:-.02em}
+  .pagehead p{color:var(--muted);margin-top:4px;font-size:13px}
+
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:12px;margin-bottom:24px}
+  .kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px}
+  .kpi .lbl{font-size:12px;color:var(--muted);margin-bottom:6px}
+  .kpi .num{font-size:22px;font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  .kpi.hl{border-color:rgba(91,140,255,.45);background:linear-gradient(180deg,var(--accent-soft),var(--surface))}
+  .kpi.hl .num{color:var(--accent)}
+  .kpi .sub{font-size:11px;color:var(--faint);margin-top:4px}
+
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
   .search{
-    flex:1 1 200px;min-width:180px;border-radius:999px;border:2px solid var(--cyan);
-    background:rgba(0,0,0,.5);color:#fff;padding:12px 18px;font-family:inherit;font-size:15px;
-    box-shadow:0 0 10px rgba(0,245,255,.4);
+    flex:1 1 220px;min-width:180px;height:36px;background:var(--surface);border:1px solid var(--border);
+    border-radius:8px;color:var(--text);padding:0 12px 0 34px;font-size:13px;font-family:inherit;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%238b93a7' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:11px center;
   }
-  .search::placeholder{color:rgba(0,245,255,.7)}
+  .search:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+  .search::placeholder{color:var(--faint)}
+  button{
+    font-family:inherit;font-size:13px;font-weight:500;cursor:pointer;height:36px;
+    border-radius:8px;padding:0 14px;border:1px solid var(--border);
+    background:var(--surface);color:var(--text);transition:background .12s,border-color .12s;
+    display:inline-flex;align-items:center;gap:7px;
+  }
+  button:hover{background:var(--surface2)}
+  .btn-primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+  .btn-primary:hover{background:#4a7bf0}
+  input[type=file]{display:none}
+  .filelabel{display:inline-flex}
 
-  .tablecard{
-    background:rgba(0,0,0,.55);border:3px solid var(--gold);border-radius:20px;
-    box-shadow:0 0 30px rgba(255,215,0,.4);overflow-x:auto;
-  }
-  table{width:100%;border-collapse:collapse;min-width:1050px}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+  .tablescroll{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;min-width:1020px}
   thead th{
-    position:sticky;top:0;background:linear-gradient(180deg,#3d0066,#12002b);
-    color:var(--gold);text-transform:uppercase;font-size:12px;letter-spacing:2px;
-    padding:14px 10px;border-bottom:3px solid var(--pink);text-shadow:0 0 8px var(--gold);white-space:nowrap;
+    position:sticky;top:0;background:var(--surface2);color:var(--muted);
+    font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;
+    padding:10px 14px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;z-index:1;
   }
-  tbody td{padding:12px 10px;border-bottom:1px solid rgba(255,47,185,.25);font-size:14px;text-align:center}
-  tbody tr:hover{background:rgba(123,47,247,.25)}
-  td.name{font-weight:900;color:#fff;text-align:left}
-  td.mail,td.tel{color:var(--cyan);font-size:13px}
-  tfoot td{padding:14px 10px;font-weight:900;color:var(--gold);background:rgba(255,215,0,.08);border-top:3px solid var(--gold);font-size:16px;text-shadow:0 0 10px var(--gold)}
+  tbody td{padding:11px 14px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle}
+  tbody tr:last-child td{border-bottom:none}
+  tbody tr{transition:background .1s}
+  tbody tr:hover{background:var(--surface2)}
+  td.name{font-weight:600}
+  td .note{font-weight:400;font-size:12px;color:var(--muted);margin-top:2px;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  td.contact{color:var(--muted);font-size:12.5px;line-height:1.5}
+  td.money{font-variant-numeric:tabular-nums;font-weight:600;text-align:right}
+  td.money.win{color:var(--green)}
+  tfoot td{padding:12px 14px;background:var(--surface2);border-top:1px solid var(--border);font-weight:600;font-size:13px;font-variant-numeric:tabular-nums}
 
-  .pill{display:inline-block;padding:5px 12px;border-radius:999px;font-size:12px;font-weight:900;letter-spacing:1px;white-space:nowrap}
-  .p-ja{background:var(--lime);color:#123300;box-shadow:0 0 10px var(--lime)}
-  .p-nein{background:var(--red);color:#fff;box-shadow:0 0 10px var(--red)}
-  .p-offen{background:#555;color:#ddd;border:1px dashed #999}
-  .p-close{background:linear-gradient(90deg,var(--gold),#ffae00);color:#3a2600;box-shadow:0 0 14px var(--gold);animation:pulse2 1.4s infinite}
-  @keyframes pulse2{50%{box-shadow:0 0 26px var(--gold)}}
-  .p-noclose{background:#38003c;color:#ff8fa3;border:1px solid var(--red)}
-  .p-ablefy{background:var(--cyan);color:#00333a;box-shadow:0 0 10px var(--cyan)}
-  .p-contract{background:var(--purple);color:#fff;box-shadow:0 0 10px var(--purple)}
-  .rowbtn{background:none;border:none;font-size:18px;padding:6px;min-height:auto;box-shadow:none}
-  .money{color:var(--lime);font-weight:900;text-shadow:0 0 8px var(--lime);white-space:nowrap}
+  .pill{
+    display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:999px;
+    font-size:12px;font-weight:500;white-space:nowrap;
+  }
+  .pill::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor}
+  .p-green{background:var(--green-soft);color:var(--green)}
+  .p-red{background:var(--red-soft);color:var(--red)}
+  .p-open{background:rgba(139,147,167,.12);color:var(--muted)}
+  .p-accent{background:var(--accent-soft);color:var(--accent)}
+  .p-violet{background:var(--violet-soft);color:var(--violet)}
+  .p-cyan{background:var(--cyan-soft);color:var(--cyan)}
+  .p-amber{background:var(--amber-soft);color:var(--amber)}
 
-  .empty{text-align:center;padding:50px 20px;font-size:20px;color:var(--gold)}
+  .rowactions{display:flex;gap:2px;justify-content:flex-end;opacity:0;transition:opacity .12s}
+  tr:hover .rowactions{opacity:1}
+  .iconbtn{height:28px;width:28px;padding:0;justify-content:center;border:none;background:transparent;color:var(--muted);border-radius:6px}
+  .iconbtn:hover{background:var(--border);color:var(--text)}
+  .iconbtn svg{width:15px;height:15px}
+  .iconbtn.danger:hover{color:var(--red)}
 
-  /* Modal */
-  .overlay{position:fixed;inset:0;background:rgba(10,0,30,.85);display:none;align-items:center;justify-content:center;z-index:50;padding:14px}
+  .empty{text-align:center;padding:56px 20px;color:var(--muted)}
+  .empty .t{font-size:15px;font-weight:600;color:var(--text);margin-bottom:6px}
+
+  .overlay{position:fixed;inset:0;background:rgba(5,7,12,.7);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;z-index:50;padding:16px}
   .overlay.open{display:flex}
   .modal{
-    background:linear-gradient(160deg,#2b0055,#12002b);border:3px solid var(--pink);
-    border-radius:22px;box-shadow:0 0 40px var(--pink);padding:24px;width:100%;max-width:560px;
-    max-height:92vh;overflow-y:auto;
+    background:var(--surface);border:1px solid var(--border);border-radius:14px;
+    padding:22px;width:100%;max-width:540px;max-height:92vh;overflow-y:auto;
+    box-shadow:0 24px 64px rgba(0,0,0,.5);
   }
-  .modal h2{color:var(--gold);text-shadow:0 0 12px var(--gold);text-align:center;margin-bottom:16px;letter-spacing:2px}
+  .modal h2{font-size:16px;font-weight:600;margin-bottom:18px;letter-spacing:-.01em}
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  .field{display:flex;flex-direction:column;gap:5px}
+  .field{display:flex;flex-direction:column;gap:6px}
   .field.full{grid-column:1/-1}
-  label{font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--cyan)}
+  label{font-size:12px;font-weight:500;color:var(--muted)}
   .field input,.field select{
-    background:rgba(0,0,0,.5);border:2px solid var(--purple);border-radius:12px;
-    color:#fff;padding:11px 12px;font-family:inherit;font-size:15px;min-height:44px;
+    background:var(--bg);border:1px solid var(--border);border-radius:8px;
+    color:var(--text);padding:0 11px;height:38px;font-family:inherit;font-size:13.5px;
   }
-  .field input:focus,.field select:focus{outline:none;border-color:var(--gold);box-shadow:0 0 12px rgba(255,215,0,.5)}
-  .modal .actions{display:flex;gap:10px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap}
-  .btn-cancel{background:#444}
-  .btn-save{background:linear-gradient(90deg,var(--gold),#ff9500);color:#3a2600;box-shadow:0 0 14px var(--gold)}
+  .field select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238b93a7' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:30px}
+  .field input:focus,.field select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+  .modal .actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
 
   .toast{
-    position:fixed;bottom:24px;left:50%;transform:translateX(-50%) scale(.8);
-    background:linear-gradient(90deg,var(--pink),var(--purple));color:#fff;font-weight:900;
-    padding:14px 28px;border-radius:999px;border:2px solid var(--gold);
-    box-shadow:0 0 24px var(--pink);opacity:0;transition:.25s;z-index:99;letter-spacing:1px;text-align:center;
+    position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(8px);
+    background:var(--surface2);border:1px solid var(--border);color:var(--text);
+    padding:10px 18px;border-radius:10px;font-size:13px;font-weight:500;
+    box-shadow:0 12px 32px rgba(0,0,0,.45);opacity:0;transition:.2s;z-index:99;pointer-events:none;
   }
-  .toast.show{opacity:1;transform:translateX(-50%) scale(1)}
-  .privacy{text-align:center;font-size:12px;color:rgba(255,255,255,.7);margin-top:26px;line-height:1.6}
-  footer{text-align:center;padding:20px;color:var(--gold);letter-spacing:2px;font-size:13px;text-shadow:0 0 8px var(--gold)}
-  @media(max-width:600px){.grid{grid-template-columns:1fr}}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  .privacy{text-align:center;font-size:12px;color:var(--faint);margin-top:22px;line-height:1.7}
+  @media(max-width:600px){.grid{grid-template-columns:1fr}.nav .tagline{display:none}}
 </style>
 </head>
 <body>
 
-<header>
-  <h1>💎 CLOSER PALACE 💎</h1>
-  <div class="subtitle">🔥 Webinar CRM · Close it like it's hot 🔥</div>
-</header>
-<div class="marquee"><span>💰💰💰 ALWAYS BE CLOSING ★ EVERY LEAD IS A JACKPOT ★ RING THE BELL, BABY ★ ALWAYS BE CLOSING ★ 💰💰💰</span></div>
+<nav class="nav">
+  <div class="logo"><span class="logo-mark">C</span> ClosePilot</div>
+  <div class="tagline">Webinar CRM</div>
+  <div class="spacer"></div>
+  <div class="badge-live"><span class="dot"></span>Lokal gespeichert</div>
+</nav>
 
 <div class="wrap">
+
+  <div class="pagehead">
+    <div>
+      <h1>Leads</h1>
+      <p>Webinar-Teilnehmer, Calls und Abschlüsse an einem Ort.</p>
+    </div>
+    <button class="btn-primary" onclick="App.openModal()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>
+      Neuer Lead
+    </button>
+  </div>
 
   <div class="kpis" id="kpis"></div>
 
   <div class="toolbar">
-    <button class="btn-add" onclick="App.openModal()">✨ Neuer Lead ✨</button>
-    <input class="search" id="search" placeholder="🔍 Suchen: Name, E-Mail, Telefon…" oninput="App.render()">
-    <button class="btn-csv" onclick="App.exportCSV()">📥 CSV Export</button>
-    <label class="btn-imp" style="display:inline-flex;align-items:center"><span>📤 CSV Import</span>
+    <input class="search" id="search" placeholder="Suchen nach Name, E-Mail oder Telefon" oninput="App.render()">
+    <button onclick="App.exportCSV()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+      Export
+    </button>
+    <label class="filelabel"><button style="pointer-events:none">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+      Import</button>
       <input type="file" id="importFile" accept=".csv" onchange="App.importCSV(event)">
     </label>
   </div>
 
-  <div class="tablecard">
-    <table id="tbl">
-      <thead>
-        <tr>
-          <th>Name</th><th>E-Mail</th><th>Telefon</th>
-          <th>Webinar</th><th>1. Call</th><th>2. Call</th>
-          <th>Ergebnis</th><th>Summe</th><th>Abschluss über</th><th></th>
-        </tr>
-      </thead>
-      <tbody id="tbody"></tbody>
-      <tfoot id="tfoot"></tfoot>
-    </table>
-    <div class="empty" id="empty" style="display:none">🌟 Noch keine Leads. Zeit, die Bühne zu rocken! 🌟</div>
+  <div class="card">
+    <div class="tablescroll">
+      <table id="tbl">
+        <thead>
+          <tr>
+            <th>Name</th><th>Kontakt</th>
+            <th>Webinar</th><th>Call 1</th><th>Call 2</th>
+            <th>Ergebnis</th><th style="text-align:right">Summe</th><th>Abschluss über</th><th></th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+        <tfoot id="tfoot"></tfoot>
+      </table>
+    </div>
+    <div class="empty" id="empty" style="display:none">
+      <div class="t">Noch keine Leads</div>
+      Lege den ersten Lead an oder importiere eine CSV-Datei.
+    </div>
   </div>
 
-  <div class="privacy">🔒 Deine Daten bleiben nur in diesem Browser auf diesem Gerät gespeichert.<br>
-  Regelmäßig CSV exportieren als Backup und um Stände mit dem Team zu teilen.</div>
+  <div class="privacy">Deine Daten werden ausschließlich lokal in diesem Browser gespeichert.<br>
+  Exportiere regelmäßig eine CSV als Backup und um Stände mit dem Team zu teilen.</div>
 </div>
 
 <div class="overlay" id="overlay" onclick="if(event.target===this)App.closeModal()">
   <div class="modal">
-    <h2 id="modalTitle">✨ Neuer Lead ✨</h2>
+    <h2 id="modalTitle">Neuer Lead</h2>
     <div class="grid">
       <div class="field full"><label>Name</label><input id="f_name" placeholder="Max Mustermann"></div>
       <div class="field"><label>E-Mail</label><input id="f_email" type="email" placeholder="max@mail.de"></div>
       <div class="field"><label>Telefonnummer</label><input id="f_tel" placeholder="+49 …"></div>
       <div class="field"><label>Webinar</label>
-        <select id="f_webinar"><option value="offen">Offen</option><option value="erschienen">Erschienen 🎉</option><option value="nicht">Nicht erschienen 👻</option></select>
+        <select id="f_webinar"><option value="offen">Offen</option><option value="erschienen">Erschienen</option><option value="nicht">Nicht erschienen</option></select>
       </div>
-      <div class="field"><label>1. Call</label>
-        <select id="f_call1"><option value="offen">Offen</option><option value="done">Stattgefunden ☎️</option><option value="noshow">No-Show 👻</option></select>
+      <div class="field"><label>Call 1</label>
+        <select id="f_call1"><option value="offen">Offen</option><option value="done">Stattgefunden</option><option value="noshow">No-Show</option></select>
       </div>
-      <div class="field"><label>2. Call</label>
-        <select id="f_call2"><option value="offen">Offen</option><option value="done">Stattgefunden ☎️</option><option value="noshow">No-Show 👻</option></select>
+      <div class="field"><label>Call 2</label>
+        <select id="f_call2"><option value="offen">Offen</option><option value="done">Stattgefunden</option><option value="noshow">No-Show</option></select>
       </div>
       <div class="field"><label>Ergebnis</label>
-        <select id="f_result"><option value="offen">Offen</option><option value="close">CLOSE 💰</option><option value="noclose">No Close 💔</option></select>
+        <select id="f_result"><option value="offen">Offen</option><option value="close">Close</option><option value="noclose">No Close</option></select>
       </div>
       <div class="field"><label>Summe (€)</label><input id="f_sum" type="number" min="0" step="0.01" placeholder="0"></div>
       <div class="field"><label>Abschluss über</label>
-        <select id="f_via"><option value="">–</option><option value="ablefy">Ablefy</option><option value="contract">Contract</option></select>
+        <select id="f_via"><option value="">Kein Abschluss</option><option value="ablefy">Ablefy</option><option value="contract">Contract</option></select>
       </div>
-      <div class="field full"><label>Notiz</label><input id="f_note" placeholder="Einwände, Follow-up, Vibes…"></div>
+      <div class="field full"><label>Notiz</label><input id="f_note" placeholder="Einwände, Follow-up, Details"></div>
     </div>
     <div class="actions">
-      <button class="btn-cancel" onclick="App.closeModal()">Abbrechen</button>
-      <button class="btn-save" onclick="App.save()">💾 Speichern</button>
+      <button onclick="App.closeModal()">Abbrechen</button>
+      <button class="btn-primary" onclick="App.save()">Speichern</button>
     </div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
-<footer>💎 CLOSER PALACE · Viel Erfolg beim Webinar! 💎</footer>
 
 <script>
 const App = (() => {
@@ -217,10 +255,10 @@ const App = (() => {
   const eur = n => (Number(n)||0).toLocaleString('de-DE',{style:'currency',currency:'EUR'});
 
   const PILLS = {
-    webinar:{erschienen:['p-ja','ERSCHIENEN 🎉'], nicht:['p-nein','NICHT DA 👻'], offen:['p-offen','offen']},
-    call:{done:['p-ja','☎️ DONE'], noshow:['p-nein','NO-SHOW'], offen:['p-offen','offen']},
-    result:{close:['p-close','💰 CLOSE 💰'], noclose:['p-noclose','No Close'], offen:['p-offen','offen']},
-    via:{ablefy:['p-ablefy','ABLEFY'], contract:['p-contract','CONTRACT'], '':['p-offen','–']}
+    webinar:{erschienen:['p-green','Erschienen'], nicht:['p-red','Nicht erschienen'], offen:['p-open','Offen']},
+    call:{done:['p-accent','Stattgefunden'], noshow:['p-amber','No-Show'], offen:['p-open','Offen']},
+    result:{close:['p-green','Close'], noclose:['p-red','No Close'], offen:['p-open','Offen']},
+    via:{ablefy:['p-cyan','Ablefy'], contract:['p-violet','Contract'], '':['p-open','–']}
   };
   const pill = (map,val) => { const [cls,txt] = map[val] || map.offen || map['']; return `<span class="pill ${cls}">${txt}</span>`; };
 
@@ -232,11 +270,15 @@ const App = (() => {
     const closes = leads.filter(l=>l.result==='close');
     const sum = closes.reduce((a,l)=>a+(Number(l.sum)||0),0);
     const rate = total ? Math.round(closes.length/total*100) : 0;
+    const showRate = total ? Math.round(shown/total*100) : 0;
     document.getElementById('kpis').innerHTML = [
-      ['👥',total,'Leads'],['🎉',shown,'Erschienen'],['☎️',c1,'1. Calls'],['📞',c2,'2. Calls'],
-      ['💰',closes.length,'Closes'],['📈',rate+'%','Close-Rate'],
-    ].map(([i,n,l])=>`<div class="kpi"><div class="num">${i} ${n}</div><div class="lbl">${l}</div></div>`).join('')
-    + `<div class="kpi gold"><div class="num">💎 ${eur(sum)}</div><div class="lbl">Cash Collected</div></div>`;
+      ['Leads', total, ''],
+      ['Erschienen', shown, showRate+'% Show-Rate'],
+      ['Call 1', c1, ''],
+      ['Call 2', c2, ''],
+      ['Closes', closes.length, rate+'% Close-Rate'],
+    ].map(([l,n,s])=>`<div class="kpi"><div class="lbl">${l}</div><div class="num">${n}</div>${s?`<div class="sub">${s}</div>`:''}</div>`).join('')
+    + `<div class="kpi hl"><div class="lbl">Umsatz</div><div class="num">${eur(sum)}</div><div class="sub">aus Closes</div></div>`;
   }
 
   function render(){
@@ -248,28 +290,33 @@ const App = (() => {
     document.getElementById('tbl').style.display = rows.length ? 'table':'none';
     tbody.innerHTML = rows.map(l=>`
       <tr>
-        <td class="name">${esc(l.name)}${l.note?`<div style="font-weight:400;font-size:12px;color:#ffb3e6">📝 ${esc(l.note)}</div>`:''}</td>
-        <td class="mail">${esc(l.email)}</td>
-        <td class="tel">${esc(l.tel)}</td>
+        <td class="name">${esc(l.name)}${l.note?`<div class="note" title="${esc(l.note)}">${esc(l.note)}</div>`:''}</td>
+        <td class="contact">${esc(l.email)}${l.email&&l.tel?'<br>':''}${esc(l.tel)}</td>
         <td>${pill(PILLS.webinar,l.webinar)}</td>
         <td>${pill(PILLS.call,l.call1)}</td>
         <td>${pill(PILLS.call,l.call2)}</td>
         <td>${pill(PILLS.result,l.result)}</td>
-        <td class="money">${l.result==='close' ? eur(l.sum) : '–'}</td>
+        <td class="money ${l.result==='close'?'win':''}">${l.result==='close' ? eur(l.sum) : '–'}</td>
         <td>${pill(PILLS.via,l.via||'')}</td>
-        <td style="white-space:nowrap">
-          <button class="rowbtn" title="Bearbeiten" onclick="App.openModal('${l.id}')">✏️</button>
-          <button class="rowbtn" title="Löschen" onclick="App.del('${l.id}')">🗑️</button>
+        <td>
+          <div class="rowactions">
+            <button class="iconbtn" title="Bearbeiten" onclick="App.openModal('${l.id}')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+            </button>
+            <button class="iconbtn danger" title="Löschen" onclick="App.del('${l.id}')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>
+            </button>
+          </div>
         </td>
       </tr>`).join('');
     const sum = rows.filter(l=>l.result==='close').reduce((a,l)=>a+(Number(l.sum)||0),0);
     document.getElementById('tfoot').innerHTML =
-      `<tr><td colspan="7" style="text-align:right">💰 GESAMT (Closes):</td><td class="money">${eur(sum)}</td><td colspan="2"></td></tr>`;
+      `<tr><td colspan="6" style="text-align:right;color:var(--muted);font-weight:500">Gesamt aus Closes</td><td class="money win" style="color:var(--green)">${eur(sum)}</td><td colspan="2"></td></tr>`;
   }
 
   function openModal(id){
     editId = id || null;
-    document.getElementById('modalTitle').textContent = id ? '✏️ Lead bearbeiten' : '✨ Neuer Lead ✨';
+    document.getElementById('modalTitle').textContent = id ? 'Lead bearbeiten' : 'Neuer Lead';
     const l = leads.find(x=>x.id===id) || {webinar:'offen',call1:'offen',call2:'offen',result:'offen',via:''};
     for (const [f,k] of [['f_name','name'],['f_email','email'],['f_tel','tel'],['f_webinar','webinar'],
       ['f_call1','call1'],['f_call2','call2'],['f_result','result'],['f_sum','sum'],['f_via','via'],['f_note','note']])
@@ -281,35 +328,23 @@ const App = (() => {
 
   function save(){
     const v = f => document.getElementById(f).value.trim();
-    if(!v('f_name')) return toast('⚠️ Name fehlt!');
+    if(!v('f_name')) return toast('Bitte einen Namen eingeben');
     const data = {name:v('f_name'),email:v('f_email'),tel:v('f_tel'),webinar:v('f_webinar'),
       call1:v('f_call1'),call2:v('f_call2'),result:v('f_result'),sum:v('f_sum'),via:v('f_via'),note:v('f_note')};
-    if(editId){ Object.assign(leads.find(x=>x.id===editId), data); toast('✏️ Gespeichert!'); }
-    else { leads.unshift({id:'l'+leads.length+'_'+Math.abs([...JSON.stringify(data)+performance.now()].reduce((a,c)=>a*31+c.charCodeAt(0)|0,7)), ...data}); toast('🎉 Lead angelegt!'); }
-    if(data.result==='close') confetti();
+    if(editId){ Object.assign(leads.find(x=>x.id===editId), data); toast('Änderungen gespeichert'); }
+    else { leads.unshift({id:'l'+leads.length+'_'+Math.abs([...JSON.stringify(data)+performance.now()].reduce((a,c)=>a*31+c.charCodeAt(0)|0,7)), ...data}); toast('Lead angelegt'); }
     persist(); render(); closeModal();
   }
 
   function del(id){
     const l = leads.find(x=>x.id===id);
     if(!confirm(`"${l?.name}" wirklich löschen?`)) return;
-    leads = leads.filter(x=>x.id!==id); persist(); render(); toast('🗑️ Gelöscht');
+    leads = leads.filter(x=>x.id!==id); persist(); render(); toast('Lead gelöscht');
   }
 
   function toast(msg){
     const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show');
     clearTimeout(t._h); t._h = setTimeout(()=>t.classList.remove('show'), 2200);
-  }
-
-  function confetti(){
-    const chars=['✨','💰','💎','🎉','⭐','🍾'];
-    for(let i=0;i<40;i++){
-      const s=document.createElement('div'); s.className='sparkle';
-      s.textContent=chars[i%chars.length];
-      s.style.left=(i*2.5)%100+'%'; s.style.top='-5vh';
-      s.style.animationDuration=(1.5+(i%10)/5)+'s'; s.style.animationDelay=(i%20)/20+'s';
-      document.body.appendChild(s); setTimeout(()=>s.remove(),4000);
-    }
   }
 
   // CSV: Semikolon + BOM für deutsches Excel
@@ -320,21 +355,21 @@ const App = (() => {
     const lines=[COLS.map(c=>q(c[1])).join(';'), ...leads.map(l=>COLS.map(c=>q(l[c[0]])).join(';'))];
     const blob=new Blob(['﻿'+lines.join('\r\n')],{type:'text/csv;charset=utf-8'});
     const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
-    a.download='closer-palace-export.csv'; a.click(); URL.revokeObjectURL(a.href);
-    toast('📥 CSV exportiert!');
+    a.download='closepilot-export.csv'; a.click(); URL.revokeObjectURL(a.href);
+    toast('CSV exportiert');
   }
   function importCSV(ev){
     const file=ev.target.files[0]; if(!file) return;
     const r=new FileReader();
     r.onload=()=>{
       const rows=parseCSV(r.result.replace(/^﻿/,''));
-      if(rows.length<2) return toast('⚠️ Keine Daten in der CSV');
+      if(rows.length<2) return toast('Keine Daten in der CSV gefunden');
       const imported=rows.slice(1).filter(c=>c[0]).map((c,i)=>{
         const o={id:'imp'+i+'_'+c[0].length+'_'+leads.length};
         COLS.forEach(([k],j)=>o[k]=c[j]??''); return o;
       });
       leads=[...imported,...leads]; persist(); render();
-      toast(`📤 ${imported.length} Leads importiert!`);
+      toast(`${imported.length} Leads importiert`);
       ev.target.value='';
     };
     r.readAsText(file,'utf-8');
