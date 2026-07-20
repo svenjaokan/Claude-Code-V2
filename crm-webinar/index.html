@@ -37,13 +37,21 @@
   }
   .nav .tagline{color:var(--faint);font-size:12px;border-left:1px solid var(--border);padding-left:12px}
   .nav .spacer{flex:1}
-  .badge-live{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
-  .badge-live .dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 0 3px var(--green-soft)}
+  .userchip{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted)}
+  .userchip .dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 0 3px var(--green-soft)}
+  .adminbadge{background:var(--violet-soft);color:var(--violet);border-radius:999px;padding:2px 8px;font-size:11px;font-weight:600}
+  .btn-logout{height:30px;padding:0 10px;font-size:12px}
 
-  .wrap{max-width:1200px;margin:0 auto;padding:28px 24px 64px}
+  .wrap{max-width:1240px;margin:0 auto;padding:28px 24px 64px}
   .pagehead{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:22px}
   h1{font-size:20px;font-weight:600;letter-spacing:-.02em}
   .pagehead p{color:var(--muted);margin-top:4px;font-size:13px}
+
+  .notice{
+    background:var(--amber-soft);border:1px solid rgba(255,180,84,.4);color:var(--amber);
+    border-radius:var(--radius);padding:12px 16px;font-size:13px;margin-bottom:18px;line-height:1.6;
+  }
+  .notice b{font-weight:600}
 
   .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:12px;margin-bottom:24px}
   .kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px}
@@ -55,13 +63,20 @@
 
   .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
   .search{
-    flex:1 1 220px;min-width:180px;height:36px;background:var(--surface);border:1px solid var(--border);
+    flex:1 1 200px;min-width:170px;height:36px;background:var(--surface);border:1px solid var(--border);
     border-radius:8px;color:var(--text);padding:0 12px 0 34px;font-size:13px;font-family:inherit;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%238b93a7' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");
     background-repeat:no-repeat;background-position:11px center;
   }
   .search:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
   .search::placeholder{color:var(--faint)}
+  select.filter{
+    height:36px;background:var(--surface);border:1px solid var(--border);border-radius:8px;
+    color:var(--text);padding:0 30px 0 11px;font-size:13px;font-family:inherit;appearance:none;cursor:pointer;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238b93a7' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:right 10px center;
+  }
+  select.filter:focus{outline:none;border-color:var(--accent)}
   button{
     font-family:inherit;font-size:13px;font-weight:500;cursor:pointer;height:36px;
     border-radius:8px;padding:0 14px;border:1px solid var(--border);
@@ -76,18 +91,21 @@
 
   .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
   .tablescroll{overflow-x:auto}
-  table{width:100%;border-collapse:collapse;min-width:1020px}
+  table{width:100%;border-collapse:collapse;min-width:1120px}
   thead th{
     position:sticky;top:0;background:var(--surface2);color:var(--muted);
     font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;
     padding:10px 14px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;z-index:1;
   }
+  th.sortable{cursor:pointer;user-select:none}
+  th.sortable:hover{color:var(--text)}
+  th .arrow{font-size:10px;margin-left:4px;color:var(--accent)}
   tbody td{padding:11px 14px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle}
   tbody tr:last-child td{border-bottom:none}
   tbody tr{transition:background .1s}
   tbody tr:hover{background:var(--surface2)}
   td.name{font-weight:600}
-  td .note{font-weight:400;font-size:12px;color:var(--muted);margin-top:2px;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  td .note{font-weight:400;font-size:12px;color:var(--muted);margin-top:2px;max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   td.contact{color:var(--muted);font-size:12.5px;line-height:1.5}
   td.money{font-variant-numeric:tabular-nums;font-weight:600;text-align:right}
   td.money.win{color:var(--green)}
@@ -136,6 +154,17 @@
   .field input:focus,.field select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
   .modal .actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
 
+  /* Auth screen */
+  .authwrap{min-height:calc(100vh - 56px);display:flex;align-items:center;justify-content:center;padding:20px}
+  .authcard{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:28px;width:100%;max-width:380px}
+  .authcard h2{font-size:18px;font-weight:600;margin-bottom:6px;letter-spacing:-.01em}
+  .authcard p{color:var(--muted);font-size:13px;margin-bottom:18px;line-height:1.6}
+  .authcard .field{margin-bottom:12px}
+  .authcard .btn-primary{width:100%;justify-content:center;margin-top:6px}
+  .authswitch{text-align:center;margin-top:14px;font-size:12.5px;color:var(--muted)}
+  .authswitch a{color:var(--accent);cursor:pointer;text-decoration:none}
+  .autherr{color:var(--red);font-size:12.5px;margin-top:10px;line-height:1.5;display:none}
+
   .toast{
     position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(8px);
     background:var(--surface2);border:1px solid var(--border);color:var(--text);
@@ -143,7 +172,6 @@
     box-shadow:0 12px 32px rgba(0,0,0,.45);opacity:0;transition:.2s;z-index:99;pointer-events:none;
   }
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-
   .privacy{text-align:center;font-size:12px;color:var(--faint);margin-top:22px;line-height:1.7}
   @media(max-width:600px){.grid{grid-template-columns:1fr}.nav .tagline{display:none}}
 </style>
@@ -154,10 +182,36 @@
   <div class="logo"><span class="logo-mark">C</span> ClosePilot</div>
   <div class="tagline">Webinar CRM</div>
   <div class="spacer"></div>
-  <div class="badge-live"><span class="dot"></span>Lokal gespeichert</div>
+  <div class="userchip" id="userchip" style="display:none">
+    <span class="dot"></span><span id="userEmail"></span>
+    <span class="adminbadge" id="adminBadge" style="display:none">Admin</span>
+    <button class="btn-logout" onclick="App.logout()">Abmelden</button>
+  </div>
+  <div class="userchip" id="localchip" style="display:none"><span class="dot" style="background:var(--amber);box-shadow:0 0 0 3px var(--amber-soft)"></span>Lokaler Modus</div>
 </nav>
 
-<div class="wrap">
+<!-- Login -->
+<div class="authwrap" id="authview" style="display:none">
+  <div class="authcard">
+    <h2 id="authTitle">Anmelden</h2>
+    <p id="authSub">Melde dich mit deinem Team-Zugang an.</p>
+    <div class="field"><label>E-Mail</label><input id="a_email" type="email" placeholder="du@mail.de" autocomplete="username"></div>
+    <div class="field"><label>Passwort</label><input id="a_pass" type="password" placeholder="Mindestens 6 Zeichen" autocomplete="current-password"></div>
+    <button class="btn-primary" id="authBtn" onclick="App.auth()">Anmelden</button>
+    <div class="autherr" id="authErr"></div>
+    <div class="authswitch" id="switchToSignup">Noch kein Konto? <a onclick="App.toggleAuthMode()">Registrieren</a></div>
+    <div class="authswitch" id="switchToLogin" style="display:none">Schon registriert? <a onclick="App.toggleAuthMode()">Anmelden</a></div>
+  </div>
+</div>
+
+<!-- App -->
+<div class="wrap" id="appview" style="display:none">
+
+  <div class="notice" id="localNotice" style="display:none">
+    <b>Lokaler Modus:</b> Die App ist noch nicht mit der Supabase-Datenbank verbunden.
+    Einträge werden nur in diesem Browser gespeichert. Sobald die Zugangsdaten eingetragen
+    sind, arbeiten alle im Team auf denselben Daten.
+  </div>
 
   <div class="pagehead">
     <div>
@@ -174,6 +228,26 @@
 
   <div class="toolbar">
     <input class="search" id="search" placeholder="Suchen nach Name, E-Mail oder Telefon" oninput="App.render()">
+    <select class="filter" id="f_filter_result" onchange="App.render()">
+      <option value="">Ergebnis: Alle</option>
+      <option value="close">Nur Close</option>
+      <option value="noclose">Nur No Close</option>
+      <option value="offen">Nur Offen</option>
+    </select>
+    <select class="filter" id="f_filter_paid" onchange="App.render()">
+      <option value="">Bezahlt: Alle</option>
+      <option value="ja">Bezahlt</option>
+      <option value="nein">Nicht bezahlt</option>
+      <option value="offen">Offen</option>
+    </select>
+    <select class="filter" id="f_sort" onchange="App.setSortFromSelect()">
+      <option value="created_desc">Neueste zuerst</option>
+      <option value="sum_desc">Umsatz: Hoch → Niedrig</option>
+      <option value="sum_asc">Umsatz: Niedrig → Hoch</option>
+      <option value="result_desc">Close zuerst</option>
+      <option value="paid_desc">Bezahlt zuerst</option>
+      <option value="name_asc">Name A → Z</option>
+    </select>
     <button onclick="App.exportCSV()">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
       Export
@@ -190,9 +264,14 @@
       <table id="tbl">
         <thead>
           <tr>
-            <th>Name</th><th>Kontakt</th>
-            <th>Webinar</th><th>Call 1</th><th>Call 2</th>
-            <th>Ergebnis</th><th style="text-align:right">Summe</th><th>Abschluss über</th><th></th>
+            <th class="sortable" onclick="App.sortBy('name')">Name<span class="arrow" id="ar_name"></span></th>
+            <th>Kontakt</th>
+            <th class="sortable" onclick="App.sortBy('webinar')">Webinar<span class="arrow" id="ar_webinar"></span></th>
+            <th>Call 1</th><th>Call 2</th>
+            <th class="sortable" onclick="App.sortBy('result')">Ergebnis<span class="arrow" id="ar_result"></span></th>
+            <th class="sortable" style="text-align:right" onclick="App.sortBy('sum')">Summe<span class="arrow" id="ar_sum"></span></th>
+            <th class="sortable" onclick="App.sortBy('paid')">Bezahlt<span class="arrow" id="ar_paid"></span></th>
+            <th>Abschluss über</th><th></th>
           </tr>
         </thead>
         <tbody id="tbody"></tbody>
@@ -205,8 +284,7 @@
     </div>
   </div>
 
-  <div class="privacy">Deine Daten werden ausschließlich lokal in diesem Browser gespeichert.<br>
-  Exportiere regelmäßig eine CSV als Backup und um Stände mit dem Team zu teilen.</div>
+  <div class="privacy" id="privacyNote"></div>
 </div>
 
 <div class="overlay" id="overlay" onclick="if(event.target===this)App.closeModal()">
@@ -232,6 +310,9 @@
       <div class="field"><label>Abschluss über</label>
         <select id="f_via"><option value="">Kein Abschluss</option><option value="ablefy">Ablefy</option><option value="contract">Contract</option></select>
       </div>
+      <div class="field"><label>Bezahlt</label>
+        <select id="f_paid"><option value="offen">Offen</option><option value="ja">Bezahlt</option><option value="nein">Nicht bezahlt</option></select>
+      </div>
       <div class="field full"><label>Notiz</label><input id="f_note" placeholder="Einwände, Follow-up, Details"></div>
     </div>
     <div class="actions">
@@ -243,21 +324,121 @@
 
 <div class="toast" id="toast"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
+/* ============================================================
+   KONFIGURATION — nach dem Supabase-Setup hier eintragen.
+   Solange die Platzhalter drinstehen, läuft die App im lokalen
+   Modus (Daten nur in diesem Browser, kein Login).
+   ============================================================ */
+const SUPABASE_URL = 'PASTE_SUPABASE_URL';
+const SUPABASE_ANON_KEY = 'PASTE_SUPABASE_ANON_KEY';
+
 const App = (() => {
   const KEY = 'closer_palace_crm_v1';
-  let leads = load();
-  let editId = null;
+  const CLOUD = SUPABASE_URL.startsWith('https://') && !SUPABASE_ANON_KEY.includes('PASTE');
+  const sb = CLOUD ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
-  function load(){ try{ return JSON.parse(localStorage.getItem(KEY)) || []; }catch(e){ return []; } }
-  function persist(){ localStorage.setItem(KEY, JSON.stringify(leads)); }
+  let leads = [];
+  let editId = null;
+  let user = null, isAdmin = false;
+  let sort = {key:'created', dir:'desc'};
+  let signupMode = false;
+
+  const $ = id => document.getElementById(id);
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const eur = n => (Number(n)||0).toLocaleString('de-DE',{style:'currency',currency:'EUR'});
 
+  /* ---------- Storage (lokal vs. Supabase) ---------- */
+  const localLoad = () => { try{ return JSON.parse(localStorage.getItem(KEY)) || []; }catch(e){ return []; } };
+  const localSave = () => localStorage.setItem(KEY, JSON.stringify(leads));
+
+  async function fetchLeads(){
+    if(!CLOUD){ leads = localLoad(); return; }
+    const {data,error} = await sb.from('leads').select('*').order('created_at',{ascending:false});
+    if(error){ toast('Fehler beim Laden: '+error.message); return; }
+    leads = data;
+  }
+  async function upsertLead(data, id){
+    if(!CLOUD){
+      if(id){ Object.assign(leads.find(x=>x.id===id), data); }
+      else leads.unshift({id:'l'+leads.length+'_'+Math.abs([...JSON.stringify(data)+performance.now()].reduce((a,c)=>a*31+c.charCodeAt(0)|0,7)), ...data});
+      localSave(); return true;
+    }
+    const q = id ? sb.from('leads').update(data).eq('id',id) : sb.from('leads').insert({...data, created_by_email:user?.email||''});
+    const {error} = await q;
+    if(error){ toast('Fehler beim Speichern: '+error.message); return false; }
+    await fetchLeads(); return true;
+  }
+  async function deleteLead(id){
+    if(!CLOUD){ leads = leads.filter(x=>x.id!==id); localSave(); return true; }
+    const {error} = await sb.from('leads').delete().eq('id',id);
+    if(error){ toast(error.code==='42501'||error.message.includes('policy') ? 'Nur Admins können löschen' : 'Fehler: '+error.message); return false; }
+    await fetchLeads(); return true;
+  }
+
+  /* ---------- Auth ---------- */
+  async function initAuth(){
+    if(!CLOUD){
+      $('localchip').style.display='flex'; $('localNotice').style.display='block';
+      $('privacyNote').innerHTML='Lokaler Modus: Daten bleiben in diesem Browser. Regelmäßig CSV exportieren als Backup.';
+      showApp(); return;
+    }
+    $('privacyNote').innerHTML='Alle Eingaben werden zentral und sicher in der Team-Datenbank gespeichert.';
+    const {data:{session}} = await sb.auth.getSession();
+    if(session){ await onLogin(session.user); } else showAuth();
+    sb.auth.onAuthStateChange((_e, s)=>{ if(!s && user){ user=null; showAuth(); } });
+  }
+  async function onLogin(u){
+    user = u;
+    const {data} = await sb.from('allowed_users').select('is_admin').eq('email',u.email).maybeSingle();
+    if(!data){
+      await sb.auth.signOut();
+      authError('Diese E-Mail ist nicht für das Team freigeschaltet. Melde dich bei Svenja.');
+      showAuth(); return;
+    }
+    isAdmin = !!data.is_admin;
+    $('userEmail').textContent = u.email;
+    $('adminBadge').style.display = isAdmin ? 'inline-block' : 'none';
+    $('userchip').style.display='flex';
+    showApp();
+    subscribeRealtime();
+  }
+  function subscribeRealtime(){
+    sb.channel('leads-live').on('postgres_changes',{event:'*',schema:'public',table:'leads'},
+      async ()=>{ await fetchLeads(); render(); }).subscribe();
+  }
+  async function auth(){
+    const email = $('a_email').value.trim(), pass = $('a_pass').value;
+    if(!email || pass.length<6) return authError('Bitte E-Mail und Passwort (mind. 6 Zeichen) eingeben.');
+    $('authBtn').disabled = true;
+    const fn = signupMode ? sb.auth.signUp({email,password:pass}) : sb.auth.signInWithPassword({email,password:pass});
+    const {data,error} = await fn;
+    $('authBtn').disabled = false;
+    if(error) return authError(error.message.includes('Invalid login') ? 'E-Mail oder Passwort falsch.' : error.message);
+    if(signupMode && !data.session) return authError('Konto angelegt. Bitte bestätige die E-Mail in deinem Postfach und melde dich dann an.');
+    await onLogin(data.session.user);
+  }
+  async function logout(){ await sb.auth.signOut(); user=null; showAuth(); }
+  function toggleAuthMode(){
+    signupMode = !signupMode;
+    $('authTitle').textContent = signupMode ? 'Registrieren' : 'Anmelden';
+    $('authSub').textContent = signupMode ? 'Nur freigeschaltete Team-E-Mails erhalten Zugriff.' : 'Melde dich mit deinem Team-Zugang an.';
+    $('authBtn').textContent = signupMode ? 'Konto erstellen' : 'Anmelden';
+    $('switchToSignup').style.display = signupMode ? 'none':'block';
+    $('switchToLogin').style.display = signupMode ? 'block':'none';
+    $('authErr').style.display='none';
+  }
+  function authError(msg){ const e=$('authErr'); e.textContent=msg; e.style.display='block'; }
+  function showAuth(){ $('authview').style.display='flex'; $('appview').style.display='none'; $('userchip').style.display='none'; }
+  async function showApp(){ $('authview').style.display='none'; $('appview').style.display='block'; await fetchLeads(); render(); }
+
+  /* ---------- UI ---------- */
   const PILLS = {
     webinar:{erschienen:['p-green','Erschienen'], nicht:['p-red','Nicht erschienen'], offen:['p-open','Offen']},
     call:{done:['p-accent','Stattgefunden'], noshow:['p-amber','No-Show'], offen:['p-open','Offen']},
     result:{close:['p-green','Close'], noclose:['p-red','No Close'], offen:['p-open','Offen']},
+    paid:{ja:['p-green','Bezahlt'], nein:['p-red','Nicht bezahlt'], offen:['p-open','Offen']},
     via:{ablefy:['p-cyan','Ablefy'], contract:['p-violet','Contract'], '':['p-open','–']}
   };
   const pill = (map,val) => { const [cls,txt] = map[val] || map.offen || map['']; return `<span class="pill ${cls}">${txt}</span>`; };
@@ -265,30 +446,56 @@ const App = (() => {
   function kpis(){
     const total = leads.length;
     const shown = leads.filter(l=>l.webinar==='erschienen').length;
-    const c1 = leads.filter(l=>l.call1==='done').length;
-    const c2 = leads.filter(l=>l.call2==='done').length;
     const closes = leads.filter(l=>l.result==='close');
     const sum = closes.reduce((a,l)=>a+(Number(l.sum)||0),0);
+    const paidSum = closes.filter(l=>l.paid==='ja').reduce((a,l)=>a+(Number(l.sum)||0),0);
     const rate = total ? Math.round(closes.length/total*100) : 0;
     const showRate = total ? Math.round(shown/total*100) : 0;
-    document.getElementById('kpis').innerHTML = [
+    $('kpis').innerHTML = [
       ['Leads', total, ''],
       ['Erschienen', shown, showRate+'% Show-Rate'],
-      ['Call 1', c1, ''],
-      ['Call 2', c2, ''],
       ['Closes', closes.length, rate+'% Close-Rate'],
+      ['Offen (unbezahlt)', eur(sum-paidSum), 'aus Closes'],
     ].map(([l,n,s])=>`<div class="kpi"><div class="lbl">${l}</div><div class="num">${n}</div>${s?`<div class="sub">${s}</div>`:''}</div>`).join('')
-    + `<div class="kpi hl"><div class="lbl">Umsatz</div><div class="num">${eur(sum)}</div><div class="sub">aus Closes</div></div>`;
+    + `<div class="kpi hl"><div class="lbl">Umsatz gesamt</div><div class="num">${eur(sum)}</div><div class="sub">davon bezahlt: ${eur(paidSum)}</div></div>`;
+  }
+
+  const ORDER = {result:{close:2,noclose:1,offen:0}, paid:{ja:2,nein:1,offen:0}, webinar:{erschienen:2,nicht:1,offen:0}};
+  function sortRows(rows){
+    const {key,dir} = sort, m = dir==='asc'?1:-1;
+    return [...rows].sort((a,b)=>{
+      let va, vb;
+      if(key==='sum'){ va=Number(a.sum)||0; vb=Number(b.sum)||0; }
+      else if(key==='name'){ return m * String(a.name||'').localeCompare(String(b.name||''),'de'); }
+      else if(ORDER[key]){ va=ORDER[key][a[key]]??0; vb=ORDER[key][b[key]]??0; }
+      else { va=a.created_at||a.id||''; vb=b.created_at||b.id||''; return m*(va<vb?-1:va>vb?1:0); }
+      return m*(va-vb);
+    });
+  }
+  function sortBy(key){
+    sort = sort.key===key ? {key, dir:sort.dir==='asc'?'desc':'asc'} : {key, dir:key==='name'?'asc':'desc'};
+    render();
+  }
+  function setSortFromSelect(){
+    const [key,dir] = $('f_sort').value.split('_');
+    sort = {key:key==='created'?'created':key, dir};
+    render();
   }
 
   function render(){
     kpis();
-    const q = (document.getElementById('search').value||'').toLowerCase();
-    const rows = leads.filter(l => !q || [l.name,l.email,l.tel].join(' ').toLowerCase().includes(q));
-    const tbody = document.getElementById('tbody');
-    document.getElementById('empty').style.display = rows.length ? 'none':'block';
-    document.getElementById('tbl').style.display = rows.length ? 'table':'none';
-    tbody.innerHTML = rows.map(l=>`
+    const q = ($('search').value||'').toLowerCase();
+    const fr = $('f_filter_result').value, fp = $('f_filter_paid').value;
+    let rows = leads.filter(l =>
+      (!q || [l.name,l.email,l.tel].join(' ').toLowerCase().includes(q)) &&
+      (!fr || l.result===fr) && (!fp || (l.paid||'offen')===fp));
+    rows = sortRows(rows);
+    ['name','webinar','result','sum','paid'].forEach(k=>{
+      $('ar_'+k).textContent = sort.key===k ? (sort.dir==='asc'?'▲':'▼') : '';
+    });
+    $('empty').style.display = rows.length ? 'none':'block';
+    $('tbl').style.display = rows.length ? 'table':'none';
+    $('tbody').innerHTML = rows.map(l=>`
       <tr>
         <td class="name">${esc(l.name)}${l.note?`<div class="note" title="${esc(l.note)}">${esc(l.note)}</div>`:''}</td>
         <td class="contact">${esc(l.email)}${l.email&&l.tel?'<br>':''}${esc(l.tel)}</td>
@@ -297,59 +504,59 @@ const App = (() => {
         <td>${pill(PILLS.call,l.call2)}</td>
         <td>${pill(PILLS.result,l.result)}</td>
         <td class="money ${l.result==='close'?'win':''}">${l.result==='close' ? eur(l.sum) : '–'}</td>
+        <td>${pill(PILLS.paid,l.paid||'offen')}</td>
         <td>${pill(PILLS.via,l.via||'')}</td>
         <td>
           <div class="rowactions">
             <button class="iconbtn" title="Bearbeiten" onclick="App.openModal('${l.id}')">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
             </button>
-            <button class="iconbtn danger" title="Löschen" onclick="App.del('${l.id}')">
+            ${(!CLOUD || isAdmin)?`<button class="iconbtn danger" title="Löschen" onclick="App.del('${l.id}')">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>
-            </button>
+            </button>`:''}
           </div>
         </td>
       </tr>`).join('');
     const sum = rows.filter(l=>l.result==='close').reduce((a,l)=>a+(Number(l.sum)||0),0);
-    document.getElementById('tfoot').innerHTML =
-      `<tr><td colspan="6" style="text-align:right;color:var(--muted);font-weight:500">Gesamt aus Closes</td><td class="money win" style="color:var(--green)">${eur(sum)}</td><td colspan="2"></td></tr>`;
+    $('tfoot').innerHTML =
+      `<tr><td colspan="6" style="text-align:right;color:var(--muted);font-weight:500">Gesamt aus Closes (Auswahl)</td><td class="money" style="color:var(--green);text-align:right">${eur(sum)}</td><td colspan="3"></td></tr>`;
   }
 
   function openModal(id){
     editId = id || null;
-    document.getElementById('modalTitle').textContent = id ? 'Lead bearbeiten' : 'Neuer Lead';
-    const l = leads.find(x=>x.id===id) || {webinar:'offen',call1:'offen',call2:'offen',result:'offen',via:''};
+    $('modalTitle').textContent = id ? 'Lead bearbeiten' : 'Neuer Lead';
+    const l = leads.find(x=>x.id===id) || {webinar:'offen',call1:'offen',call2:'offen',result:'offen',via:'',paid:'offen'};
     for (const [f,k] of [['f_name','name'],['f_email','email'],['f_tel','tel'],['f_webinar','webinar'],
-      ['f_call1','call1'],['f_call2','call2'],['f_result','result'],['f_sum','sum'],['f_via','via'],['f_note','note']])
-      document.getElementById(f).value = l[k] ?? '';
-    document.getElementById('overlay').classList.add('open');
-    document.getElementById('f_name').focus();
+      ['f_call1','call1'],['f_call2','call2'],['f_result','result'],['f_sum','sum'],['f_via','via'],['f_paid','paid'],['f_note','note']])
+      $(f).value = l[k] ?? (k==='paid'?'offen':'');
+    $('overlay').classList.add('open');
+    $('f_name').focus();
   }
-  function closeModal(){ document.getElementById('overlay').classList.remove('open'); }
+  function closeModal(){ $('overlay').classList.remove('open'); }
 
-  function save(){
-    const v = f => document.getElementById(f).value.trim();
+  async function save(){
+    const v = f => $(f).value.trim();
     if(!v('f_name')) return toast('Bitte einen Namen eingeben');
     const data = {name:v('f_name'),email:v('f_email'),tel:v('f_tel'),webinar:v('f_webinar'),
-      call1:v('f_call1'),call2:v('f_call2'),result:v('f_result'),sum:v('f_sum'),via:v('f_via'),note:v('f_note')};
-    if(editId){ Object.assign(leads.find(x=>x.id===editId), data); toast('Änderungen gespeichert'); }
-    else { leads.unshift({id:'l'+leads.length+'_'+Math.abs([...JSON.stringify(data)+performance.now()].reduce((a,c)=>a*31+c.charCodeAt(0)|0,7)), ...data}); toast('Lead angelegt'); }
-    persist(); render(); closeModal();
+      call1:v('f_call1'),call2:v('f_call2'),result:v('f_result'),sum:Number(v('f_sum'))||0,
+      via:v('f_via'),paid:v('f_paid'),note:v('f_note')};
+    if(await upsertLead(data, editId)){ toast(editId?'Änderungen gespeichert':'Lead angelegt'); render(); closeModal(); }
   }
 
-  function del(id){
+  async function del(id){
     const l = leads.find(x=>x.id===id);
     if(!confirm(`"${l?.name}" wirklich löschen?`)) return;
-    leads = leads.filter(x=>x.id!==id); persist(); render(); toast('Lead gelöscht');
+    if(await deleteLead(id)){ render(); toast('Lead gelöscht'); }
   }
 
   function toast(msg){
-    const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show');
-    clearTimeout(t._h); t._h = setTimeout(()=>t.classList.remove('show'), 2200);
+    const t = $('toast'); t.textContent = msg; t.classList.add('show');
+    clearTimeout(t._h); t._h = setTimeout(()=>t.classList.remove('show'), 2600);
   }
 
-  // CSV: Semikolon + BOM für deutsches Excel
+  /* ---------- CSV ---------- */
   const COLS=[['name','Name'],['email','E-Mail'],['tel','Telefon'],['webinar','Webinar'],['call1','Call 1'],
-    ['call2','Call 2'],['result','Ergebnis'],['sum','Summe'],['via','Abschluss über'],['note','Notiz']];
+    ['call2','Call 2'],['result','Ergebnis'],['sum','Summe'],['paid','Bezahlt'],['via','Abschluss über'],['note','Notiz']];
   function exportCSV(){
     const q = s => `"${String(s??'').replace(/"/g,'""')}"`;
     const lines=[COLS.map(c=>q(c[1])).join(';'), ...leads.map(l=>COLS.map(c=>q(l[c[0]])).join(';'))];
@@ -361,16 +568,21 @@ const App = (() => {
   function importCSV(ev){
     const file=ev.target.files[0]; if(!file) return;
     const r=new FileReader();
-    r.onload=()=>{
+    r.onload=async ()=>{
       const rows=parseCSV(r.result.replace(/^﻿/,''));
       if(rows.length<2) return toast('Keine Daten in der CSV gefunden');
-      const imported=rows.slice(1).filter(c=>c[0]).map((c,i)=>{
-        const o={id:'imp'+i+'_'+c[0].length+'_'+leads.length};
-        COLS.forEach(([k],j)=>o[k]=c[j]??''); return o;
+      const items=rows.slice(1).filter(c=>c[0]).map(c=>{
+        const o={}; COLS.forEach(([k],j)=>o[k]=c[j]??''); o.sum=Number(String(o.sum).replace(',','.'))||0; return o;
       });
-      leads=[...imported,...leads]; persist(); render();
-      toast(`${imported.length} Leads importiert`);
-      ev.target.value='';
+      if(CLOUD){
+        const {error}=await sb.from('leads').insert(items.map(o=>({...o, created_by_email:user?.email||''})));
+        if(error) return toast('Import-Fehler: '+error.message);
+        await fetchLeads();
+      } else {
+        items.forEach((o,i)=>leads.unshift({id:'imp'+i+'_'+o.name.length+'_'+leads.length, ...o}));
+        localSave();
+      }
+      render(); toast(`${items.length} Leads importiert`); ev.target.value='';
     };
     r.readAsText(file,'utf-8');
   }
@@ -388,8 +600,8 @@ const App = (() => {
     return rows;
   }
 
-  render();
-  return {openModal,closeModal,save,del,exportCSV,importCSV,render};
+  initAuth();
+  return {openModal,closeModal,save,del,exportCSV,importCSV,render,sortBy,setSortFromSelect,auth,logout,toggleAuthMode};
 })();
 </script>
 </body>
