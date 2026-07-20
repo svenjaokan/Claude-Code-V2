@@ -4,12 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Money Basics in 10 Minuten | The Identity Atelier</title>
-<meta name="description" content="Dein Selbstlernkurs: In 10 Minuten die Grundlagen für einen klaren Umgang mit deinen Finanzen. The Identity Atelier.">
+<meta name="description" content="Der 10-Minuten-Selbstlernkurs für einen klaren Umgang mit deinem Geld. 5 Lektionen, kleine Übungen, dein Aktionsplan. The Identity Atelier.">
 <link rel="icon" href="./assets/logo/emblem-bordeaux.svg">
 <link rel="stylesheet" href="./tokens.css">
 <style>
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
+html{scroll-behavior:smooth}
 body{
   background:var(--bg-page);
   color:var(--text);
@@ -19,177 +20,128 @@ body{
   -webkit-font-smoothing:antialiased;
   text-rendering:optimizeLegibility;
 }
-.wrap{max-width:820px;margin:0 auto;padding:0 clamp(18px,4vw,40px)}
+.wrap{max-width:900px;margin:0 auto;padding:0 clamp(18px,4vw,40px)}
 a{color:inherit}
 
 /* ---------- Header ---------- */
 .brandhead{background:var(--bg-page);text-align:center;padding:26px 20px 6px}
 .brandhead .emblem{width:48px;height:auto;margin:0 auto 12px;display:block}
 .brandhead .wordmark{width:172px;height:auto;margin:0 auto 10px;display:block}
-.powered{
-  font-size:var(--text-2xs);letter-spacing:var(--ls-eyebrow);text-transform:uppercase;
-  color:var(--text-faint);margin:0
-}
+.powered{font-size:var(--text-2xs);letter-spacing:var(--ls-eyebrow);text-transform:uppercase;color:var(--text-faint);margin:0}
 
-/* ---------- Intro ---------- */
-.intro{text-align:center;padding:clamp(18px,4vw,30px) 0 clamp(16px,3vw,26px)}
+/* ---------- Hero ---------- */
+.hero{text-align:center;padding:clamp(26px,5vw,52px) 0 clamp(26px,5vw,44px)}
 .eyebrow{
   font-family:var(--font-body);font-size:var(--text-xs);letter-spacing:var(--ls-eyebrow);
   text-transform:uppercase;color:var(--accent);margin:0 0 14px;font-weight:var(--fw-semibold)
 }
-.intro h1{
+.hero h1{
   font-family:var(--font-display);font-weight:var(--fw-semibold);
-  font-size:var(--text-d2);line-height:var(--lh-snug);letter-spacing:var(--ls-tight);
-  margin:0 0 12px
+  font-size:var(--text-d1);line-height:var(--lh-snug);letter-spacing:var(--ls-tight);
+  margin:0 0 16px
 }
-.intro h1 em{font-style:italic;color:var(--accent)}
-.intro p{
-  font-family:var(--font-serif);color:var(--text-soft);max-width:540px;margin:0 auto;
-  font-size:var(--text-lg)
+.hero h1 em{font-style:italic;color:var(--accent)}
+.hero .lead{
+  font-family:var(--font-serif);color:var(--text-soft);max-width:600px;margin:0 auto 26px;
+  font-size:var(--text-lg);line-height:var(--lh-relaxed)
 }
-.privacy{
-  display:inline-flex;align-items:center;gap:9px;margin-top:18px;
-  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-pill);
-  padding:8px 16px;font-size:var(--text-sm);color:var(--text-soft);box-shadow:var(--shadow-sm)
-}
-.privacy svg{width:16px;height:16px;color:var(--accent);flex:none}
-
-/* ---------- Progress ---------- */
-.progress-wrap{margin:10px 0 26px}
-.progress-meta{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
-.progress-meta .p-label{font-size:var(--text-xs);letter-spacing:.04em;text-transform:uppercase;color:var(--text-muted);font-weight:var(--fw-semibold)}
-.progress-meta .p-val{font-family:var(--font-display);font-size:var(--text-lg);font-weight:var(--fw-semibold);color:var(--accent)}
-.pbar{height:9px;border-radius:var(--radius-pill);background:var(--c-bone-200);overflow:hidden}
-.pbar > span{display:block;height:100%;border-radius:var(--radius-pill);background:var(--accent);transition:width .5s var(--ease)}
-
-/* ---------- Lesson nav ---------- */
-.steps{display:flex;justify-content:center;gap:8px;margin:0 0 30px;flex-wrap:wrap}
-.step{
-  appearance:none;border:1px solid var(--border);background:var(--surface);cursor:pointer;
-  width:44px;height:44px;border-radius:var(--radius-pill);
-  font-family:var(--font-display);font-size:var(--text-lg);font-weight:var(--fw-semibold);
-  color:var(--text-soft);display:inline-flex;align-items:center;justify-content:center;
-  transition:all .18s var(--ease);box-shadow:var(--shadow-sm)
-}
-.step[aria-current="true"]{background:var(--accent);color:var(--on-accent);border-color:var(--accent);box-shadow:var(--shadow-accent)}
-.step.done:not([aria-current="true"]){border-color:var(--accent);color:var(--accent)}
-.step.done svg{width:18px;height:18px}
-
-/* ---------- Lesson card ---------- */
-.lesson{
-  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xl);
-  padding:clamp(24px,4vw,40px);box-shadow:var(--shadow-md);animation:rise .3s var(--ease)
-}
-@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
-.lesson .l-eyebrow{
-  font-size:var(--text-xs);letter-spacing:var(--ls-eyebrow);text-transform:uppercase;
-  color:var(--accent);font-weight:var(--fw-semibold);margin:0 0 8px
-}
-.lesson h2{
-  font-family:var(--font-display);font-size:var(--text-d3);font-weight:var(--fw-semibold);
-  letter-spacing:var(--ls-tight);margin:0 0 16px;line-height:var(--lh-snug)
-}
-.lesson h2 em{font-style:italic;color:var(--accent)}
-.lesson .body p{font-family:var(--font-serif);color:var(--text-soft);font-size:var(--text-lg);margin:0 0 16px;line-height:var(--lh-relaxed)}
-.lesson .body strong{color:var(--text);font-weight:var(--fw-bold)}
-
-.keybox{
-  border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:var(--radius-md);
-  background:var(--bg-page-soft);padding:16px 18px;margin:0 0 18px
-}
-.keybox .k-label{font-size:var(--text-2xs);letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:var(--fw-semibold);margin:0 0 6px}
-.keybox p{margin:0;font-family:var(--font-serif);color:var(--text);font-size:var(--text-base)}
-
-.minilist{list-style:none;margin:0 0 18px;padding:0}
-.minilist li{
-  display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--border);
-  font-size:var(--text-base);color:var(--text-soft)
-}
-.minilist li:last-child{border-bottom:0}
-.minilist .dot{
-  flex:none;width:26px;height:26px;border-radius:var(--radius-pill);background:var(--c-bordeaux-100);
-  color:var(--accent);font-family:var(--font-display);font-weight:var(--fw-semibold);font-size:var(--text-sm);
-  display:inline-flex;align-items:center;justify-content:center;margin-top:1px
-}
-
-/* ---------- Quiz ---------- */
-.quiz{margin-top:24px;border-top:1px solid var(--border);padding-top:22px}
-.quiz .q-label{font-size:var(--text-xs);letter-spacing:var(--ls-eyebrow);text-transform:uppercase;color:var(--text-muted);font-weight:var(--fw-semibold);margin:0 0 8px}
-.quiz .q-question{font-family:var(--font-display);font-size:var(--text-h5);font-weight:var(--fw-semibold);margin:0 0 14px}
-.q-options{display:flex;flex-direction:column;gap:10px}
-.q-opt{
-  appearance:none;cursor:pointer;text-align:left;font-family:var(--font-body);font-size:var(--text-base);
-  color:var(--text);background:var(--bg-page-soft);border:1px solid var(--border);border-radius:var(--radius-md);
-  padding:13px 16px;transition:all .16s var(--ease)
-}
-.q-opt:hover{border-color:var(--border-strong)}
-.q-opt.correct{border-color:var(--accent);background:var(--c-bordeaux-100);color:var(--accent);font-weight:var(--fw-semibold)}
-.q-opt.wrong{border-color:var(--border-strong);opacity:.55;text-decoration:line-through}
-.q-feedback{margin:14px 0 0;font-family:var(--font-serif);font-size:var(--text-base);color:var(--text-soft);display:none}
-.q-feedback.show{display:block}
-.q-feedback strong{color:var(--accent)}
-
-/* ---------- Calculator ---------- */
-.calc{margin-top:24px;border-top:1px solid var(--border);padding-top:22px}
-.calc .q-label{font-size:var(--text-xs);letter-spacing:var(--ls-eyebrow);text-transform:uppercase;color:var(--text-muted);font-weight:var(--fw-semibold);margin:0 0 8px}
-.calc .q-question{font-family:var(--font-display);font-size:var(--text-h5);font-weight:var(--fw-semibold);margin:0 0 14px}
-.calc-input{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
-.calc-input input{
-  font-family:var(--font-body);font-size:var(--text-base);color:var(--text);background:var(--bg-page-soft);
-  border:1px solid var(--border);border-radius:var(--radius-md);padding:12px 14px;width:180px;max-width:100%
-}
-.calc-input input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--focus-ring)}
-.calc-input .unit{color:var(--text-muted);font-size:var(--text-sm)}
-.calc-out{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.calc-tile{padding:16px;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--bg-page-soft)}
-.calc-tile .c-label{font-size:var(--text-2xs);letter-spacing:.04em;text-transform:uppercase;color:var(--text-muted);margin:0 0 6px;font-weight:var(--fw-semibold);line-height:1.3}
-.calc-tile .c-val{font-family:var(--font-display);font-size:1.5rem;font-weight:var(--fw-semibold);color:var(--accent)}
-.calc-tile.clay .c-val{color:var(--accent-2)}
-.calc-note{margin:14px 0 0;font-size:var(--text-sm);color:var(--text-faint)}
-
-/* ---------- Lesson footer nav ---------- */
-.lesson-nav{display:flex;gap:10px;justify-content:space-between;margin-top:28px;flex-wrap:wrap}
+.cta-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
 .btn{
-  appearance:none;cursor:pointer;font-family:var(--font-body);font-size:var(--text-sm);
+  appearance:none;cursor:pointer;font-family:var(--font-body);font-size:var(--text-base);
   font-weight:var(--fw-semibold);letter-spacing:.01em;border-radius:var(--radius-pill);
-  padding:13px 26px;display:inline-flex;align-items:center;gap:8px;border:1px solid transparent;
-  transition:all .16s var(--ease);max-width:100%;text-align:center;justify-content:center
+  padding:15px 30px;display:inline-flex;align-items:center;gap:9px;border:1px solid transparent;
+  transition:all .16s var(--ease);text-decoration:none;max-width:100%;justify-content:center;text-align:center
 }
-.btn svg{width:16px;height:16px;flex:none}
+.btn svg{width:17px;height:17px;flex:none}
 .btn-primary{background:var(--accent);color:var(--on-accent);box-shadow:var(--shadow-accent)}
 .btn-primary:hover{background:var(--accent-hover)}
-.btn-ghost{background:var(--surface);color:var(--text);border-color:var(--border)}
+.btn-ghost{background:var(--surface);color:var(--text);border-color:var(--border);box-shadow:var(--shadow-sm)}
 .btn-ghost:hover{border-color:var(--border-strong);transform:translateY(-1px)}
-.btn[disabled]{opacity:.4;cursor:default;pointer-events:none}
+.hero .micro{font-size:var(--text-sm);color:var(--text-faint);margin:16px 0 0}
 
-/* ---------- Finish screen ---------- */
-.finish{text-align:center}
-.finish .em-emb{width:52px;height:auto;margin:0 auto 18px;display:block}
-.plan{list-style:none;margin:22px 0 0;padding:0;text-align:left}
-.plan li{
-  display:flex;gap:12px;align-items:flex-start;background:var(--bg-page-soft);
-  border:1px solid var(--border);border-radius:var(--radius-md);padding:14px 16px;margin-bottom:10px;
-  cursor:pointer;transition:all .16s var(--ease)
+.badges{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:28px}
+.badge{
+  display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-pill);padding:9px 16px;font-size:var(--text-sm);color:var(--text-soft);box-shadow:var(--shadow-sm)
 }
-.plan li:hover{border-color:var(--border-strong)}
-.plan li .check{
-  flex:none;width:24px;height:24px;border-radius:6px;border:2px solid var(--border-strong);
-  display:inline-flex;align-items:center;justify-content:center;margin-top:1px;color:transparent;
-  transition:all .16s var(--ease)
-}
-.plan li.on .check{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
-.plan li .check svg{width:14px;height:14px}
-.plan li.on span.txt{color:var(--text-muted);text-decoration:line-through}
-.finish-actions{display:flex;gap:10px;justify-content:center;margin-top:26px;flex-wrap:wrap}
+.badge svg{width:15px;height:15px;color:var(--accent);flex:none}
 
-/* ---------- Toast ---------- */
-.toast{
-  position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);
-  background:var(--surface-ink);color:var(--text-on-dark);padding:13px 22px;border-radius:var(--radius-pill);
-  font-size:var(--text-sm);box-shadow:var(--shadow-lg);opacity:0;pointer-events:none;
-  transition:all .3s var(--ease);z-index:60;max-width:90vw;text-align:center
+/* ---------- Sections ---------- */
+section.block{padding:clamp(26px,5vw,44px) 0}
+.sec-eyebrow{font-size:var(--text-xs);letter-spacing:var(--ls-eyebrow);text-transform:uppercase;color:var(--accent);font-weight:var(--fw-semibold);margin:0 0 8px;text-align:center}
+.sec-title{
+  font-family:var(--font-display);font-size:var(--text-d3);font-weight:var(--fw-semibold);
+  letter-spacing:var(--ls-tight);margin:0 0 10px;line-height:var(--lh-snug);text-align:center
 }
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.sec-title em{font-style:italic;color:var(--accent)}
+.sec-lead{font-family:var(--font-serif);color:var(--text-soft);max-width:560px;margin:0 auto 30px;text-align:center;font-size:var(--text-lg)}
+
+/* Lessons grid */
+.lessons{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.lcard{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);
+  padding:22px;box-shadow:var(--shadow-sm)
+}
+.lcard .num{
+  width:32px;height:32px;border-radius:var(--radius-pill);background:var(--c-bordeaux-100);color:var(--accent);
+  font-family:var(--font-display);font-weight:var(--fw-semibold);display:inline-flex;align-items:center;justify-content:center;margin-bottom:12px
+}
+.lcard h3{font-family:var(--font-display);font-size:var(--text-h5);font-weight:var(--fw-semibold);margin:0 0 8px}
+.lcard p{margin:0;font-size:var(--text-sm);color:var(--text-muted);line-height:var(--lh-relaxed)}
+.lcard.wide{grid-column:1 / -1;display:flex;gap:18px;align-items:flex-start}
+.lcard.wide .num{flex:none;margin-bottom:0;margin-top:2px}
+
+/* Steps */
+.how{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.step{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);
+  padding:24px 20px;box-shadow:var(--shadow-sm);text-align:center
+}
+.step .s-num{font-family:var(--font-display);font-size:2rem;font-weight:var(--fw-semibold);color:var(--accent);line-height:1;margin-bottom:10px}
+.step h3{font-family:var(--font-body);font-size:var(--text-sm);letter-spacing:.04em;text-transform:uppercase;font-weight:var(--fw-semibold);margin:0 0 8px;color:var(--text)}
+.step p{margin:0;font-size:var(--text-sm);color:var(--text-muted);line-height:var(--lh-relaxed)}
+
+/* For whom */
+.fit{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.fitcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;box-shadow:var(--shadow-sm)}
+.fitcard h3{font-family:var(--font-body);font-size:var(--text-sm);letter-spacing:.04em;text-transform:uppercase;font-weight:var(--fw-semibold);margin:0 0 14px}
+.fitcard.yes h3{color:var(--accent)}
+.fitcard.no h3{color:var(--text-muted)}
+.fitcard ul{list-style:none;margin:0;padding:0}
+.fitcard li{display:flex;gap:10px;align-items:flex-start;padding:7px 0;font-size:var(--text-sm);color:var(--text-soft);line-height:var(--lh-relaxed)}
+.fitcard li svg{width:16px;height:16px;flex:none;margin-top:2px}
+.fitcard.yes li svg{color:var(--accent)}
+.fitcard.no li svg{color:var(--text-faint)}
+
+/* Price card */
+.price{
+  background:var(--surface-ink);color:var(--text-on-dark);border-radius:var(--radius-xl);
+  padding:clamp(30px,5vw,48px);text-align:center;box-shadow:var(--shadow-lg)
+}
+.price .p-eyebrow{font-size:var(--text-xs);letter-spacing:var(--ls-eyebrow);text-transform:uppercase;color:var(--accent-2);font-weight:var(--fw-semibold);margin:0 0 10px}
+.price h2{font-family:var(--font-display);font-size:var(--text-d3);font-weight:var(--fw-semibold);margin:0 0 8px;line-height:var(--lh-snug)}
+.price h2 em{font-style:italic;color:var(--accent-2)}
+.price .p-lead{font-family:var(--font-serif);color:var(--text-on-dark-muted);max-width:480px;margin:0 auto 22px;font-size:var(--text-base);line-height:var(--lh-relaxed)}
+.price ul{list-style:none;margin:0 auto 26px;padding:0;max-width:420px;text-align:left}
+.price li{display:flex;gap:10px;align-items:flex-start;padding:7px 0;font-size:var(--text-sm);color:var(--text-on-dark-muted)}
+.price li svg{width:16px;height:16px;flex:none;color:var(--accent-2);margin-top:2px}
+.price .micro{font-size:var(--text-xs);color:var(--text-on-dark-muted);opacity:.7;margin:14px 0 0}
+
+/* FAQ */
+.faq{max-width:680px;margin:0 auto}
+.faq details{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);
+  padding:0;margin-bottom:10px;box-shadow:var(--shadow-sm);overflow:hidden
+}
+.faq summary{
+  cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:12px;
+  padding:16px 18px;font-weight:var(--fw-semibold);font-size:var(--text-base)
+}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary svg{width:16px;height:16px;color:var(--accent);flex:none;transition:transform .2s var(--ease)}
+.faq details[open] summary svg{transform:rotate(45deg)}
+.faq .a{padding:0 18px 16px;font-size:var(--text-sm);color:var(--text-soft);line-height:var(--lh-relaxed)}
+.faq .a a{color:var(--accent)}
 
 /* ---------- Footer ---------- */
 .atelier-footer{background:var(--bg-dark);color:var(--text-on-dark-muted);padding:clamp(44px,6vw,72px) 0 36px;text-align:center;font-family:var(--font-body);margin-top:56px}
@@ -203,9 +155,14 @@ a{color:inherit}
 .atelier-footer .legal a:hover{color:var(--text-on-dark-muted)}
 
 /* ---------- Responsive ---------- */
+@media (max-width:720px){
+  .lessons{grid-template-columns:1fr}
+  .how{grid-template-columns:1fr}
+  .fit{grid-template-columns:1fr}
+  .lcard.wide{flex-direction:row}
+}
 @media (max-width:560px){
-  .calc-out{grid-template-columns:1fr}
-  .lesson-nav .btn{flex:1 1 auto}
+  .cta-row .btn{flex:1 1 auto}
 }
 </style>
 </head>
@@ -220,35 +177,129 @@ a{color:inherit}
 
 <main class="wrap">
 
-  <!-- ===== Intro ===== -->
-  <section class="intro">
-    <p class="eyebrow">Dein Selbstlernkurs · 10 Minuten</p>
+  <!-- ===== Hero ===== -->
+  <section class="hero">
+    <p class="eyebrow">Digitales Mini-Produkt · Selbstlernkurs</p>
     <h1>Money Basics, <em>endlich klar.</em></h1>
-    <p>Fünf kurze Lektionen, kleine Übungen, dein persönlicher Aktionsplan. In 10 Minuten weißt du, wie du dein Geld ordnest, absicherst und wachsen lässt.</p>
-    <div class="privacy">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-      Dein Fortschritt bleibt nur auf diesem Gerät. Niemand sonst sieht ihn.
+    <p class="lead">Du verdienst gut und trotzdem fühlt sich dein Geld unübersichtlich an? In 10 Minuten lernst du das System, mit dem du dein Geld ordnest, absicherst und wachsen lässt. Ohne Fachchinesisch, ohne Excel-Marathon.</p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="#kaufen">
+        Jetzt Zugang sichern
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+      <a class="btn btn-ghost" href="./kurs/">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Ich habe schon einen Zugang
+      </a>
+    </div>
+    <div class="badges">
+      <span class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>10 Minuten, ein Durchgang</span>
+      <span class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>Interaktiv mit Übungen</span>
+      <span class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Mit persönlichem Aktionsplan</span>
     </div>
   </section>
 
-  <!-- ===== Progress ===== -->
-  <div class="progress-wrap">
-    <div class="progress-meta">
-      <span class="p-label">Dein Fortschritt</span>
-      <span class="p-val" id="p-val">0 %</span>
+  <!-- ===== Lessons ===== -->
+  <section class="block" id="inhalt">
+    <p class="sec-eyebrow">Der Inhalt</p>
+    <h2 class="sec-title">Fünf Lektionen, <em>ein System.</em></h2>
+    <p class="sec-lead">Jede Lektion dauert rund zwei Minuten und endet mit einem Kurz-Check, damit das Wissen wirklich sitzt.</p>
+    <div class="lessons">
+      <div class="lcard"><span class="num">1</span><h3>Überblick statt Chaos</h3><p>Das 3-Konten-Modell: Fixkosten, Alltag, Zukunft. Warum dein Geld nie wieder "einfach verschwindet".</p></div>
+      <div class="lcard"><span class="num">2</span><h3>Die 50/30/20-Regel</h3><p>Wie viel wohin gehört, mit interaktivem Rechner für dein eigenes Netto-Einkommen.</p></div>
+      <div class="lcard"><span class="num">3</span><h3>Dein Notgroschen</h3><p>Dein Sicherheitsnetz: wie viel du brauchst, wo es liegt und warum 1.000 Euro der perfekte Start sind.</p></div>
+      <div class="lcard"><span class="num">4</span><h3>Schulden zuerst</h3><p>Warum Dispo tilgen jede Geldanlage schlägt, und ob Lawine oder Schneeball besser zu dir passt.</p></div>
+      <div class="lcard wide"><span class="num">5</span><div><h3>Investieren, einfach gestartet</h3><p>ETF-Sparplan statt Aktien-Roulette: die drei Regeln, mit denen dein Geld langfristig für dich arbeitet. Plus Abschluss-Screen mit deinem persönlichen 5-Punkte-Aktionsplan zum Abhaken.</p></div></div>
     </div>
-    <div class="pbar"><span id="p-bar" style="width:0%"></span></div>
-  </div>
+  </section>
 
-  <!-- ===== Step nav ===== -->
-  <div class="steps" id="steps" role="tablist"></div>
+  <!-- ===== For whom ===== -->
+  <section class="block">
+    <p class="sec-eyebrow">Passt das zu dir?</p>
+    <h2 class="sec-title">Für dich gemacht, <em>wenn du …</em></h2>
+    <div class="fit">
+      <div class="fitcard yes">
+        <h3>Genau richtig, wenn du</h3>
+        <ul>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>endlich Ordnung in deine Finanzen bringen willst, ohne dich wochenlang einzulesen</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>am Monatsende oft nicht weißt, wo das Geld geblieben ist</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>mit dem Investieren starten willst, aber nicht weißt, was zuerst kommt</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>ein klares System willst, das du heute noch einrichten kannst</li>
+        </ul>
+      </div>
+      <div class="fitcard no">
+        <h3>Eher nichts für dich, wenn du</h3>
+        <ul>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>heiße Aktientipps oder schnelle Reichtums-Versprechen suchst</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>eine individuelle Anlageberatung erwartest</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>dein System schon stehen hast und nur noch optimierst</li>
+        </ul>
+      </div>
+    </div>
+  </section>
 
-  <!-- ===== Lesson container ===== -->
-  <div id="lesson-root"></div>
+  <!-- ===== How it works ===== -->
+  <section class="block">
+    <p class="sec-eyebrow">So funktioniert es</p>
+    <h2 class="sec-title">In drei Schritten <em>zum Zugang.</em></h2>
+    <div class="how">
+      <div class="step"><div class="s-num">1</div><h3>Kaufen</h3><p>Du sicherst dir den Kurs bequem über den Kauf-Button. Die Zahlung läuft sicher über Ablefy.</p></div>
+      <div class="step"><div class="s-num">2</div><h3>Passwort erhalten</h3><p>Direkt nach dem Kauf bekommst du dein persönliches Zugangspasswort per E-Mail.</p></div>
+      <div class="step"><div class="s-num">3</div><h3>Loslernen</h3><p>Du öffnest den Mitgliederbereich, gibst dein Passwort ein und startest sofort. Auf jedem Gerät.</p></div>
+    </div>
+  </section>
+
+  <!-- ===== Price / CTA ===== -->
+  <section class="block" id="kaufen">
+    <div class="price">
+      <p class="p-eyebrow">Dein Zugang</p>
+      <h2>Ein Kaffee-Invest für <em>klare Finanzen.</em></h2>
+      <p class="p-lead">Einmal kaufen, sofort starten, so oft wiederholen wie du willst. Kein Abo, keine versteckten Kosten.</p>
+      <ul>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>5 kompakte Lektionen mit Kurz-Checks</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Interaktiver 50/30/20-Rechner</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Persönlicher 5-Punkte-Aktionsplan</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Sofortiger Zugang, dauerhaft nutzbar</li>
+      </ul>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="https://www.ablefy.io" target="_blank" rel="noopener" id="buy-btn">
+          Jetzt Zugang sichern
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+      <p class="micro">Sichere Zahlung über Ablefy. Passwort kommt direkt nach dem Kauf per E-Mail.</p>
+    </div>
+  </section>
+
+  <!-- ===== FAQ ===== -->
+  <section class="block">
+    <p class="sec-eyebrow">Häufige Fragen</p>
+    <h2 class="sec-title">Kurz <em>beantwortet.</em></h2>
+    <div class="faq">
+      <details>
+        <summary>Wie lange habe ich Zugriff auf den Kurs?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></summary>
+        <div class="a">Dauerhaft. Dein Passwort bleibt gültig und du kannst den Kurs so oft durchgehen, wie du möchtest.</div>
+      </details>
+      <details>
+        <summary>Brauche ich Vorwissen?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></summary>
+        <div class="a">Nein. Der Kurs ist bewusst für den Einstieg gebaut und erklärt alles ohne Fachbegriffe.</div>
+      </details>
+      <details>
+        <summary>Auf welchen Geräten funktioniert der Kurs?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></summary>
+        <div class="a">Auf allen: Handy, Tablet und Computer, direkt im Browser. Keine App, kein Download.</div>
+      </details>
+      <details>
+        <summary>Ist das eine Anlageberatung?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></summary>
+        <div class="a">Nein. Der Kurs vermittelt Finanzbildung und bewährte Grundprinzipien, keine individuelle Anlage- oder Steuerberatung.</div>
+      </details>
+      <details>
+        <summary>Ich habe mein Passwort verloren. Was nun?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></summary>
+        <div class="a">Kein Problem: Schreib einfach an <a href="mailto:hello@svenjaokan.de">hello@svenjaokan.de</a> und du bekommst es erneut zugeschickt.</div>
+      </details>
+    </div>
+  </section>
 
 </main>
-
-<div class="toast" id="toast"></div>
 
 <!-- ===== Footer ===== -->
 <footer class="atelier-footer">
@@ -267,329 +318,5 @@ a{color:inherit}
   </div>
 </footer>
 
-<script>
-const App = (function(){
-  "use strict";
-
-  const STORE_KEY = "ia_finanzkurs_v1";
-  const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
-
-  // ---------- Course content ----------
-  const LESSONS = [
-    {
-      eyebrow:"Lektion 1 · ca. 2 Minuten",
-      title:'Überblick statt <em>Chaos.</em>',
-      body:`
-        <p>Der häufigste Grund, warum Geld <strong>gefühlt einfach verschwindet</strong>: Alles läuft über ein einziges Konto. Miete, Einkäufe, Urlaub, Rücklagen, alles durcheinander. So siehst du nie, was wirklich übrig ist.</p>
-        <p>Die Lösung ist das <strong>3-Konten-Modell</strong>:</p>
-        <ul class="minilist">
-          <li><span class="dot">1</span><span><strong>Fixkosten-Konto:</strong> Miete, Strom, Versicherungen, Abos. Hier gehen alle festen Zahlungen automatisch ab.</span></li>
-          <li><span class="dot">2</span><span><strong>Alltags-Konto:</strong> Lebensmittel, Freizeit, alles Variable. Was hier drauf ist, darfst du guten Gewissens ausgeben.</span></li>
-          <li><span class="dot">3</span><span><strong>Zukunfts-Konto:</strong> Notgroschen, Sparen, Investieren. Geld, das dich langfristig frei macht.</span></li>
-        </ul>
-        <div class="keybox"><p class="k-label">Merksatz</p><p>Direkt nach Gehaltseingang verteilst du per Dauerauftrag. <em>Erst dich selbst bezahlen, dann leben.</em></p></div>
-      `,
-      quiz:{
-        q:"Wann überweist du am besten auf dein Zukunfts-Konto?",
-        opts:["Am Monatsende, wenn ich sehe, was übrig ist","Direkt nach Gehaltseingang, per Dauerauftrag","Nur wenn ich einen Bonus bekomme"],
-        correct:1,
-        fb:'<strong>Genau.</strong> Was am Monatsende "übrig bleibt", ist meistens nichts. Zuerst sparen, dann ausgeben, das ist der ganze Trick.'
-      }
-    },
-    {
-      eyebrow:"Lektion 2 · ca. 2 Minuten",
-      title:'Die <em>50/30/20-Regel.</em>',
-      body:`
-        <p>Wie viel gehört auf welches Konto? Eine bewährte Faustregel teilt dein <strong>Netto-Einkommen</strong> in drei Teile:</p>
-        <ul class="minilist">
-          <li><span class="dot">50</span><span><strong>50 % Fixkosten:</strong> Wohnen, Energie, Versicherungen, Mobilität.</span></li>
-          <li><span class="dot">30</span><span><strong>30 % Wünsche:</strong> Restaurants, Shopping, Hobbys, Urlaub. Leben darf Spaß machen.</span></li>
-          <li><span class="dot">20</span><span><strong>20 % Zukunft:</strong> Notgroschen, Schulden tilgen, investieren.</span></li>
-        </ul>
-        <p>Die Regel ist ein <strong>Startpunkt, kein Gesetz</strong>. In teuren Städten sind es vielleicht 60/25/15. Wichtig ist nur: Die Zukunfts-Quote ist fest eingeplant, nicht optional.</p>
-      `,
-      calc:{
-        q:"Rechne es für dich aus",
-        note:"Gib dein monatliches Netto-Einkommen ein. Die Zahlen bleiben nur auf deinem Gerät.",
-        tiles:[["Fixkosten (50 %)",.5],["Wünsche (30 %)",.3],["Zukunft (20 %)",.2]]
-      },
-      quiz:{
-        q:"Was passiert mit den 20 %, wenn der Monat knapp wird?",
-        opts:["Sie fallen als Erstes weg","Sie sind fest eingeplant wie die Miete","Ich entscheide spontan"],
-        correct:1,
-        fb:'<strong>Richtig.</strong> Behandle deine Sparrate wie eine Rechnung an dein zukünftiges Ich. Sie wird zuerst bezahlt.'
-      }
-    },
-    {
-      eyebrow:"Lektion 3 · ca. 2 Minuten",
-      title:'Dein <em>Notgroschen.</em>',
-      body:`
-        <p>Bevor du investierst, brauchst du ein Sicherheitsnetz: den <strong>Notgroschen</strong>. Er fängt kaputte Waschmaschinen, Autoreparaturen oder Auftragsflauten ab, ohne dass du Schulden machen musst.</p>
-        <p>Die Faustregel: <strong>3 bis 6 Monatsausgaben</strong> auf einem separaten Tagesgeldkonto. Angestellt mit sicherem Job eher 3, selbstständig eher 6.</p>
-        <div class="keybox"><p class="k-label">Wichtig</p><p>Der Notgroschen liegt auf einem <em>Tagesgeldkonto</em>: jederzeit verfügbar, getrennt vom Alltagskonto, niemals investiert. Er soll nicht wachsen, er soll da sein.</p></div>
-        <p>Klingt das Ziel groß? Fang mit einer ersten Etappe von <strong>1.000 Euro</strong> an. Das fängt die meisten Notfälle schon ab.</p>
-      `,
-      quiz:{
-        q:"Wo liegt der Notgroschen am besten?",
-        opts:["In ETFs, damit er sich vermehrt","Auf dem Girokonto, griffbereit neben dem Alltagsgeld","Auf einem separaten Tagesgeldkonto"],
-        correct:2,
-        fb:'<strong>Genau.</strong> Investiert kann er im Notfall gerade im Minus stehen, auf dem Girokonto wird er "aus Versehen" ausgegeben. Separat und verfügbar ist die Lösung.'
-      }
-    },
-    {
-      eyebrow:"Lektion 4 · ca. 2 Minuten",
-      title:'Schulden <em>zuerst.</em>',
-      body:`
-        <p>Ein Dispo kostet oft <strong>10 bis 13 % Zinsen im Jahr</strong>, Konsumkredite ähnlich viel. Keine sichere Geldanlage bringt dir so viel. Deshalb gilt: <strong>Teure Schulden tilgen schlägt Investieren.</strong> Jeder getilgte Euro ist eine garantierte Rendite in Höhe des Kreditzinses.</p>
-        <p>Zwei bewährte Strategien, um mehrere Schulden abzubauen:</p>
-        <ul class="minilist">
-          <li><span class="dot">A</span><span><strong>Lawine:</strong> Zuerst die Schuld mit dem höchsten Zins. Mathematisch am günstigsten.</span></li>
-          <li><span class="dot">B</span><span><strong>Schneeball:</strong> Zuerst die kleinste Schuld. Schnelle Erfolge, starke Motivation.</span></li>
-        </ul>
-        <p>Beide funktionieren. Nimm die, die du <strong>durchhältst</strong>. Ausnahme: Sehr günstige Kredite (z. B. ein alter Immobilienkredit unter 2 %) müssen nicht überstürzt getilgt werden.</p>
-      `,
-      quiz:{
-        q:"Du hast 200 Euro übrig: Dispo mit 12 % Zinsen oder ETF mit erwarteten 6 %?",
-        opts:["In den ETF, investieren geht vor","Erst den Dispo ausgleichen","Hälfte hier, Hälfte da"],
-        correct:1,
-        fb:'<strong>Richtig.</strong> Dispo tilgen bringt dir garantierte 12 %, der ETF nur unsichere 6 %. Erst raus aus teuren Schulden, dann investieren.'
-      }
-    },
-    {
-      eyebrow:"Lektion 5 · ca. 2 Minuten",
-      title:'Investieren, <em>einfach gestartet.</em>',
-      body:`
-        <p>Geld auf dem Konto verliert durch Inflation jedes Jahr an Kaufkraft. Langfristig wachsen lässt du es am Aktienmarkt, und dafür brauchst du keine Einzelaktien und kein Timing, sondern einen <strong>breit gestreuten ETF-Sparplan</strong> (z. B. auf einen Welt-Index mit über 1.000 Firmen).</p>
-        <p>Dein größter Verbündeter ist der <strong>Zinseszins</strong>: 150 Euro monatlich bei durchschnittlich 6 % pro Jahr sind nach 10 Jahren rund 24.500 Euro, nach 20 Jahren rund 69.000 Euro, nach 30 Jahren über 150.000 Euro, bei nur 54.000 Euro Einzahlung.</p>
-        <div class="keybox"><p class="k-label">Die 3 Regeln</p><p>Breit streuen. Nur Geld investieren, das du <em>10+ Jahre</em> nicht brauchst. Sparplan laufen lassen, auch wenn die Kurse fallen.</p></div>
-        <p><em>Hinweis: Das ist Finanzbildung, keine individuelle Anlageberatung.</em></p>
-      `,
-      quiz:{
-        q:"Die Kurse fallen um 20 %. Was machst du mit deinem Sparplan?",
-        opts:["Verkaufen, bevor es schlimmer wird","Pausieren und abwarten","Weiterlaufen lassen, ich kaufe gerade günstig ein"],
-        correct:2,
-        fb:'<strong>Genau.</strong> Wer 10+ Jahre Zeit hat, kauft in Krisen dieselben Anteile zum Rabatt. Verkaufen im Tief macht aus Buchverlusten echte Verluste.'
-      }
-    }
-  ];
-
-  const PLAN = [
-    "Zweites und drittes Konto eröffnen (3-Konten-Modell)",
-    "Daueraufträge direkt nach Gehaltseingang einrichten (50/30/20 als Start)",
-    "Tagesgeldkonto eröffnen und erste 1.000 Euro Notgroschen ansparen",
-    "Teure Schulden auflisten und Tilgungsreihenfolge festlegen",
-    "Depot eröffnen und ETF-Sparplan starten (und laufen lassen)"
-  ];
-
-  // ---------- State ----------
-  let state = { current:0, done:[], plan:[], netto:"" };
-
-  function load(){
-    try{
-      const raw = localStorage.getItem(STORE_KEY);
-      if(raw){ const d = JSON.parse(raw);
-        state.current = Math.min(Math.max(d.current||0,0), LESSONS.length);
-        state.done = Array.isArray(d.done)?d.done:[];
-        state.plan = Array.isArray(d.plan)?d.plan:[];
-        state.netto = d.netto||"";
-      }
-    }catch(e){ console.warn("load failed", e); }
-  }
-  function save(){
-    try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(e){}
-  }
-
-  function fmtEUR(v){
-    return v.toLocaleString("de-DE",{maximumFractionDigits:0}) + " €";
-  }
-
-  // ---------- Render ----------
-  function render(){
-    renderProgress();
-    renderSteps();
-    if(state.current >= LESSONS.length) renderFinish();
-    else renderLesson(state.current);
-    window.scrollTo({top:0, behavior:"instant" in window ? "instant" : "auto"});
-  }
-
-  function renderProgress(){
-    const p = Math.round((state.done.length / LESSONS.length) * 100);
-    document.getElementById("p-val").textContent = p + " %";
-    document.getElementById("p-bar").style.width = p + "%";
-  }
-
-  function renderSteps(){
-    const el = document.getElementById("steps");
-    el.innerHTML = LESSONS.map((l,i)=>{
-      const done = state.done.includes(i);
-      const cur = state.current === i;
-      return `<button class="step ${done?'done':''}" aria-current="${cur}" title="Lektion ${i+1}" onclick="App.go(${i})">${done && !cur ? CHECK : (i+1)}</button>`;
-    }).join("") + (function(){
-      const done = state.done.length===LESSONS.length;
-      const cur = state.current >= LESSONS.length;
-      return `<button class="step ${done?'done':''}" aria-current="${cur}" title="Abschluss" onclick="App.go(${LESSONS.length})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg></button>`;
-    })();
-  }
-
-  function renderLesson(i){
-    const L = LESSONS[i];
-    const root = document.getElementById("lesson-root");
-    let html = `<article class="lesson">
-      <p class="l-eyebrow">${L.eyebrow}</p>
-      <h2>${L.title}</h2>
-      <div class="body">${L.body}</div>`;
-
-    if(L.calc){
-      html += `<div class="calc">
-        <p class="q-label">Kleine Übung</p>
-        <p class="q-question">${L.calc.q}</p>
-        <div class="calc-input">
-          <input type="number" id="netto" min="0" inputmode="numeric" placeholder="z. B. 2400" value="${state.netto?String(state.netto).replace(/"/g,""):""}" oninput="App.calc()">
-          <span class="unit">Euro netto / Monat</span>
-        </div>
-        <div class="calc-out" id="calc-out"></div>
-        <p class="calc-note">${L.calc.note}</p>
-      </div>`;
-    }
-
-    if(L.quiz){
-      html += `<div class="quiz">
-        <p class="q-label">Kurz-Check</p>
-        <p class="q-question">${L.quiz.q}</p>
-        <div class="q-options" id="q-options">` +
-        L.quiz.opts.map((o,j)=>`<button class="q-opt" data-j="${j}" onclick="App.answer(${i},${j})">${o}</button>`).join("") +
-        `</div>
-        <p class="q-feedback" id="q-feedback">${L.quiz.fb}</p>
-      </div>`;
-    }
-
-    const answered = state.done.includes(i);
-    html += `<div class="lesson-nav">
-      <button class="btn btn-ghost" ${i===0?"disabled":""} onclick="App.go(${i-1})">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-        Zurück
-      </button>
-      <button class="btn btn-primary" id="next-btn" ${answered?"":"disabled"} onclick="App.go(${i+1})">
-        ${i===LESSONS.length-1?"Zum Abschluss":"Weiter"}
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-      </button>
-    </div>
-    </article>`;
-
-    root.innerHTML = html;
-
-    if(L.calc) calc();
-    if(state.done.includes(i) && L.quiz){
-      markAnswer(i, LESSONS[i].quiz.correct, true);
-    }
-  }
-
-  function renderFinish(){
-    const root = document.getElementById("lesson-root");
-    const all = state.done.length === LESSONS.length;
-    root.innerHTML = `<article class="lesson finish">
-      <img class="em-emb" src="./assets/logo/emblem-bordeaux.png" alt="">
-      <p class="l-eyebrow">${all?"Geschafft":"Fast geschafft"}</p>
-      <h2>${all?'Du hast die Basics. <em>Jetzt kommt die Praxis.</em>':'Noch nicht <em>alle Lektionen</em> abgeschlossen.'}</h2>
-      <div class="body">
-        <p>${all
-          ? "Wissen wirkt erst, wenn du es umsetzt. Hier ist dein Aktionsplan, hake ab, was du erledigt hast. Dein Stand bleibt gespeichert."
-          : "Schließe alle fünf Kurz-Checks ab, um deinen vollen Fortschritt zu sehen. Deinen Aktionsplan kannst du trotzdem schon starten."}</p>
-      </div>
-      <ul class="plan">` +
-      PLAN.map((p,i)=>`<li class="${state.plan.includes(i)?'on':''}" onclick="App.togglePlan(${i})"><span class="check">${CHECK}</span><span class="txt">${p}</span></li>`).join("") +
-      `</ul>
-      <div class="finish-actions">
-        <button class="btn btn-ghost" onclick="App.go(0)">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-          Kurs nochmal ansehen
-        </button>
-        <button class="btn btn-primary" onclick="App.reset()">
-          Neu starten
-        </button>
-      </div>
-    </article>`;
-  }
-
-  // ---------- Interactions ----------
-  function answer(i, j){
-    const L = LESSONS[i];
-    markAnswer(i, j, false);
-    if(j === L.quiz.correct){
-      if(!state.done.includes(i)){ state.done.push(i); save(); }
-      renderProgress(); renderSteps();
-      const btn = document.getElementById("next-btn");
-      if(btn) btn.removeAttribute("disabled");
-      document.getElementById("q-feedback").classList.add("show");
-    }else{
-      toast("Fast. Schau dir die Lektion nochmal an und probier es erneut.");
-    }
-  }
-
-  function markAnswer(i, j, restored){
-    const L = LESSONS[i];
-    document.querySelectorAll("#q-options .q-opt").forEach(btn=>{
-      const bj = parseInt(btn.dataset.j,10);
-      btn.classList.remove("correct","wrong");
-      if(j === L.quiz.correct){
-        if(bj === L.quiz.correct) btn.classList.add("correct");
-        else btn.classList.add("wrong");
-        btn.disabled = true;
-      }else if(bj === j){
-        btn.classList.add("wrong");
-      }
-    });
-    if(restored){
-      const fb = document.getElementById("q-feedback");
-      if(fb) fb.classList.add("show");
-    }
-  }
-
-  function calc(){
-    const inp = document.getElementById("netto");
-    const out = document.getElementById("calc-out");
-    if(!inp || !out) return;
-    const v = parseFloat(inp.value);
-    state.netto = inp.value; save();
-    const L = LESSONS[1].calc;
-    out.innerHTML = L.tiles.map((t,i)=>{
-      const val = (!isNaN(v) && v>0) ? fmtEUR(v*t[1]) : "–";
-      return `<div class="calc-tile ${i===2?'clay':''}"><p class="c-label">${t[0]}</p><div class="c-val">${val}</div></div>`;
-    }).join("");
-  }
-
-  function togglePlan(i){
-    if(state.plan.includes(i)) state.plan = state.plan.filter(x=>x!==i);
-    else state.plan.push(i);
-    save();
-    renderFinish();
-  }
-
-  function go(i){
-    state.current = Math.min(Math.max(i,0), LESSONS.length);
-    save();
-    render();
-  }
-
-  function reset(){
-    if(!confirm("Kurs-Fortschritt und Aktionsplan zurücksetzen?")) return;
-    state = { current:0, done:[], plan:[], netto:"" };
-    save();
-    render();
-    toast("Alles zurückgesetzt. Viel Spaß beim zweiten Durchgang.");
-  }
-
-  let toastTimer=null;
-  function toast(msg){
-    const t=document.getElementById("toast"); t.textContent=msg; t.classList.add("show");
-    clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove("show"),3000);
-  }
-
-  function init(){ load(); render(); }
-
-  return {init, go, answer, calc, togglePlan, reset};
-})();
-App.init();
-</script>
 </body>
 </html>
