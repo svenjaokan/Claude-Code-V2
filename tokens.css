@@ -1,0 +1,106 @@
+/* ============================================================
+   THE IDENTITY ATELIER — Design Tokens
+   Drop this <style> / .css into any project and use the
+   var(--*) tokens everywhere. Self-host the fonts from
+   ./assets/fonts/ (paths below assume this file sits next
+   to an /assets folder).
+   ============================================================ */
+
+/* ---- Fonts ---- */
+@font-face{
+  font-family:'Playfair Display';
+  src:url('./assets/fonts/PlayfairDisplay-Variable.ttf') format('truetype');
+  font-weight:400 900; font-style:normal; font-display:swap;
+}
+@font-face{
+  font-family:'Playfair Display';
+  src:url('./assets/fonts/PlayfairDisplay-Italic-Variable.ttf') format('truetype');
+  font-weight:400 900; font-style:italic; font-display:swap;
+}
+@font-face{
+  font-family:'Noto Serif';
+  src:url('./assets/fonts/NotoSerif-Variable.ttf') format('truetype');
+  font-weight:100 900; font-style:normal; font-display:swap;
+}
+@font-face{
+  font-family:'Noto Serif';
+  src:url('./assets/fonts/NotoSerif-Italic-Variable.ttf') format('truetype');
+  font-weight:100 900; font-style:italic; font-display:swap;
+}
+@font-face{
+  font-family:'Gloria Hallelujah';
+  src:url('./assets/fonts/GloriaHallelujah-Regular.ttf') format('truetype');
+  font-weight:400; font-style:normal; font-display:swap;
+}
+/* UI sans (Google substitute — replace if a licensed face exists) */
+@import url('https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&display=swap');
+
+:root{
+  /* ============ COLOR ============ */
+  /* Cream / "paper" neutrals */
+  --c-bone-50:#faf7f1; --c-bone-100:#f6f2ea; --c-bone-200:#f0ebe1;
+  --c-bone-300:#e7dccb; --c-bone-400:#d8cab2; --c-bone-500:#c4b298;
+  /* Ink (warm near-black) */
+  --c-ink-900:#1c191b; --c-ink-800:#282427; --c-ink-700:#3a353a;
+  --c-ink-600:#4a4448; --c-ink-500:#6b6469; --c-ink-400:#938b90;
+  /* Bordeaux (the single loud accent) */
+  --c-bordeaux-900:#2e0304; --c-bordeaux-800:#3d0405; --c-bordeaux-700:#540607;
+  --c-bordeaux-600:#6e1314; --c-bordeaux-500:#8a2324; --c-bordeaux-100:#efddd9;
+  /* Supporting editorial tones (use quietly) */
+  --c-clay:#cf7a43;     /* warm terracotta/orange — pairs with the 3H product mark */
+  --c-ocean:#6f8c92; --c-stone:#9a9088; --c-brass:#b08d57;
+  --c-white:#ffffff;
+
+  /* ---- Semantic aliases — USE THESE ---- */
+  --bg-page:#f4f3ef;            /* warm cream canvas (light page background) */
+  --bg-page-soft:#faf9f6;
+  --surface:#ffffff;            /* cards, panels */
+  --surface-ink:#282427;        /* dark sections */
+  --bg-dark:#141013;            /* deepest dark section background */
+
+  --text:#282427;
+  --text-soft:#4a4448;
+  --text-muted:#6b6469;
+  --text-faint:#938b90;
+  --text-on-dark:#f0ebe1;
+  --text-on-dark-muted:#d8cab2;
+
+  --accent:#540607;             /* bordeaux — primary brand accent */
+  --accent-hover:#6e1314;
+  --accent-2:#cf7a43;           /* clay/orange — secondary highlight (numbers, keywords) */
+  --on-accent:#f6f2ea;
+
+  --border:#e8e3d8;             /* warm hairline (never pure grey) */
+  --border-strong:#cabfad;
+  --border-on-dark:rgba(240,235,225,.18);
+  --focus-ring:rgba(84,6,7,.35);
+
+  /* ============ TYPE ============ */
+  --font-display:'Playfair Display','Times New Roman',Georgia,serif; /* headlines, italic emphasis */
+  --font-serif:'Noto Serif',Georgia,'Times New Roman',serif;         /* editorial body / leads */
+  --font-body:'Hanken Grotesk','Helvetica Neue',Arial,sans-serif;    /* UI, labels, buttons */
+  --font-script:'Gloria Hallelujah','Segoe Script',cursive;          /* rare handwritten accent */
+
+  --fw-regular:400; --fw-medium:500; --fw-semibold:600; --fw-bold:700; --fw-black:800;
+
+  /* Fluid display scale */
+  --text-hero:clamp(3rem,7.6vw,6.5rem);
+  --text-d1:clamp(2.5rem,5.5vw,4.5rem);
+  --text-d2:clamp(2rem,4vw,3.25rem);
+  --text-d3:clamp(1.6rem,2.9vw,2.4rem);
+  /* Static scale */
+  --text-h4:1.5rem; --text-h5:1.25rem; --text-lg:1.125rem;
+  --text-base:1rem; --text-sm:.875rem; --text-xs:.75rem; --text-2xs:.6875rem;
+
+  --lh-tight:1.02; --lh-snug:1.18; --lh-normal:1.45; --lh-relaxed:1.65;
+  --ls-tight:-0.02em; --ls-wide:.04em; --ls-eyebrow:.22em;
+
+  /* ============ SHAPE / SPACE ============ */
+  --radius-sm:8px; --radius-md:12px; --radius-lg:16px; --radius-xl:22px; --radius-pill:999px;
+  --shadow-sm:0 1px 2px rgba(40,36,39,.06),0 2px 8px rgba(40,36,39,.05);
+  --shadow-md:0 10px 30px -12px rgba(40,36,39,.22);
+  --shadow-lg:0 30px 60px -24px rgba(40,36,39,.30);
+  --shadow-accent:0 16px 40px -16px rgba(84,6,7,.55);
+  --container:1200px; --reading:760px;
+  --ease:cubic-bezier(.2,.6,.2,1);
+}

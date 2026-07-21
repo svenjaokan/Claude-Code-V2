@@ -1,0 +1,598 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Antistress Quiz | The Identity Atelier</title>
+<meta name="description" content="Dein Antistress Quiz für Frauen. Finde in unter 10 Minuten heraus, wo dein Stress wirklich sitzt. Ein Freebie von Svenja Okan.">
+<link rel="icon" href="./assets/logo/emblem-bordeaux.svg">
+<link rel="stylesheet" href="./tokens.css">
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg-page);
+  color:var(--text);
+  font-family:var(--font-body);
+  font-size:16px;
+  line-height:var(--lh-normal);
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+.wrap{max-width:760px;margin:0 auto;padding:0 clamp(18px,4vw,40px)}
+a{color:inherit}
+
+/* ---------- Header ---------- */
+.brandhead{background:var(--bg-page);text-align:center;padding:26px 20px 6px}
+.brandhead .emblem{width:48px;height:auto;margin:0 auto 12px;display:block}
+.brandhead .wordmark{width:172px;height:auto;margin:0 auto 10px;display:block}
+.powered{
+  font-size:var(--text-2xs);letter-spacing:var(--ls-eyebrow);text-transform:uppercase;
+  color:var(--text-faint);margin:0
+}
+
+/* ---------- Intro ---------- */
+.intro{text-align:center;padding:clamp(18px,4vw,30px) 0 clamp(20px,4vw,34px)}
+.eyebrow{
+  font-family:var(--font-body);font-size:var(--text-xs);letter-spacing:var(--ls-eyebrow);
+  text-transform:uppercase;color:var(--accent);margin:0 0 14px;font-weight:var(--fw-semibold)
+}
+.intro h1{
+  font-family:var(--font-display);font-weight:var(--fw-semibold);
+  font-size:var(--text-d2);line-height:var(--lh-snug);letter-spacing:var(--ls-tight);
+  margin:0 0 12px
+}
+.intro h1 em{font-style:italic;color:var(--accent)}
+.intro p.lead{
+  font-family:var(--font-serif);color:var(--text-soft);max-width:540px;margin:0 auto;
+  font-size:var(--text-lg)
+}
+.privacy{
+  display:inline-flex;align-items:center;gap:9px;margin-top:18px;
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-pill);
+  padding:8px 16px;font-size:var(--text-sm);color:var(--text-soft);box-shadow:var(--shadow-sm)
+}
+.privacy svg{width:16px;height:16px;color:var(--accent);flex:none}
+
+/* ---------- Start card ---------- */
+.card{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xl);
+  box-shadow:var(--shadow-sm);padding:clamp(24px,4vw,40px);margin-bottom:24px
+}
+.startmeta{display:flex;justify-content:center;gap:26px;flex-wrap:wrap;margin:0 0 24px}
+.startmeta .m{display:flex;align-items:center;gap:8px;font-size:var(--text-sm);color:var(--text-soft)}
+.startmeta svg{width:17px;height:17px;color:var(--accent);flex:none}
+.startlist{max-width:460px;margin:0 auto 26px;padding:0;list-style:none}
+.startlist li{
+  display:flex;gap:11px;align-items:flex-start;padding:9px 0;
+  font-family:var(--font-serif);color:var(--text-soft);font-size:var(--text-base);text-align:left
+}
+.startlist svg{width:17px;height:17px;color:var(--accent);flex:none;margin-top:3px}
+
+/* ---------- Buttons ---------- */
+.btn{
+  appearance:none;cursor:pointer;font-family:var(--font-body);font-size:var(--text-sm);
+  font-weight:var(--fw-semibold);letter-spacing:.01em;border-radius:var(--radius-pill);
+  padding:13px 26px;display:inline-flex;align-items:center;gap:8px;border:1px solid transparent;
+  transition:all .16s var(--ease);max-width:100%;text-align:center;justify-content:center;text-decoration:none
+}
+.btn svg{width:16px;height:16px;flex:none}
+.btn-primary{background:var(--accent);color:var(--on-accent);box-shadow:var(--shadow-accent)}
+.btn-primary:hover{background:var(--accent-hover)}
+.btn-ghost{background:var(--surface);color:var(--text);border-color:var(--border)}
+.btn-ghost:hover{border-color:var(--border-strong);transform:translateY(-1px)}
+.center{text-align:center}
+
+/* ---------- Progress ---------- */
+.progress{margin:6px 0 22px}
+.progress .p-meta{
+  display:flex;justify-content:space-between;font-size:var(--text-xs);
+  letter-spacing:.04em;text-transform:uppercase;color:var(--text-muted);
+  font-weight:var(--fw-semibold);margin-bottom:8px
+}
+.bar{height:8px;border-radius:var(--radius-pill);background:var(--c-bone-200);overflow:hidden}
+.bar > span{display:block;height:100%;border-radius:var(--radius-pill);background:var(--accent);transition:width .4s var(--ease)}
+
+/* ---------- Question ---------- */
+.q-cat{
+  font-size:var(--text-xs);letter-spacing:var(--ls-eyebrow);text-transform:uppercase;
+  color:var(--accent);font-weight:var(--fw-semibold);margin:0 0 10px
+}
+.q-text{
+  font-family:var(--font-display);font-size:var(--text-d3);font-weight:var(--fw-semibold);
+  letter-spacing:var(--ls-tight);line-height:var(--lh-snug);margin:0 0 24px
+}
+.answers{display:flex;flex-direction:column;gap:10px}
+.answer{
+  appearance:none;cursor:pointer;text-align:left;width:100%;
+  background:var(--bg-page-soft);border:1px solid var(--border);border-radius:var(--radius-md);
+  padding:15px 18px;font-family:var(--font-serif);font-size:var(--text-base);color:var(--text);
+  line-height:var(--lh-normal);transition:all .16s var(--ease);min-height:44px
+}
+.answer:hover{border-color:var(--accent);background:var(--c-bordeaux-100)}
+.answer:focus-visible{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--focus-ring)}
+.answer.selected{background:var(--accent);border-color:var(--accent);color:var(--on-accent);box-shadow:var(--shadow-accent)}
+.q-foot{display:flex;justify-content:space-between;align-items:center;margin-top:22px;gap:10px;flex-wrap:wrap}
+.backlink{
+  appearance:none;border:0;background:transparent;cursor:pointer;font-family:var(--font-body);
+  font-size:var(--text-sm);color:var(--text-muted);display:inline-flex;align-items:center;gap:6px;
+  padding:10px 6px;border-radius:var(--radius-sm)
+}
+.backlink:hover{color:var(--accent)}
+.backlink svg{width:15px;height:15px}
+.q-hint{font-size:var(--text-xs);color:var(--text-faint)}
+
+/* ---------- Result ---------- */
+.r-eyebrow{
+  font-size:var(--text-xs);letter-spacing:var(--ls-eyebrow);text-transform:uppercase;
+  color:var(--accent);font-weight:var(--fw-semibold);margin:0 0 10px;text-align:center
+}
+.r-title{
+  font-family:var(--font-display);font-size:var(--text-d2);font-weight:var(--fw-semibold);
+  letter-spacing:var(--ls-tight);line-height:var(--lh-snug);margin:0 0 14px;text-align:center
+}
+.r-title em{font-style:italic;color:var(--accent)}
+.r-lead{
+  font-family:var(--font-serif);color:var(--text-soft);font-size:var(--text-lg);
+  max-width:560px;margin:0 auto 28px;text-align:center
+}
+.scorewrap{display:flex;justify-content:center;margin-bottom:30px}
+.scorering{position:relative;width:150px;height:150px}
+.scorering svg{width:150px;height:150px;transform:rotate(-90deg)}
+.scorering .ring-bg{fill:none;stroke:var(--c-bone-200);stroke-width:10}
+.scorering .ring-val{fill:none;stroke:var(--accent);stroke-width:10;stroke-linecap:round;transition:stroke-dashoffset .9s var(--ease)}
+.scorering .s-num{
+  position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+}
+.scorering .s-num strong{font-family:var(--font-display);font-size:2.3rem;font-weight:var(--fw-semibold);line-height:1;color:var(--accent)}
+.scorering .s-num span{font-size:var(--text-2xs);letter-spacing:.06em;text-transform:uppercase;color:var(--text-faint);margin-top:5px}
+
+.areas{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:28px}
+.area{padding:16px 18px;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--bg-page-soft)}
+.area .a-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;gap:10px}
+.area .a-name{font-size:var(--text-sm);font-weight:var(--fw-semibold);color:var(--text)}
+.area .a-level{font-size:var(--text-xs);letter-spacing:.04em;text-transform:uppercase;font-weight:var(--fw-semibold);color:var(--text-muted)}
+.area .a-level.hot{color:var(--accent)}
+.area .a-note{font-family:var(--font-serif);font-size:var(--text-sm);color:var(--text-soft);margin:8px 0 0}
+
+.tips{margin:0 0 6px}
+.tips h3{
+  font-family:var(--font-body);font-size:var(--text-sm);letter-spacing:.04em;text-transform:uppercase;
+  color:var(--text-muted);font-weight:var(--fw-semibold);margin:0 0 16px
+}
+.tip{display:flex;gap:14px;align-items:flex-start;padding:12px 0;border-top:1px solid var(--border)}
+.tip:last-child{padding-bottom:0}
+.tip .t-num{
+  font-family:var(--font-display);font-style:italic;font-size:var(--text-h5);
+  color:var(--accent-2);flex:none;width:26px;text-align:center;line-height:1.4
+}
+.tip p{margin:0;font-family:var(--font-serif);color:var(--text-soft);font-size:var(--text-base)}
+.tip p strong{color:var(--text);font-weight:var(--fw-semibold)}
+
+/* ---------- CTA ---------- */
+.cta{
+  background:var(--surface-ink);color:var(--text-on-dark);border-radius:var(--radius-xl);
+  padding:clamp(26px,4vw,40px);text-align:center;margin-bottom:24px
+}
+.cta .c-eyebrow{
+  font-size:var(--text-xs);letter-spacing:var(--ls-eyebrow);text-transform:uppercase;
+  color:var(--accent-2);font-weight:var(--fw-semibold);margin:0 0 12px
+}
+.cta h2{
+  font-family:var(--font-display);font-size:var(--text-d3);font-weight:var(--fw-semibold);
+  letter-spacing:var(--ls-tight);line-height:var(--lh-snug);margin:0 0 12px
+}
+.cta h2 em{font-style:italic;color:var(--accent-2)}
+.cta p{
+  font-family:var(--font-serif);color:var(--text-on-dark-muted);max-width:480px;
+  margin:0 auto 22px;font-size:var(--text-base)
+}
+.cta .btn-primary{box-shadow:none}
+
+.hidden{display:none}
+.fadein{animation:rise .32s var(--ease)}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){
+  .fadein{animation:none}
+  .bar > span,.scorering .ring-val{transition:none}
+}
+
+/* ---------- Footer ---------- */
+.atelier-footer{background:var(--bg-dark);color:var(--text-on-dark-muted);padding:clamp(44px,6vw,72px) 0 36px;text-align:center;font-family:var(--font-body);margin-top:56px}
+.atelier-footer .fw{width:min(240px,70vw);height:auto;margin:0 auto 26px;display:block}
+.atelier-footer .social{display:flex;gap:22px;justify-content:center;align-items:center;flex-wrap:wrap;margin-bottom:24px}
+.atelier-footer .social a{font-size:13px;letter-spacing:.06em;color:var(--text-on-dark-muted);text-decoration:none}
+.atelier-footer .social a:hover{color:var(--text-on-dark)}
+.atelier-footer .divider{height:1px;background:var(--border-on-dark);max-width:520px;margin:0 auto 22px}
+.atelier-footer .legal{display:flex;gap:20px;justify-content:center;align-items:center;flex-wrap:wrap;font-size:12.5px;color:var(--text-faint)}
+.atelier-footer .legal a{color:var(--text-faint);text-decoration:none}
+.atelier-footer .legal a:hover{color:var(--text-on-dark-muted)}
+
+@media (max-width:560px){
+  .q-text{font-size:var(--text-h4)}
+  .startmeta{gap:14px}
+  .q-foot .btn{flex:1 1 auto}
+}
+</style>
+</head>
+<body>
+
+<!-- ===== Brand header ===== -->
+<header class="brandhead">
+  <img class="emblem" src="./assets/logo/emblem-bordeaux.png" alt="The Identity Atelier">
+  <img class="wordmark" src="./assets/logo/atelier-wordmark-bordeaux.png" alt="The Identity Atelier — the place to build your online empire">
+  <p class="powered">Powered by Svenja Okan Consulting</p>
+</header>
+
+<main class="wrap">
+
+  <!-- ===== Start screen ===== -->
+  <section id="view-start" class="fadein">
+    <div class="intro">
+      <p class="eyebrow">Dein Freebie · Antistress Quiz</p>
+      <h1>Wo sitzt dein Stress <em>wirklich?</em></h1>
+      <p class="lead">Zwölf ehrliche Fragen, keine zehn Minuten. Am Ende weißt du, wo dein Stress herkommt und was du als Erstes verändern kannst.</p>
+      <div class="privacy">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Deine Antworten bleiben nur auf diesem Gerät. Niemand sonst sieht sie.
+      </div>
+    </div>
+
+    <div class="card center">
+      <div class="startmeta">
+        <span class="m">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+          Unter 10 Minuten
+        </span>
+        <span class="m">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3 8-8"/><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"/></svg>
+          12 Fragen
+        </span>
+        <span class="m">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-4.6-9.5-9A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 9.5 6c-2.5 4.4-9.5 9-9.5 9z"/></svg>
+          Für Frauen gemacht
+        </span>
+      </div>
+      <ul class="startlist">
+        <li>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+          Du siehst, in welchem Bereich dein Stresslevel gerade liegt.
+        </li>
+        <li>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+          Du erkennst, ob dein Stress eher im Körper, im Kopf oder im Alltag sitzt.
+        </li>
+        <li>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+          Du bekommst drei kleine Schritte, die du sofort umsetzen kannst.
+        </li>
+      </ul>
+      <button class="btn btn-primary" onclick="Quiz.start()">
+        Quiz starten
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </button>
+    </div>
+  </section>
+
+  <!-- ===== Quiz screen ===== -->
+  <section id="view-quiz" class="hidden">
+    <div class="progress">
+      <div class="p-meta">
+        <span id="p-count">Frage 1 von 12</span>
+        <span id="p-cat"></span>
+      </div>
+      <div class="bar"><span id="p-bar" style="width:0%"></span></div>
+    </div>
+
+    <div class="card" id="q-card">
+      <p class="q-cat" id="q-cat"></p>
+      <h2 class="q-text" id="q-text"></h2>
+      <div class="answers" id="q-answers"></div>
+      <div class="q-foot">
+        <button class="backlink" id="q-back" onclick="Quiz.back()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+          Zurück
+        </button>
+        <span class="q-hint">Wähle die Antwort, die sich am ehrlichsten anfühlt.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Result screen ===== -->
+  <section id="view-result" class="hidden">
+    <p class="r-eyebrow">Dein Ergebnis</p>
+    <h1 class="r-title" id="r-title"></h1>
+    <p class="r-lead" id="r-lead"></p>
+
+    <div class="scorewrap">
+      <div class="scorering">
+        <svg viewBox="0 0 150 150">
+          <circle class="ring-bg" cx="75" cy="75" r="64"/>
+          <circle class="ring-val" id="r-ring" cx="75" cy="75" r="64" stroke-dasharray="402" stroke-dashoffset="402"/>
+        </svg>
+        <div class="s-num">
+          <strong id="r-percent">0%</strong>
+          <span>Stresslevel</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="areas" id="r-areas"></div>
+      <div class="tips">
+        <h3>Deine ersten drei Schritte</h3>
+        <div id="r-tips"></div>
+      </div>
+    </div>
+
+    <div class="cta">
+      <p class="c-eyebrow">Und jetzt?</p>
+      <h2>Dein Ergebnis ist ein Anfang, <em>kein Urteil.</em></h2>
+      <p>Wenn du tiefer gehen willst, begleite ich dich als Antistress Coach dabei, aus dem Dauerdruck wieder in deine Ruhe zu kommen. Schreib mir und wir schauen gemeinsam auf dein Ergebnis.</p>
+      <a class="btn btn-primary" href="mailto:hello@svenjaokan.de?subject=Mein%20Antistress%20Quiz%20Ergebnis">
+        Schreib mir dein Ergebnis
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+      </a>
+    </div>
+
+    <p class="center" style="margin-bottom:8px">
+      <button class="btn btn-ghost" onclick="Quiz.restart()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
+        Quiz noch einmal machen
+      </button>
+    </p>
+  </section>
+
+</main>
+
+<!-- ===== Footer ===== -->
+<footer class="atelier-footer">
+  <img class="fw" src="./assets/logo/atelier-wordmark-cream.png" alt="The Identity Atelier — the place to build your online empire">
+  <div class="social">
+    <a href="https://www.instagram.com/svenjaokan.de" target="_blank" rel="noopener">Instagram</a>
+    <a href="https://www.linkedin.com/in/svenjaokan" target="_blank" rel="noopener">LinkedIn</a>
+    <a href="https://www.youtube.com/@TheIdentityAtelier" target="_blank" rel="noopener">YouTube</a>
+    <a href="mailto:hello@svenjaokan.de">hello@svenjaokan.de</a>
+  </div>
+  <div class="divider"></div>
+  <div class="legal">
+    <span>© 2026 The Identity Atelier · O´consulting / Svenja Okan</span>
+    <a href="https://www.svenjaokan.de/datenschutz" target="_blank" rel="noopener">Datenschutz</a>
+    <a href="https://www.svenjaokan.de/impressum" target="_blank" rel="noopener">Impressum</a>
+  </div>
+</footer>
+
+<script>
+const Quiz = (function(){
+  "use strict";
+
+  const CATS = {
+    koerper: "Dein Körper",
+    kopf:    "Deine Gedanken",
+    alltag:  "Dein Alltag"
+  };
+
+  // Antworten immer von 0 (entspannt) bis 3 (hoher Stress)
+  const SCALE_OFT = [
+    "Selten oder nie",
+    "Ab und zu",
+    "Häufig",
+    "Fast täglich"
+  ];
+
+  const QUESTIONS = [
+    {cat:"koerper", text:"Wie oft wachst du morgens auf und fühlst dich schon erschöpft?", answers:SCALE_OFT},
+    {cat:"koerper", text:"Wie oft merkst du körperliche Anspannung, zum Beispiel im Nacken, Kiefer oder Bauch?", answers:SCALE_OFT},
+    {cat:"koerper", text:"Wie gut kannst du abends ein- und durchschlafen?", answers:[
+      "Sehr gut, ich schlafe ruhig",
+      "Meistens gut, mit kleinen Ausnahmen",
+      "Oft schwer, ich brauche lange oder wache auf",
+      "Fast jede Nacht ist unruhig"
+    ]},
+    {cat:"koerper", text:"Wie oft gönnst du deinem Körper bewusst eine Pause, ohne Handy und ohne To-do?", answers:[
+      "Jeden Tag",
+      "Mehrmals pro Woche",
+      "Selten",
+      "Ehrlich gesagt fast nie"
+    ]},
+    {cat:"kopf", text:"Wie oft kreisen deine Gedanken abends um offene Aufgaben oder Sorgen?", answers:SCALE_OFT},
+    {cat:"kopf", text:"Wie oft hast du das Gefühl, es allen recht machen zu müssen?", answers:SCALE_OFT},
+    {cat:"kopf", text:"Wie streng bist du mit dir selbst, wenn etwas nicht perfekt läuft?", answers:[
+      "Ich bin freundlich mit mir",
+      "Ich hadere kurz, lasse es dann los",
+      "Ich mache mir oft Vorwürfe",
+      "Meine innere Kritikerin ist ständig laut"
+    ]},
+    {cat:"kopf", text:"Wie oft sagst du Ja, obwohl du eigentlich Nein meinst?", answers:SCALE_OFT},
+    {cat:"alltag", text:"Wie oft fühlt sich dein Tag an wie ein Wettlauf gegen die Uhr?", answers:SCALE_OFT},
+    {cat:"alltag", text:"Wie viel Zeit am Tag gehört wirklich nur dir?", answers:[
+      "Mindestens eine Stunde",
+      "Etwa eine halbe Stunde",
+      "Ein paar Minuten zwischendurch",
+      "So gut wie keine"
+    ]},
+    {cat:"alltag", text:"Wie oft fällt Erholung als Erstes weg, wenn es voll wird?", answers:SCALE_OFT},
+    {cat:"alltag", text:"Wie oft bist du bei schönen Momenten mit dem Kopf schon beim nächsten Punkt auf der Liste?", answers:SCALE_OFT}
+  ];
+
+  const MAX_PER_Q = 3;
+
+  const LEVELS = [
+    {
+      max:0.33,
+      title:'Du bist gut <em>bei dir.</em>',
+      lead:"Dein Stresslevel ist gerade niedrig. Du hast ein gutes Gespür dafür, was dir guttut. Deine Aufgabe ist jetzt, das zu schützen, bevor der Alltag wieder lauter wird."
+    },
+    {
+      max:0.66,
+      title:'Du funktionierst, aber es <em>kostet dich.</em>',
+      lead:"Nach außen läuft alles, doch innen wird es enger. Genau jetzt ist der beste Moment, gegenzusteuern, solange kleine Veränderungen noch viel bewirken."
+    },
+    {
+      max:1.01,
+      title:'Dein System läuft auf <em>Reserve.</em>',
+      lead:"Dein Ergebnis zeigt ein hohes Stresslevel. Das ist kein Zeichen von Schwäche, sondern ein deutliches Signal deines Körpers. Du musst da nicht alleine durch."
+    }
+  ];
+
+  const AREA_NOTES = {
+    koerper:{
+      low:"Dein Körper ist gerade eine gute Verbündete. Halte deine Pausen und deinen Schlaf weiter in Ehren.",
+      mid:"Dein Körper sendet erste Signale. Anspannung und Müdigkeit sind seine Art zu sagen: Ich brauche mehr Ruhe.",
+      high:"Dein Körper spricht sehr deutlich mit dir. Schlaf, Atmung und echte Pausen sind jetzt deine wichtigsten Hebel."
+    },
+    kopf:{
+      low:"Dein Kopf gönnt dir Ruhe. Deine Gedanken arbeiten für dich, nicht gegen dich.",
+      mid:"Dein Kopf kommt schwer zur Ruhe. Hohe Ansprüche und Grübeln kosten dich still und leise Energie.",
+      high:"Der größte Druck entsteht gerade in deinem Kopf. Die gute Nachricht: Genau da kannst du am meisten verändern."
+    },
+    alltag:{
+      low:"Dein Alltag lässt dir Raum. Du hast Zeitinseln, die wirklich dir gehören.",
+      mid:"Dein Alltag ist eng getaktet. Deine eigenen Bedürfnisse rutschen öfter ans Ende der Liste.",
+      high:"Dein Alltag lässt dir kaum Luft. Der erste Schritt ist nicht mehr Disziplin, sondern mehr Raum für dich."
+    }
+  };
+
+  const TIPS = {
+    koerper:[
+      {t:"Atme dich runter.", p:"Dreimal am Tag: vier Sekunden einatmen, sechs Sekunden ausatmen, sechs Wiederholungen. Das beruhigt dein Nervensystem messbar."},
+      {t:"Schütze deinen Schlaf.", p:"Lege eine feste Zeit fest, ab der das Handy aus der Hand geht. Dein Körper braucht einen ruhigen Übergang in die Nacht."}
+    ],
+    kopf:[
+      {t:"Leere deinen Kopf auf Papier.", p:"Schreibe abends fünf Minuten alles auf, was kreist. Was auf dem Papier steht, muss nicht mehr in deinem Kopf wohnen."},
+      {t:"Übe das kleine Nein.", p:"Sage diese Woche einmal bewusst Nein zu etwas Kleinem. Jedes ehrliche Nein zu anderen ist ein Ja zu dir."}
+    ],
+    alltag:[
+      {t:"Blocke deine Ich-Zeit.", p:"Trage 20 Minuten nur für dich in den Kalender ein, so verbindlich wie jeden anderen Termin. Nicht verhandelbar."},
+      {t:"Baue Mini-Pausen ein.", p:"Zwischen zwei Aufgaben: aufstehen, ans Fenster, drei tiefe Atemzüge. Kleine Pausen wirken, weil sie wirklich stattfinden."}
+    ]
+  };
+
+  let current = 0;
+  let picks = [];
+
+  const $ = id => document.getElementById(id);
+
+  function show(view){
+    ["view-start","view-quiz","view-result"].forEach(v=>{
+      const el = $(v);
+      el.classList.toggle("hidden", v!==view);
+      el.classList.remove("fadein");
+      if(v===view){ void el.offsetWidth; el.classList.add("fadein"); }
+    });
+    window.scrollTo({top:0, behavior:"smooth"});
+  }
+
+  function render(){
+    const q = QUESTIONS[current];
+    $("p-count").textContent = "Frage " + (current+1) + " von " + QUESTIONS.length;
+    $("p-cat").textContent = CATS[q.cat];
+    $("p-bar").style.width = (current / QUESTIONS.length * 100) + "%";
+    $("q-cat").textContent = CATS[q.cat];
+    $("q-text").textContent = q.text;
+    $("q-back").style.visibility = current===0 ? "hidden" : "visible";
+
+    const box = $("q-answers");
+    box.innerHTML = "";
+    q.answers.forEach((a,i)=>{
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "answer" + (picks[current]===i ? " selected" : "");
+      b.textContent = a;
+      b.onclick = ()=>pick(i);
+      box.appendChild(b);
+    });
+
+    const card = $("q-card");
+    card.classList.remove("fadein");
+    void card.offsetWidth;
+    card.classList.add("fadein");
+  }
+
+  function pick(i){
+    picks[current] = i;
+    render();
+    setTimeout(()=>{
+      if(current < QUESTIONS.length-1){ current++; render(); }
+      else { finish(); }
+    }, 260);
+  }
+
+  function finish(){
+    const total = picks.reduce((s,v)=>s+v,0);
+    const maxTotal = QUESTIONS.length * MAX_PER_Q;
+    const ratio = total / maxTotal;
+    const pct = Math.round(ratio*100);
+    const level = LEVELS.find(l=>ratio < l.max) || LEVELS[LEVELS.length-1];
+
+    $("r-title").innerHTML = level.title;
+    $("r-lead").textContent = level.lead;
+
+    // Score-Ring
+    show("view-result");
+    $("r-percent").textContent = pct + "%";
+    const ring = $("r-ring");
+    ring.setAttribute("stroke-dashoffset", 402);
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      ring.setAttribute("stroke-dashoffset", Math.round(402 * (1 - ratio)));
+    }));
+
+    // Bereiche auswerten
+    const areaScores = {};
+    QUESTIONS.forEach((q,i)=>{
+      areaScores[q.cat] = areaScores[q.cat] || {sum:0, max:0};
+      areaScores[q.cat].sum += picks[i];
+      areaScores[q.cat].max += MAX_PER_Q;
+    });
+
+    const areaBox = $("r-areas");
+    areaBox.innerHTML = "";
+    const ranked = Object.keys(areaScores)
+      .map(cat=>({cat, r:areaScores[cat].sum/areaScores[cat].max}))
+      .sort((a,b)=>b.r-a.r);
+
+    ranked.forEach(({cat,r})=>{
+      const band = r < 0.34 ? "low" : r < 0.67 ? "mid" : "high";
+      const label = band==="low" ? "Entspannt" : band==="mid" ? "Angespannt" : "Hoch belastet";
+      const div = document.createElement("div");
+      div.className = "area";
+      div.innerHTML =
+        '<div class="a-head">' +
+          '<span class="a-name">' + CATS[cat] + '</span>' +
+          '<span class="a-level' + (band==="high" ? " hot" : "") + '">' + label + '</span>' +
+        '</div>' +
+        '<div class="bar"><span style="width:' + Math.round(r*100) + '%"></span></div>' +
+        '<p class="a-note">' + AREA_NOTES[cat][band] + '</p>';
+      areaBox.appendChild(div);
+    });
+
+    // Tipps: zwei aus dem stärksten Bereich, einer aus dem zweiten
+    const tipList = [ TIPS[ranked[0].cat][0], TIPS[ranked[0].cat][1], TIPS[ranked[1].cat][0] ];
+    const tipBox = $("r-tips");
+    tipBox.innerHTML = "";
+    tipList.forEach((tip,i)=>{
+      const div = document.createElement("div");
+      div.className = "tip";
+      div.innerHTML =
+        '<span class="t-num">' + (i+1) + '</span>' +
+        '<p><strong>' + tip.t + '</strong> ' + tip.p + '</p>';
+      tipBox.appendChild(div);
+    });
+  }
+
+  function start(){
+    current = 0;
+    picks = [];
+    show("view-quiz");
+    render();
+  }
+
+  return {
+    start,
+    restart: start,
+    back(){ if(current>0){ current--; render(); } }
+  };
+})();
+</script>
+</body>
+</html>
