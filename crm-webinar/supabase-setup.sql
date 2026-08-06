@@ -33,6 +33,9 @@ create table if not exists public.leads (
   produkt text not null default '',              -- '' | kurs | selbstlernkurs
   kosten numeric not null default 0,             -- Lead-Kosten (Reseller-Partnermodus)
   notes jsonb not null default '[]',             -- [{t, by, text}]
+  onboarding_info text default '',               -- Infos für die Assistentin
+  onboarding_status text not null default 'offen', -- offen | termin | erledigt
+  start_datum date,                              -- wann angefangen
   created_by_email text default '',
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()

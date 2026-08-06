@@ -247,6 +247,7 @@
     <button class="tab active" id="tab_dash" onclick="App.setTab('dash')">Dashboard</button>
     <button class="tab" id="tab_webinar" onclick="App.setTab('webinar')">Webinar-Leads</button>
     <button class="tab" id="tab_evergreen" onclick="App.setTab('evergreen')">Evergreen-Leads</button>
+    <button class="tab" id="tab_onboarding" onclick="App.setTab('onboarding')">Onboarding</button>
   </div>
   <div class="wrap">
 
@@ -339,6 +340,40 @@
       </div>
     </div>
 
+    <!-- ONBOARDING -->
+    <div id="view_onboarding" style="display:none">
+      <div class="pagehead">
+        <div><h1>Onboarding</h1><p>Alle Closes mit Infos, Zahlungsstand und Startdatum. Für die Terminvergabe und Betreuung.</p></div>
+      </div>
+      <div class="toolbar">
+        <input class="search" id="ob_search" placeholder="Suchen: Name, E-Mail, Telefon" oninput="App.render()">
+        <select class="filter" id="ob_filter_status" onchange="App.render()">
+          <option value="">Status: Alle</option>
+          <option value="offen">Offen</option>
+          <option value="termin">Termin vereinbart</option>
+          <option value="erledigt">Erledigt</option>
+        </select>
+      </div>
+      <div class="card">
+        <div class="tablescroll">
+          <table id="ob_tbl" style="min-width:1100px">
+            <thead>
+              <tr>
+                <th>Name</th><th>Kontakt</th><th>Onboarding-Infos</th>
+                <th style="text-align:right">Bezahlt</th><th>Zahlung</th><th>Produkt</th>
+                <th>Onboarding-Status</th><th>Angefangen am</th><th></th>
+              </tr>
+            </thead>
+            <tbody id="ob_tbody"></tbody>
+          </table>
+        </div>
+        <div class="empty" id="ob_empty" style="display:none">
+          <div class="t">Noch keine Leads im Onboarding</div>
+          Sobald ein Lead auf "Close" oder "Onboarding-Termin gelegt" steht, erscheint er hier.
+        </div>
+      </div>
+    </div>
+
     <div class="privacy" id="privacyNote"></div>
   </div>
 </div>
@@ -365,6 +400,13 @@
         <select id="f_produkt"><option value="">Noch offen</option><option value="kurs">Normaler Kurs</option><option value="selbstlernkurs">Selbstlernkurs</option></select>
       </div>
       <div class="field"><label>Lead-Kosten (€) <span class="hint" id="kostenHint"></span></label><input id="f_kosten" type="number" min="0" step="0.01" placeholder="0"></div>
+      <div class="field"><label>Angefangen am</label><input id="f_start" type="date"></div>
+      <div class="field"><label>Onboarding-Status</label>
+        <select id="f_obstatus"><option value="offen">Offen</option><option value="termin">Termin vereinbart</option><option value="erledigt">Erledigt</option></select>
+      </div>
+      <div class="field full"><label>Onboarding-Infos (für die Assistentin)</label>
+        <textarea id="f_obinfo" placeholder="Alles, was fürs Onboarding wichtig ist: Ziele, Besonderheiten, Absprachen aus dem Call …"></textarea>
+      </div>
     </div>
     <div class="actions">
       <button onclick="App.closeModal()">Abbrechen</button>
@@ -400,6 +442,9 @@ const SUPABASE_ANON_KEY = 'PASTE_SUPABASE_ANON_KEY';
 /* Standard-Kosten pro Lead (Reseller-Partnermodus).
    Wert eintragen, sobald bekannt — wird bei neuen Leads vorausgefüllt. */
 const DEFAULT_LEAD_KOSTEN = 0;
+/* E-Mail der Assistentin, die das Onboarding macht.
+   Eintragen, sobald bekannt — dann ist die Onboarding-Mail vor-adressiert. */
+const ASSISTANT_EMAIL = '';
 
 const App = (() => {
   const KEY = 'closepilot_crm_v2';
@@ -516,10 +561,11 @@ const App = (() => {
   function setTab(t){
     tab = t;
     if(t==='webinar'||t==='evergreen') pipeline = t;
-    ['dash','webinar','evergreen'].forEach(x=>$('tab_'+x).classList.toggle('active', x===t));
+    ['dash','webinar','evergreen','onboarding'].forEach(x=>$('tab_'+x).classList.toggle('active', x===t));
     $('view_dash').style.display = t==='dash' ? 'block':'none';
-    $('view_pipe').style.display = t==='dash' ? 'none':'block';
-    if(t!=='dash') $('pipeTitle').textContent = t==='webinar' ? 'Webinar-Leads' : 'Evergreen-Leads';
+    $('view_pipe').style.display = (t==='webinar'||t==='evergreen') ? 'block':'none';
+    $('view_onboarding').style.display = t==='onboarding' ? 'block':'none';
+    if(t==='webinar'||t==='evergreen') $('pipeTitle').textContent = t==='webinar' ? 'Webinar-Leads' : 'Evergreen-Leads';
     render();
   }
   function quickRange(q){
@@ -643,10 +689,80 @@ const App = (() => {
       <td colspan="2"></td><td class="money" style="color:var(--amber)">${eur(kos)}</td><td colspan="2"></td></tr>`;
   }
 
-  function render(){ if(tab==='dash') renderDash(); else renderPipe(); }
+  function render(){
+    if(tab==='dash') renderDash();
+    else if(tab==='onboarding') renderOnboarding();
+    else renderPipe();
+  }
 
   async function setStage(id, stage){
-    if(await upsertLead({stage}, id)) { toast('Schritt: '+STAGE_LABEL[stage]); render(); }
+    if(await upsertLead({stage}, id)) {
+      toast(stage==='close'||stage==='onboarding'
+        ? STAGE_LABEL[stage]+' – Lead ist jetzt im Onboarding-Tab'
+        : 'Schritt: '+STAGE_LABEL[stage]);
+      render();
+    }
+  }
+
+  /* ---------- Onboarding ---------- */
+  const OB_LABEL = {offen:'Offen', termin:'Termin vereinbart', erledigt:'Erledigt'};
+  const isOnboarding = l => l.stage==='close' || l.stage==='onboarding';
+  function renderOnboarding(){
+    const q = ($('ob_search').value||'').toLowerCase();
+    const fs = $('ob_filter_status').value;
+    const rows = leads.filter(l => isOnboarding(l) &&
+      (!q || [l.name,l.email,l.tel].join(' ').toLowerCase().includes(q)) &&
+      (!fs || (l.onboarding_status||'offen')===fs));
+    $('ob_empty').style.display = rows.length ? 'none':'block';
+    $('ob_tbl').style.display = rows.length ? 'table':'none';
+    $('ob_tbody').innerHTML = rows.map(l=>{
+      const st = l.onboarding_status||'offen';
+      const rest = (Number(l.wert)||0)-(Number(l.bezahlt)||0);
+      return `<tr>
+        <td class="name">${esc(l.name)}<div class="sub">${l.pipeline==='evergreen'?'Evergreen':'Webinar'}${l.closer?' · Closer: '+esc(l.closer):''}</div></td>
+        <td class="contact">${esc(l.email)}${l.email&&l.tel?'<br>':''}${esc(l.tel)}</td>
+        <td style="max-width:260px"><div style="font-size:12.5px;line-height:1.5;color:var(--muted);white-space:pre-wrap">${esc(l.onboarding_info)||'<i>Noch keine Infos</i>'}</div></td>
+        <td class="money ${(Number(l.bezahlt)||0)>0?'win':''}">${eur(l.bezahlt)}${rest>0?`<div class="sub" style="color:var(--amber)">offen: ${eur(rest)}</div>`:''}</td>
+        <td>${l.zahlungsart?`<span class="pill ${l.zahlungsart==='komplett'?'p-green':'p-cyan'}">${PAY_LABEL[l.zahlungsart]}</span>`:'<span class="pill p-open">Offen</span>'}</td>
+        <td>${l.produkt?`<span class="pill ${l.produkt==='kurs'?'p-violet':'p-accent'}">${PROD_LABEL[l.produkt]}</span>`:'<span class="pill p-open">–</span>'}</td>
+        <td><select class="stagesel ${st==='erledigt'?'s-close':st==='termin'?'s-onboarding':''}" onchange="App.setObStatus('${l.id}',this.value)">
+          ${Object.entries(OB_LABEL).map(([k,lab])=>`<option value="${k}" ${st===k?'selected':''}>${lab}</option>`).join('')}
+        </select></td>
+        <td>${l.start_datum ? new Date(l.start_datum+'T00:00:00').toLocaleDateString('de-DE') : '<span style="color:var(--faint)">–</span>'}</td>
+        <td><div class="rowactions" style="opacity:1">
+          <button class="iconbtn" title="Mail an Assistentin" onclick="App.mailAssistant('${l.id}')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 7L2 7"/></svg>
+          </button>
+          <button class="iconbtn" title="Notizen" onclick="App.openNotes('${l.id}')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </button>
+          <button class="iconbtn" title="Bearbeiten" onclick="App.openModal('${l.id}')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+          </button>
+        </div></td>
+      </tr>`;
+    }).join('');
+  }
+  async function setObStatus(id, s){
+    if(await upsertLead({onboarding_status:s}, id)){ toast('Onboarding: '+OB_LABEL[s]); render(); }
+  }
+  function mailAssistant(id){
+    const l = leads.find(x=>x.id===id);
+    const subject = 'Neues Onboarding: '+(l.name||'');
+    const body = [
+      'Hallo,','', 'bitte Onboarding-Termin vereinbaren:','',
+      'Name: '+(l.name||''),
+      'E-Mail: '+(l.email||'-'),
+      'Telefon: '+(l.tel||'-'),
+      'Produkt: '+(PROD_LABEL[l.produkt]||'-'),
+      'Zahlung: '+(PAY_LABEL[l.zahlungsart]||'-')+' | bezahlt: '+eur(l.bezahlt)+' von '+eur(l.wert),
+      'Closer: '+(l.closer||'-'),'',
+      'Infos fürs Onboarding:',
+      (l.onboarding_info||'-'),'',
+      'Viele Grüße'
+    ].join('\n');
+    location.href = 'mailto:'+encodeURIComponent(ASSISTANT_EMAIL)
+      +'?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
   }
 
   /* ---------- Lead-Modal ---------- */
@@ -657,11 +773,12 @@ const App = (() => {
   function openModal(id){
     editId = id || null;
     $('modalTitle').textContent = id ? 'Lead bearbeiten' : 'Neuer Lead';
-    const l = leads.find(x=>x.id===id) || {pipeline, stage:'neuer_termin', zahlungsart:'', produkt:'', kosten:DEFAULT_LEAD_KOSTEN};
+    const l = leads.find(x=>x.id===id) || {pipeline, stage:'neuer_termin', zahlungsart:'', produkt:'', kosten:DEFAULT_LEAD_KOSTEN, onboarding_status:'offen'};
     for (const [f,k] of [['f_name','name'],['f_email','email'],['f_tel','tel'],['f_pipeline','pipeline'],
       ['f_stage','stage'],['f_closer','closer'],['f_wert','wert'],['f_bezahlt','bezahlt'],
-      ['f_zahlungsart','zahlungsart'],['f_produkt','produkt'],['f_kosten','kosten']])
-      $(f).value = l[k] ?? '';
+      ['f_zahlungsart','zahlungsart'],['f_produkt','produkt'],['f_kosten','kosten'],
+      ['f_start','start_datum'],['f_obstatus','onboarding_status'],['f_obinfo','onboarding_info']])
+      $(f).value = l[k] ?? (k==='onboarding_status'?'offen':'');
     $('f_kosten').disabled = !isAdmin;
     $('kostenHint').textContent = isAdmin ? '' : '(nur Admin)';
     $('overlay').classList.add('open');
@@ -674,7 +791,8 @@ const App = (() => {
     if(!v('f_name')) return toast('Bitte einen Namen eingeben');
     const data = {name:v('f_name'),email:v('f_email'),tel:v('f_tel'),pipeline:v('f_pipeline'),
       stage:v('f_stage'),closer:v('f_closer'),wert:Number(v('f_wert'))||0,bezahlt:Number(v('f_bezahlt'))||0,
-      zahlungsart:v('f_zahlungsart'),produkt:v('f_produkt')};
+      zahlungsart:v('f_zahlungsart'),produkt:v('f_produkt'),
+      start_datum:v('f_start')||null,onboarding_status:v('f_obstatus'),onboarding_info:v('f_obinfo')};
     if(isAdmin) data.kosten = Number(v('f_kosten'))||0;
     else if(!editId) data.kosten = DEFAULT_LEAD_KOSTEN;
     if(await upsertLead(data, editId)){ toast(editId?'Änderungen gespeichert':'Lead angelegt'); render(); closeModal(); }
@@ -719,7 +837,8 @@ const App = (() => {
 
   /* ---------- CSV ---------- */
   const COLS=[['name','Name'],['email','E-Mail'],['tel','Telefon'],['pipeline','Pipeline'],['stage','Schritt'],
-    ['closer','Closer'],['wert','Lead-Wert'],['bezahlt','Bezahlt'],['zahlungsart','Zahlungsart'],['produkt','Produkt'],['kosten','Kosten']];
+    ['closer','Closer'],['wert','Lead-Wert'],['bezahlt','Bezahlt'],['zahlungsart','Zahlungsart'],['produkt','Produkt'],
+    ['kosten','Kosten'],['start_datum','Angefangen am'],['onboarding_status','Onboarding-Status'],['onboarding_info','Onboarding-Infos']];
   function exportCSV(){
     const q = s => `"${String(s??'').replace(/"/g,'""')}"`;
     const rows = leads.filter(l=>(l.pipeline||'webinar')===pipeline);
@@ -740,6 +859,8 @@ const App = (() => {
         ['wert','bezahlt','kosten'].forEach(k=>o[k]=Number(String(o[k]).replace(',','.'))||0);
         if(!o.pipeline) o.pipeline=pipeline;
         if(!o.stage||!STAGE_LABEL[o.stage]) o.stage='neuer_termin';
+        if(!o.start_datum) o.start_datum=null;
+        if(!o.onboarding_status) o.onboarding_status='offen';
         return o;
       });
       if(CLOUD){
@@ -770,7 +891,7 @@ const App = (() => {
 
   fillStageSelects();
   initAuth();
-  return {setTab,quickRange,customRange,openModal,closeModal,save,del,setStage,
+  return {setTab,quickRange,customRange,openModal,closeModal,save,del,setStage,setObStatus,mailAssistant,
     openNotes,closeNotes,addNote,exportCSV,importCSV,render,sortBy,setSortFromSelect,auth,logout,toggleAuthMode};
 })();
 </script>
