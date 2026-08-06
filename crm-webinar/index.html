@@ -205,6 +205,32 @@
   .authswitch a{color:var(--accent);cursor:pointer;text-decoration:none}
   .autherr{color:var(--red);font-size:12.5px;margin-top:10px;line-height:1.5;display:none}
 
+  /* Kanban-Board */
+  .board{display:flex;gap:12px;overflow-x:auto;padding-bottom:8px;align-items:flex-start}
+  .bcol{min-width:250px;max-width:250px;background:var(--surface);border:1px solid var(--border);border-radius:12px;flex-shrink:0}
+  .bcol.dragover{border-color:var(--accent);background:var(--accent-soft)}
+  .bcolhead{padding:10px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+  .bcolhead .t{font-size:12.5px;font-weight:600;flex:1}
+  .bcolhead .cnt{font-size:11px;color:var(--muted);background:var(--surface2);border-radius:999px;padding:2px 8px;font-variant-numeric:tabular-nums}
+  .bcolhead .dot2{width:8px;height:8px;border-radius:50%}
+  .bcolsum{padding:4px 12px 8px;font-size:11px;color:var(--faint);font-variant-numeric:tabular-nums}
+  .bcards{display:flex;flex-direction:column;gap:8px;padding:10px;min-height:60px;max-height:62vh;overflow-y:auto}
+  .bcard{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:10px 12px;cursor:grab}
+  .bcard:active{cursor:grabbing}
+  .bcard.dragging{opacity:.45}
+  .bcard .n{font-weight:600;font-size:13px;display:flex;justify-content:space-between;gap:6px}
+  .bcard .n .w{color:var(--green);font-variant-numeric:tabular-nums;font-weight:600;font-size:12px;white-space:nowrap}
+  .bcard .m{font-size:11.5px;color:var(--muted);margin-top:3px;line-height:1.5}
+  .bcard .foot{display:flex;justify-content:space-between;align-items:center;margin-top:6px}
+  .bcard .foot .cl{font-size:11px;color:var(--accent)}
+  .viewtoggle{display:inline-flex;border:1px solid var(--border);border-radius:8px;overflow:hidden}
+  .viewtoggle button{border:none;border-radius:0;height:34px}
+  .viewtoggle button.active{background:var(--accent-soft);color:var(--accent);font-weight:600}
+  .stageitem{display:grid;grid-template-columns:auto auto 1fr auto auto;gap:8px;align-items:center;margin-bottom:8px}
+  .stageitem input[type=text]{background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);height:34px;padding:0 10px;font-family:inherit;font-size:13px}
+  .stageitem select{background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);height:34px;padding:0 26px 0 8px;font-family:inherit;font-size:12px;appearance:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%238b93a7' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center}
+  .stageitem .mv{height:28px;width:26px;padding:0;justify-content:center;font-size:13px}
   .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(8px);
     background:var(--surface2);border:1px solid var(--border);color:var(--text);
     padding:10px 18px;border-radius:10px;font-size:13px;font-weight:500;
@@ -293,11 +319,21 @@
     <!-- PIPELINE (webinar / evergreen) -->
     <div id="view_pipe" style="display:none">
       <div class="pagehead">
-        <div><h1 id="pipeTitle">Webinar-Leads</h1><p>Pipeline-Schritt direkt in der Tabelle umstellen.</p></div>
-        <button class="btn-primary" onclick="App.openModal()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>
-          Neuer Lead
-        </button>
+        <div><h1 id="pipeTitle">Webinar-Leads</h1><p>Leads per Drag &amp; Drop zwischen den Schritten verschieben.</p></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+          <div class="viewtoggle">
+            <button id="vt_board" class="active" onclick="App.setView('board')">Board</button>
+            <button id="vt_table" onclick="App.setView('table')">Tabelle</button>
+          </div>
+          <button onclick="App.openStageEditor()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            Schritte bearbeiten
+          </button>
+          <button class="btn-primary" onclick="App.openModal()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>
+            Neuer Lead
+          </button>
+        </div>
       </div>
       <div class="toolbar">
         <input class="search" id="search" placeholder="Suchen: Name, E-Mail, Telefon, Closer" oninput="App.render()">
@@ -327,7 +363,8 @@
           <input type="file" id="importFile" accept=".csv" onchange="App.importCSV(event)">
         </label>
       </div>
-      <div class="card">
+      <div class="board" id="board"></div>
+      <div class="card" id="tablecard">
         <div class="tablescroll">
           <table id="tbl">
             <thead>
@@ -404,7 +441,7 @@
       <div class="field"><label>E-Mail</label><input id="f_email" type="email" placeholder="max@mail.de"></div>
       <div class="field"><label>Telefonnummer</label><input id="f_tel" placeholder="+49 …"></div>
       <div class="field"><label>Pipeline</label>
-        <select id="f_pipeline"><option value="webinar">Webinar</option><option value="evergreen">Evergreen</option></select>
+        <select id="f_pipeline" onchange="App.fillStageSelects()"><option value="webinar">Webinar</option><option value="evergreen">Evergreen</option></select>
       </div>
       <div class="field"><label>Pipeline-Schritt</label><select id="f_stage"></select></div>
       <div class="field"><label>Closer (wer betreut den Kontakt)</label>
@@ -429,6 +466,21 @@
     <div class="actions">
       <button onclick="App.closeModal()">Abbrechen</button>
       <button class="btn-primary" onclick="App.save()">Speichern</button>
+    </div>
+  </div>
+</div>
+
+<!-- Schritte-Editor -->
+<div class="overlay" id="stageOverlay" onclick="if(event.target===this)App.closeStageEditor()">
+  <div class="modal">
+    <h2 id="stageEditorTitle">Pipeline-Schritte bearbeiten</h2>
+    <p class="hint" style="margin-bottom:14px">Reihenfolge mit den Pfeilen ändern. Der Typ steuert die Auswertung:
+    <b>Gewonnen</b> zählt als Close (und landet im Onboarding), <b>Verloren</b> als No Close, <b>No Show</b> als No Show.</p>
+    <div id="stageList"></div>
+    <button onclick="App.addStageRow()" style="margin-top:4px">+ Schritt hinzufügen</button>
+    <div class="actions">
+      <button onclick="App.closeStageEditor()">Abbrechen</button>
+      <button class="btn-primary" onclick="App.saveStages()">Speichern</button>
     </div>
   </div>
 </div>
@@ -492,6 +544,7 @@ const App = (() => {
   let user = null, isAdmin = true; // lokaler Modus: volle Rechte
   let tab = 'dash', pipeline = 'webinar';
   let sort = {key:'created', dir:'desc'};
+  let view = 'board';
   let range = {from:null, to:null, quick:'all'};
   let signupMode = false;
 
@@ -500,17 +553,51 @@ const App = (() => {
   const eur = n => (Number(n)||0).toLocaleString('de-DE',{style:'currency',currency:'EUR'});
   const fmtDate = d => d ? new Date(d+'T00:00:00').toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'}) : '–';
 
-  const STAGES = [
-    ['neuer_termin','Neuer Termin'],
-    ['ersttermin','Ersttermin'],
-    ['zweittermin','Zweittermin'],
-    ['noshow','No Show'],
-    ['close','Close'],
-    ['noclose','No Close'],
-    ['onboarding','Onboarding-Termin gelegt'],
+  /* ---------- Pipeline-Schritte (frei definierbar) ---------- */
+  const STAGES_KEY = 'closepilot_stages_v1';
+  const DEFAULT_STAGES = [
+    {key:'neuer_termin',label:'Neuer Termin',type:'normal'},
+    {key:'ersttermin',label:'Ersttermin',type:'normal'},
+    {key:'zweittermin',label:'Zweittermin',type:'normal'},
+    {key:'noshow',label:'No Show',type:'noshow'},
+    {key:'close',label:'Close',type:'win'},
+    {key:'noclose',label:'No Close',type:'lose'},
+    {key:'onboarding',label:'Onboarding-Termin gelegt',type:'win'},
   ];
-  const STAGE_LABEL = Object.fromEntries(STAGES);
-  const STAGE_ORDER = Object.fromEntries(STAGES.map(([k],i)=>[k,i]));
+  let stageDefs = {webinar:null, evergreen:null};
+  const stagesFor = p => stageDefs[p==='evergreen'?'evergreen':'webinar'] || DEFAULT_STAGES;
+  const stageOf = l => stagesFor(l.pipeline).find(s=>s.key===l.stage);
+  const typeOf = l => (stageOf(l)||{}).type || 'normal';
+  const labelOf = l => (stageOf(l)||{}).label || l.stage;
+  const isWin = l => typeOf(l)==='win';
+  const TYPE_COLOR = {win:'var(--green)', lose:'var(--red)', noshow:'var(--red)', normal:'var(--accent)'};
+
+  async function fetchStages(){
+    if(!CLOUD){
+      try{ const s = JSON.parse(localStorage.getItem(STAGES_KEY)); if(s) stageDefs = s; }catch(e){}
+      if(!stageDefs.webinar){ stageDefs={webinar:structuredClone(DEFAULT_STAGES), evergreen:structuredClone(DEFAULT_STAGES)}; localStorage.setItem(STAGES_KEY, JSON.stringify(stageDefs)); }
+      return;
+    }
+    const {data,error} = await sb.from('stages').select('*').order('pos');
+    if(error) return; // Tabelle fehlt evtl. noch — Fallback: DEFAULT_STAGES
+    for(const p of ['webinar','evergreen']){
+      const rows = data.filter(s=>s.pipeline===p);
+      if(rows.length) stageDefs[p] = rows.map(s=>({key:s.key,label:s.label,type:s.type}));
+      else { // einmalig mit Standard befüllen
+        const seed = DEFAULT_STAGES.map((s,i)=>({pipeline:p,key:s.key,label:s.label,type:s.type,pos:i}));
+        const {error:e2} = await sb.from('stages').insert(seed);
+        if(!e2) stageDefs[p] = structuredClone(DEFAULT_STAGES);
+      }
+    }
+  }
+  async function persistStages(p, list){
+    if(!CLOUD){ stageDefs[p]=list; localStorage.setItem(STAGES_KEY, JSON.stringify(stageDefs)); return true; }
+    const {error:delErr} = await sb.from('stages').delete().eq('pipeline',p);
+    if(delErr){ toast('Fehler: '+delErr.message); return false; }
+    const {error} = await sb.from('stages').insert(list.map((s,i)=>({pipeline:p,key:s.key,label:s.label,type:s.type,pos:i})));
+    if(error){ toast('Fehler: '+error.message); return false; }
+    stageDefs[p]=list; return true;
+  }
   const PAY_LABEL = {komplett:'Voll bezahlt', klarna:'Klarna', raten3:'3 Raten', '':'–'};
   const PROD_LABEL = {kurs:'Normaler Kurs', selbstlernkurs:'Selbstlernkurs', '':'–'};
 
@@ -592,7 +679,7 @@ const App = (() => {
   }
   function authError(msg){ const e=$('authErr'); e.textContent=msg; e.style.display='block'; }
   function showAuth(){ $('authview').style.display='flex'; $('appview').style.display='none'; $('userchip').style.display='none'; }
-  async function showApp(){ $('authview').style.display='none'; $('appview').style.display='block'; await fetchLeads(); render(); }
+  async function showApp(){ $('authview').style.display='none'; $('appview').style.display='block'; await fetchStages(); await fetchLeads(); render(); }
 
   /* ---------- Tabs & Zeitraum ---------- */
   function setTab(t){
@@ -635,11 +722,11 @@ const App = (() => {
   /* ---------- Dashboard ---------- */
   function renderDash(){
     const rows = leads.filter(inRange);
-    const closes = rows.filter(l=>l.stage==='close'||l.stage==='onboarding');
+    const closes = rows.filter(isWin);
     const wert = closes.reduce((a,l)=>a+(Number(l.wert)||0),0);
     const bezahlt = rows.reduce((a,l)=>a+(Number(l.bezahlt)||0),0);
     const kosten = rows.reduce((a,l)=>a+(Number(l.kosten)||0),0);
-    const noclose = rows.filter(l=>l.stage==='noclose').length;
+    const noclose = rows.filter(l=>typeOf(l)==='lose').length;
     const rate = rows.length ? Math.round(closes.length/rows.length*100) : 0;
     $('dash_kpis').innerHTML = [
       ['','Leads gesamt', rows.length, `Webinar ${rows.filter(l=>l.pipeline==='webinar').length} · Evergreen ${rows.filter(l=>l.pipeline!=='webinar').length}`],
@@ -653,10 +740,10 @@ const App = (() => {
     // Closer-Auswertung
     const CLOSERS = ['Raphael','Dominik','René'];
     const extra = [...new Set(rows.map(l=>l.closer).filter(c=>c && !CLOSERS.includes(c)))];
-    const hadSecond = l => !!l.termin2 || ['zweittermin','close','noclose','onboarding'].includes(l.stage);
+    const hadSecond = l => !!l.termin2 || l.stage==='zweittermin' || typeOf(l)!=='normal';
     $('closer_tbody').innerHTML = [...CLOSERS, ...extra].map(c=>{
       const cl = rows.filter(l=>l.closer===c);
-      const cCloses = cl.filter(l=>l.stage==='close'||l.stage==='onboarding');
+      const cCloses = cl.filter(isWin);
       const umsatz = cCloses.reduce((a,l)=>a+(Number(l.wert)||0),0);
       const bez = cl.reduce((a,l)=>a+(Number(l.bezahlt)||0),0);
       const cRate = cl.length ? Math.round(cCloses.length/cl.length*100) : 0;
@@ -664,7 +751,7 @@ const App = (() => {
         <td class="name">${esc(c)}</td>
         <td class="money" style="color:var(--text)">${cl.length}</td>
         <td class="money" style="color:var(--text)">${cl.filter(hadSecond).length}</td>
-        <td class="money" style="color:${cl.filter(l=>l.stage==='noshow').length?'var(--red)':'var(--muted)'}">${cl.filter(l=>l.stage==='noshow').length}</td>
+        <td class="money" style="color:${cl.filter(l=>typeOf(l)==='noshow').length?'var(--red)':'var(--muted)'}">${cl.filter(l=>typeOf(l)==='noshow').length}</td>
         <td class="money" style="color:var(--green)">${cCloses.length}</td>
         <td class="money" style="color:var(--muted)">${cRate}%</td>
         <td class="money">${eur(umsatz)}</td>
@@ -676,10 +763,11 @@ const App = (() => {
         <td colspan="6"></td></tr>` : '');
     for(const p of ['webinar','evergreen']){
       const pr = rows.filter(l=>(l.pipeline||'webinar')===p);
-      const max = Math.max(1,...STAGES.map(([k])=>pr.filter(l=>l.stage===k).length));
-      $('funnel_'+p).innerHTML = STAGES.map(([k,lab])=>{
-        const c = pr.filter(l=>l.stage===k).length;
-        return `<div class="stagerow"><span>${lab}</span><div class="bartrack"><div class="barfill" style="width:${c/max*100}%${k==='close'||k==='onboarding'?';background:var(--green)':k==='noclose'||k==='noshow'?';background:var(--red)':''}"></div></div><span class="cnt">${c}</span></div>`;
+      const defs = stagesFor(p);
+      const max = Math.max(1,...defs.map(s=>pr.filter(l=>l.stage===s.key).length));
+      $('funnel_'+p).innerHTML = defs.map(s=>{
+        const c = pr.filter(l=>l.stage===s.key).length;
+        return `<div class="stagerow"><span>${esc(s.label)}</span><div class="bartrack"><div class="barfill" style="width:${c/max*100}%;background:${TYPE_COLOR[s.type]||'var(--accent)'}"></div></div><span class="cnt">${c}</span></div>`;
       }).join('');
     }
   }
@@ -691,8 +779,9 @@ const App = (() => {
       if(key==='name') return m*String(a.name||'').localeCompare(String(b.name||''),'de');
       if(key==='wert'||key==='bezahlt') return m*((Number(a[key])||0)-(Number(b[key])||0));
       if(key==='stage'){
-        const w = s=>s==='close'?100:s==='onboarding'?99:(STAGE_ORDER[s]??0);
-        return m*(w(a.stage)-w(b.stage));
+        const defs = stagesFor(pipeline);
+        const w = l=>isWin(l)?100:defs.findIndex(s=>s.key===l.stage);
+        return m*(w(a)-w(b));
       }
       const va=a.created_at||'', vb=b.created_at||'';
       return m*(va<vb?-1:va>vb?1:0);
@@ -710,6 +799,10 @@ const App = (() => {
       (!fs || l.stage===fs) &&
       (!fp || (fp==='none' ? !(l.zahlungsart) : l.zahlungsart===fp)));
     rows = sortRows(rows);
+    fillStageSelects();
+    $('board').style.display = view==='board' ? 'flex':'none';
+    $('tablecard').style.display = view==='board' ? 'none':'block';
+    if(view==='board'){ renderBoard(rows); return; }
     ['name','stage','wert','bezahlt'].forEach(k=>{ $('ar_'+k).textContent = sort.key===k ? (sort.dir==='asc'?'▲':'▼') : ''; });
     $('empty').style.display = rows.length ? 'none':'block';
     $('tbl').style.display = rows.length ? 'table':'none';
@@ -719,8 +812,8 @@ const App = (() => {
         <td class="name">${esc(l.name)}${notes.length?`<div class="sub">${esc(notes[notes.length-1].text).slice(0,60)}</div>`:''}</td>
         <td class="contact">${esc(l.email)}${l.email&&l.tel?'<br>':''}${esc(l.tel)}</td>
         <td>${esc(l.closer)||'<span style="color:var(--faint)">–</span>'}</td>
-        <td><select class="stagesel s-${l.stage}" onchange="App.setStage('${l.id}',this.value)">
-          ${STAGES.map(([k,lab])=>`<option value="${k}" ${l.stage===k?'selected':''}>${lab}</option>`).join('')}
+        <td><select class="stagesel ${ {win:'s-close',lose:'s-noclose',noshow:'s-noshow'}[typeOf(l)]||'' }" onchange="App.setStage('${l.id}',this.value)">
+          ${stagesFor(pipeline).map(s=>`<option value="${s.key}" ${l.stage===s.key?'selected':''}>${esc(s.label)}</option>`).join('')}
         </select></td>
         <td style="font-size:11.5px;line-height:1.6;color:var(--muted);white-space:nowrap">
           1: ${fmtDate(l.termin1)}<br>2: ${fmtDate(l.termin2)}<br>OB: ${fmtDate(l.ob_termin)}</td>
@@ -752,6 +845,108 @@ const App = (() => {
       <td colspan="2"></td><td class="money" style="color:var(--amber)">${eur(kos)}</td><td colspan="2"></td></tr>`;
   }
 
+  function setView(v){
+    view = v;
+    $('vt_board').classList.toggle('active', v==='board');
+    $('vt_table').classList.toggle('active', v==='table');
+    render();
+  }
+
+  function renderBoard(rows){
+    const defs = stagesFor(pipeline);
+    $('empty').style.display='none';
+    $('board').innerHTML = defs.map(s=>{
+      const cards = rows.filter(l=>l.stage===s.key);
+      const sum = cards.reduce((a,l)=>a+(Number(l.wert)||0),0);
+      return `<div class="bcol" data-stage="${s.key}"
+        ondragover="event.preventDefault();this.classList.add('dragover')"
+        ondragleave="this.classList.remove('dragover')"
+        ondrop="App.dropCard(event,'${s.key}')">
+        <div class="bcolhead"><span class="dot2" style="background:${TYPE_COLOR[s.type]||'var(--accent)'}"></span>
+          <span class="t">${esc(s.label)}</span><span class="cnt">${cards.length}</span></div>
+        <div class="bcolsum">${eur(sum)} Lead-Wert</div>
+        <div class="bcards">${cards.map(l=>{
+          const notes = Array.isArray(l.notes)?l.notes:[];
+          return `<div class="bcard" draggable="true"
+            ondragstart="event.dataTransfer.setData('text/plain','${l.id}');this.classList.add('dragging')"
+            ondragend="this.classList.remove('dragging')">
+            <div class="n"><span>${esc(l.name)}</span><span class="w">${(Number(l.wert)||0)?eur(l.wert):''}</span></div>
+            <div class="m">${esc(l.email)||''}${l.email&&l.tel?' · ':''}${esc(l.tel)||''}</div>
+            ${l.termin1||l.termin2||l.ob_termin?`<div class="m">1: ${fmtDate(l.termin1)} · 2: ${fmtDate(l.termin2)} · OB: ${fmtDate(l.ob_termin)}</div>`:''}
+            <div class="foot">
+              <span class="cl">${esc(l.closer)||''}</span>
+              <span style="display:flex;gap:2px">
+                <button class="iconbtn" title="Notizen" onclick="App.openNotes('${l.id}')" style="width:auto;padding:0 4px;gap:3px">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                  ${notes.length?`<span class="notecount">${notes.length}</span>`:''}</button>
+                <button class="iconbtn" title="Bearbeiten" onclick="App.openModal('${l.id}')">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg></button>
+                ${isAdmin?`<button class="iconbtn danger" title="Löschen" onclick="App.del('${l.id}')">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button>`:''}
+              </span>
+            </div>
+          </div>`;
+        }).join('')||'<div class="hint" style="text-align:center;padding:10px">Leads hierher ziehen</div>'}</div>
+      </div>`;
+    }).join('');
+  }
+  async function dropCard(ev, stageKey){
+    ev.preventDefault();
+    document.querySelectorAll('.bcol').forEach(c=>c.classList.remove('dragover'));
+    const id = ev.dataTransfer.getData('text/plain');
+    const l = leads.find(x=>x.id===id);
+    if(!l || l.stage===stageKey) return;
+    await setStage(id, stageKey);
+  }
+
+  /* ---------- Schritte-Editor ---------- */
+  let editStages = [];
+  function openStageEditor(){
+    editStages = structuredClone(stagesFor(pipeline));
+    $('stageEditorTitle').textContent = 'Schritte: '+(pipeline==='webinar'?'Webinar':'Evergreen')+'-Pipeline';
+    renderStageEditor();
+    $('stageOverlay').classList.add('open');
+  }
+  function renderStageEditor(){
+    $('stageList').innerHTML = editStages.map((s,i)=>`
+      <div class="stageitem">
+        <button class="mv" ${i===0?'disabled style="opacity:.3"':''} onclick="App.moveStage(${i},-1)">↑</button>
+        <button class="mv" ${i===editStages.length-1?'disabled style="opacity:.3"':''} onclick="App.moveStage(${i},1)">↓</button>
+        <input type="text" value="${esc(s.label)}" oninput="App.editStageLabel(${i},this.value)" placeholder="Name des Schritts">
+        <select onchange="App.editStageType(${i},this.value)">
+          <option value="normal" ${s.type==='normal'?'selected':''}>Normal</option>
+          <option value="win" ${s.type==='win'?'selected':''}>Gewonnen</option>
+          <option value="lose" ${s.type==='lose'?'selected':''}>Verloren</option>
+          <option value="noshow" ${s.type==='noshow'?'selected':''}>No Show</option>
+        </select>
+        <button class="mv" style="color:var(--red)" onclick="App.removeStage(${i})">✕</button>
+      </div>`).join('');
+  }
+  function moveStage(i,d){ const t=editStages[i]; editStages[i]=editStages[i+d]; editStages[i+d]=t; renderStageEditor(); }
+  function editStageLabel(i,v){ editStages[i].label=v; }
+  function editStageType(i,v){ editStages[i].type=v; }
+  function removeStage(i){
+    if(editStages.length<=1) return toast('Mindestens ein Schritt muss bleiben');
+    editStages.splice(i,1); renderStageEditor();
+  }
+  function addStageRow(){ editStages.push({key:null,label:'',type:'normal'}); renderStageEditor(); }
+  const slug = s => s.toLowerCase().replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/ß/g,'ss').replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'')||'schritt';
+  async function saveStages(){
+    const list = editStages.filter(s=>s.label.trim());
+    if(!list.length) return toast('Bitte mindestens einen Schritt benennen');
+    const used = new Set(list.filter(s=>s.key).map(s=>s.key));
+    for(const s of list){ if(!s.key){ let k=slug(s.label), n=1; while(used.has(k)) k=slug(s.label)+'_'+(++n); s.key=k; used.add(k); } s.label=s.label.trim(); }
+    // Leads, deren Schritt gelöscht wurde, in den ersten Schritt schieben
+    const valid = new Set(list.map(s=>s.key));
+    const orphans = leads.filter(l=>(l.pipeline||'webinar')===pipeline && !valid.has(l.stage));
+    if(!await persistStages(pipeline, list)) return;
+    for(const o of orphans) await upsertLead({stage:list[0].key}, o.id);
+    toast('Schritte gespeichert');
+    $('stageOverlay').classList.remove('open');
+    render();
+  }
+  function closeStageEditor(){ $('stageOverlay').classList.remove('open'); }
+
   function render(){
     if(tab==='dash') renderDash();
     else if(tab==='onboarding') renderOnboarding();
@@ -760,9 +955,8 @@ const App = (() => {
 
   async function setStage(id, stage){
     if(await upsertLead({stage}, id)) {
-      toast(stage==='close'||stage==='onboarding'
-        ? STAGE_LABEL[stage]+' – Lead ist jetzt im Onboarding-Tab'
-        : 'Schritt: '+STAGE_LABEL[stage]);
+      const l = leads.find(x=>x.id===id);
+      toast(l && isWin(l) ? labelOf(l)+' – Lead ist jetzt im Onboarding-Tab' : 'Schritt geändert');
       render();
     }
   }
@@ -774,7 +968,7 @@ const App = (() => {
     ['ob_zugaenge','Zugänge versendet'],
   ];
   const obDone = l => OB_CHECKS.every(([k])=>!!l[k]);
-  const isOnboarding = l => l.stage==='close' || l.stage==='onboarding';
+  const isOnboarding = l => isWin(l);
   function renderOnboarding(){
     const q = ($('ob_search').value||'').toLowerCase();
     const fs = $('ob_filter_status').value;
@@ -835,13 +1029,17 @@ const App = (() => {
 
   /* ---------- Lead-Modal ---------- */
   function fillStageSelects(){
-    $('f_stage').innerHTML = STAGES.map(([k,l])=>`<option value="${k}">${l}</option>`).join('');
-    $('f_filter_stage').innerHTML = '<option value="">Schritt: Alle</option>'+STAGES.map(([k,l])=>`<option value="${k}">${l}</option>`).join('');
+    const mp = $('f_pipeline').value || pipeline;
+    $('f_stage').innerHTML = stagesFor(mp).map(s=>`<option value="${s.key}">${esc(s.label)}</option>`).join('');
+    const cur = $('f_filter_stage').value;
+    $('f_filter_stage').innerHTML = '<option value="">Schritt: Alle</option>'+stagesFor(pipeline).map(s=>`<option value="${s.key}">${esc(s.label)}</option>`).join('');
+    $('f_filter_stage').value = cur && stagesFor(pipeline).some(s=>s.key===cur) ? cur : '';
   }
   function openModal(id){
     editId = id || null;
     $('modalTitle').textContent = id ? 'Lead bearbeiten' : 'Neuer Lead';
-    const l = leads.find(x=>x.id===id) || {pipeline, stage:'neuer_termin', zahlungsart:'', produkt:'', kosten:DEFAULT_LEAD_KOSTEN, onboarding_status:'offen'};
+    const l = leads.find(x=>x.id===id) || {pipeline, stage:stagesFor(pipeline)[0].key, zahlungsart:'', produkt:'', kosten:DEFAULT_LEAD_KOSTEN};
+    $('f_pipeline').value = l.pipeline||pipeline; fillStageSelects();
     for (const [f,k] of [['f_name','name'],['f_email','email'],['f_tel','tel'],['f_pipeline','pipeline'],
       ['f_stage','stage'],['f_closer','closer'],['f_wert','wert'],['f_bezahlt','bezahlt'],
       ['f_zahlungsart','zahlungsart'],['f_produkt','produkt'],['f_kosten','kosten'],
@@ -928,7 +1126,7 @@ const App = (() => {
         const o={}; COLS.forEach(([k],j)=>o[k]=c[j]??'');
         ['wert','bezahlt','kosten'].forEach(k=>o[k]=Number(String(o[k]).replace(',','.'))||0);
         if(!o.pipeline) o.pipeline=pipeline;
-        if(!o.stage||!STAGE_LABEL[o.stage]) o.stage='neuer_termin';
+        if(!o.stage||!stagesFor(o.pipeline).some(s=>s.key===o.stage)){ const byLabel=stagesFor(o.pipeline).find(s=>s.label===o.stage); o.stage = byLabel?byLabel.key:stagesFor(o.pipeline)[0].key; }
         ['termin1','termin2','ob_termin'].forEach(k=>{ if(!o[k]) o[k]=null; });
         ['ob_termin_gemacht','ob_stattgefunden','ob_zugaenge'].forEach(k=>o[k]=/^(true|ja|1|x)$/i.test(String(o[k]).trim()));
         return o;
@@ -961,7 +1159,8 @@ const App = (() => {
 
   fillStageSelects();
   initAuth();
-  return {setTab,quickRange,customRange,openModal,closeModal,save,del,setStage,setObField,mailAssistant,
+  return {setTab,quickRange,customRange,openModal,closeModal,save,del,setStage,setObField,mailAssistant,setView,dropCard,fillStageSelects,
+    openStageEditor,closeStageEditor,saveStages,addStageRow,moveStage,editStageLabel,editStageType,removeStage,
     openNotes,closeNotes,addNote,exportCSV,importCSV,render,sortBy,setSortFromSelect,auth,logout,toggleAuthMode};
 })();
 </script>

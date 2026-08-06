@@ -79,6 +79,20 @@ drop policy if exists allowed_self on public.allowed_users;
 create policy allowed_self on public.allowed_users for select to authenticated
   using (email = auth.jwt()->>'email');
 
+-- Frei definierbare Pipeline-Schritte (Team darf sie anlegen und ändern)
+create table if not exists public.stages (
+  id uuid primary key default gen_random_uuid(),
+  pipeline text not null,          -- webinar | evergreen
+  key text not null,
+  label text not null,
+  type text not null default 'normal', -- normal | win | lose | noshow
+  pos int not null default 0
+);
+alter table public.stages enable row level security;
+drop policy if exists stages_all on public.stages;
+create policy stages_all on public.stages for all to authenticated
+  using (public.is_allowed()) with check (public.is_allowed());
+
 -- Live-Updates für alle Team-Mitglieder
 do $$ begin
   alter publication supabase_realtime add table public.leads;
