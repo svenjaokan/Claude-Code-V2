@@ -12,11 +12,10 @@ create table if not exists public.allowed_users (
 
 insert into public.allowed_users (email, is_admin) values
   ('hello@svenjaokan.de', true),          -- Svenja Okan (Admin)
-  ('keller.danny1990@gmail.com', false),  -- Danny Keller
+  ('keller.danny1990@gmail.com', true),   -- Danny Keller (Admin)
   ('deliaraphael@icloud.com', false),     -- Raphael
   ('khato.1983@gmail.com', false),        -- Khato
   ('dettmardominic@gmail.com', false)     -- Dominic Dettmar
-  -- ,('zweiter-admin@mail.de', true)     -- zweiter Admin, sobald bekannt
 on conflict (email) do nothing;
 
 -- Leads (beide Pipelines in einer Tabelle)
