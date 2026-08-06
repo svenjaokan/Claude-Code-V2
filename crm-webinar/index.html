@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ClosePilot — Webinar CRM</title>
+<title>ClosePilot — CRM</title>
 <style>
   :root{
     --bg:#0b0d12; --surface:#12151d; --surface2:#181c26; --border:#232837;
@@ -22,48 +22,72 @@
     background:var(--bg); color:var(--text); min-height:100vh;
     font-size:14px; -webkit-font-smoothing:antialiased;
   }
-
   .nav{
-    display:flex;align-items:center;gap:12px;padding:0 24px;height:56px;
+    display:flex;align-items:center;gap:12px;padding:0 20px;height:56px;
     border-bottom:1px solid var(--border);
     background:rgba(11,13,18,.85); backdrop-filter:blur(8px);
     position:sticky;top:0;z-index:20;
   }
   .logo{display:flex;align-items:center;gap:10px;font-weight:600;font-size:15px;letter-spacing:-.01em}
-  .logo-mark{
-    width:26px;height:26px;border-radius:7px;display:grid;place-items:center;
-    background:linear-gradient(135deg,var(--accent),#8b5cf6);
-    font-size:13px;font-weight:700;color:#fff;
-  }
-  .nav .tagline{color:var(--faint);font-size:12px;border-left:1px solid var(--border);padding-left:12px}
+  .logo-mark{width:26px;height:26px;border-radius:7px;display:grid;place-items:center;
+    background:linear-gradient(135deg,var(--accent),#8b5cf6);font-size:13px;font-weight:700;color:#fff}
   .nav .spacer{flex:1}
   .userchip{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted)}
   .userchip .dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 0 3px var(--green-soft)}
   .adminbadge{background:var(--violet-soft);color:var(--violet);border-radius:999px;padding:2px 8px;font-size:11px;font-weight:600}
   .btn-logout{height:30px;padding:0 10px;font-size:12px}
 
-  .wrap{max-width:1240px;margin:0 auto;padding:28px 24px 64px}
-  .pagehead{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:22px}
-  h1{font-size:20px;font-weight:600;letter-spacing:-.02em}
+  .tabs{display:flex;gap:4px;padding:12px 20px 0;border-bottom:1px solid var(--border);background:var(--bg);flex-wrap:wrap}
+  .tab{
+    padding:9px 16px;font-size:13.5px;font-weight:500;color:var(--muted);cursor:pointer;
+    border:none;background:none;border-bottom:2px solid transparent;border-radius:0;height:auto;
+  }
+  .tab:hover{color:var(--text);background:none}
+  .tab.active{color:var(--text);border-bottom-color:var(--accent);font-weight:600}
+
+  .wrap{max-width:1280px;margin:0 auto;padding:24px 20px 64px}
+  .pagehead{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:20px}
+  h1{font-size:19px;font-weight:600;letter-spacing:-.02em}
   .pagehead p{color:var(--muted);margin-top:4px;font-size:13px}
 
-  .notice{
-    background:var(--amber-soft);border:1px solid rgba(255,180,84,.4);color:var(--amber);
-    border-radius:var(--radius);padding:12px 16px;font-size:13px;margin-bottom:18px;line-height:1.6;
-  }
+  .notice{background:var(--amber-soft);border:1px solid rgba(255,180,84,.4);color:var(--amber);
+    border-radius:var(--radius);padding:12px 16px;font-size:13px;margin-bottom:18px;line-height:1.6}
   .notice b{font-weight:600}
 
-  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:12px;margin-bottom:24px}
+  /* Dashboard */
+  .rangebar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:18px}
+  .rangebar label{font-size:12.5px;color:var(--muted)}
+  .rangebar input[type=date]{
+    background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);
+    height:36px;padding:0 10px;font-family:inherit;font-size:13px;color-scheme:dark;
+  }
+  .chip{height:30px;padding:0 12px;font-size:12.5px;border-radius:999px}
+  .chip.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);font-weight:600}
+
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:20px}
   .kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px}
   .kpi .lbl{font-size:12px;color:var(--muted);margin-bottom:6px}
-  .kpi .num{font-size:22px;font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  .kpi .num{font-size:21px;font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
   .kpi.hl{border-color:rgba(91,140,255,.45);background:linear-gradient(180deg,var(--accent-soft),var(--surface))}
   .kpi.hl .num{color:var(--accent)}
+  .kpi.good .num{color:var(--green)}
+  .kpi.bad .num{color:var(--red)}
   .kpi .sub{font-size:11px;color:var(--faint);margin-top:4px}
 
+  .dashsplit{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+  @media(max-width:760px){.dashsplit{grid-template-columns:1fr}}
+  .panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px}
+  .panel h3{font-size:13px;font-weight:600;margin-bottom:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+  .stagebar{display:flex;flex-direction:column;gap:8px}
+  .stagerow{display:grid;grid-template-columns:150px 1fr 34px;gap:10px;align-items:center;font-size:12.5px}
+  .stagerow .bartrack{height:8px;background:var(--surface2);border-radius:99px;overflow:hidden}
+  .stagerow .barfill{height:100%;border-radius:99px;background:var(--accent)}
+  .stagerow .cnt{text-align:right;color:var(--muted);font-variant-numeric:tabular-nums}
+
+  /* Toolbar */
   .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
   .search{
-    flex:1 1 200px;min-width:170px;height:36px;background:var(--surface);border:1px solid var(--border);
+    flex:1 1 190px;min-width:160px;height:36px;background:var(--surface);border:1px solid var(--border);
     border-radius:8px;color:var(--text);padding:0 12px 0 34px;font-size:13px;font-family:inherit;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%238b93a7' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");
     background-repeat:no-repeat;background-position:11px center;
@@ -89,32 +113,42 @@
   input[type=file]{display:none}
   .filelabel{display:inline-flex}
 
+  /* Table */
   .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
   .tablescroll{overflow-x:auto}
-  table{width:100%;border-collapse:collapse;min-width:1120px}
+  table{width:100%;border-collapse:collapse;min-width:1180px}
   thead th{
     position:sticky;top:0;background:var(--surface2);color:var(--muted);
     font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;
-    padding:10px 14px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;z-index:1;
+    padding:10px 12px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;z-index:1;
   }
   th.sortable{cursor:pointer;user-select:none}
   th.sortable:hover{color:var(--text)}
   th .arrow{font-size:10px;margin-left:4px;color:var(--accent)}
-  tbody td{padding:11px 14px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle}
+  tbody td{padding:10px 12px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle}
   tbody tr:last-child td{border-bottom:none}
-  tbody tr{transition:background .1s}
   tbody tr:hover{background:var(--surface2)}
   td.name{font-weight:600}
-  td .note{font-weight:400;font-size:12px;color:var(--muted);margin-top:2px;max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  td.contact{color:var(--muted);font-size:12.5px;line-height:1.5}
-  td.money{font-variant-numeric:tabular-nums;font-weight:600;text-align:right}
+  td .sub{font-weight:400;font-size:11.5px;color:var(--muted);margin-top:2px}
+  td.contact{color:var(--muted);font-size:12px;line-height:1.5}
+  td.money{font-variant-numeric:tabular-nums;font-weight:600;text-align:right;white-space:nowrap}
   td.money.win{color:var(--green)}
-  tfoot td{padding:12px 14px;background:var(--surface2);border-top:1px solid var(--border);font-weight:600;font-size:13px;font-variant-numeric:tabular-nums}
+  td.money.cost{color:var(--amber);font-weight:500}
+  tfoot td{padding:12px;background:var(--surface2);border-top:1px solid var(--border);font-weight:600;font-size:13px;font-variant-numeric:tabular-nums}
 
-  .pill{
-    display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:999px;
-    font-size:12px;font-weight:500;white-space:nowrap;
+  select.stagesel{
+    height:30px;border-radius:999px;border:1px solid var(--border);background:var(--surface2);
+    color:var(--text);font-size:12px;font-weight:500;padding:0 24px 0 10px;font-family:inherit;
+    appearance:none;cursor:pointer;max-width:170px;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%238b93a7' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:right 8px center;
   }
+  select.stagesel:focus{outline:none;border-color:var(--accent)}
+  select.stagesel.s-close{border-color:rgba(61,220,151,.5);color:var(--green)}
+  select.stagesel.s-noclose,select.stagesel.s-noshow{border-color:rgba(255,92,114,.5);color:var(--red)}
+  select.stagesel.s-onboarding{border-color:rgba(167,139,250,.5);color:var(--violet)}
+
+  .pill{display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:999px;font-size:12px;font-weight:500;white-space:nowrap}
   .pill::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor}
   .p-green{background:var(--green-soft);color:var(--green)}
   .p-red{background:var(--red-soft);color:var(--red)}
@@ -124,40 +158,46 @@
   .p-cyan{background:var(--cyan-soft);color:var(--cyan)}
   .p-amber{background:var(--amber-soft);color:var(--amber)}
 
-  .rowactions{display:flex;gap:2px;justify-content:flex-end;opacity:0;transition:opacity .12s}
-  tr:hover .rowactions{opacity:1}
+  .rowactions{display:flex;gap:2px;justify-content:flex-end}
   .iconbtn{height:28px;width:28px;padding:0;justify-content:center;border:none;background:transparent;color:var(--muted);border-radius:6px}
   .iconbtn:hover{background:var(--border);color:var(--text)}
   .iconbtn svg{width:15px;height:15px}
   .iconbtn.danger:hover{color:var(--red)}
+  .notecount{font-size:10.5px;background:var(--accent-soft);color:var(--accent);border-radius:999px;padding:1px 6px;font-weight:600}
 
   .empty{text-align:center;padding:56px 20px;color:var(--muted)}
   .empty .t{font-size:15px;font-weight:600;color:var(--text);margin-bottom:6px}
 
+  /* Modals */
   .overlay{position:fixed;inset:0;background:rgba(5,7,12,.7);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;z-index:50;padding:16px}
   .overlay.open{display:flex}
-  .modal{
-    background:var(--surface);border:1px solid var(--border);border-radius:14px;
-    padding:22px;width:100%;max-width:540px;max-height:92vh;overflow-y:auto;
-    box-shadow:0 24px 64px rgba(0,0,0,.5);
-  }
+  .modal{background:var(--surface);border:1px solid var(--border);border-radius:14px;
+    padding:22px;width:100%;max-width:560px;max-height:92vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,.5)}
   .modal h2{font-size:16px;font-weight:600;margin-bottom:18px;letter-spacing:-.01em}
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
   .field{display:flex;flex-direction:column;gap:6px}
   .field.full{grid-column:1/-1}
   label{font-size:12px;font-weight:500;color:var(--muted)}
-  .field input,.field select{
+  .field input,.field select,.field textarea{
     background:var(--bg);border:1px solid var(--border);border-radius:8px;
     color:var(--text);padding:0 11px;height:38px;font-family:inherit;font-size:13.5px;
   }
+  .field textarea{height:auto;min-height:70px;padding:9px 11px;resize:vertical}
   .field select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238b93a7' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:30px}
-  .field input:focus,.field select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+  .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+  .field input:disabled{opacity:.5;cursor:not-allowed}
   .modal .actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
+  .hint{font-size:11.5px;color:var(--faint);line-height:1.5}
 
-  /* Auth screen */
+  .notelist{display:flex;flex-direction:column;gap:10px;margin-bottom:14px;max-height:280px;overflow-y:auto}
+  .noteitem{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:10px 12px}
+  .noteitem .meta{font-size:11px;color:var(--faint);margin-bottom:4px}
+  .noteitem .txt{font-size:13px;line-height:1.55;white-space:pre-wrap}
+
+  /* Auth */
   .authwrap{min-height:calc(100vh - 56px);display:flex;align-items:center;justify-content:center;padding:20px}
   .authcard{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:28px;width:100%;max-width:380px}
-  .authcard h2{font-size:18px;font-weight:600;margin-bottom:6px;letter-spacing:-.01em}
+  .authcard h2{font-size:18px;font-weight:600;margin-bottom:6px}
   .authcard p{color:var(--muted);font-size:13px;margin-bottom:18px;line-height:1.6}
   .authcard .field{margin-bottom:12px}
   .authcard .btn-primary{width:100%;justify-content:center;margin-top:6px}
@@ -165,22 +205,19 @@
   .authswitch a{color:var(--accent);cursor:pointer;text-decoration:none}
   .autherr{color:var(--red);font-size:12.5px;margin-top:10px;line-height:1.5;display:none}
 
-  .toast{
-    position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(8px);
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(8px);
     background:var(--surface2);border:1px solid var(--border);color:var(--text);
     padding:10px 18px;border-radius:10px;font-size:13px;font-weight:500;
-    box-shadow:0 12px 32px rgba(0,0,0,.45);opacity:0;transition:.2s;z-index:99;pointer-events:none;
-  }
+    box-shadow:0 12px 32px rgba(0,0,0,.45);opacity:0;transition:.2s;z-index:99;pointer-events:none}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
   .privacy{text-align:center;font-size:12px;color:var(--faint);margin-top:22px;line-height:1.7}
-  @media(max-width:600px){.grid{grid-template-columns:1fr}.nav .tagline{display:none}}
+  @media(max-width:600px){.grid{grid-template-columns:1fr}.stagerow{grid-template-columns:110px 1fr 30px}}
 </style>
 </head>
 <body>
 
 <nav class="nav">
   <div class="logo"><span class="logo-mark">C</span> ClosePilot</div>
-  <div class="tagline">Webinar CRM</div>
   <div class="spacer"></div>
   <div class="userchip" id="userchip" style="display:none">
     <span class="dot"></span><span id="userEmail"></span>
@@ -205,88 +242,108 @@
 </div>
 
 <!-- App -->
-<div class="wrap" id="appview" style="display:none">
-
-  <div class="notice" id="localNotice" style="display:none">
-    <b>Lokaler Modus:</b> Die App ist noch nicht mit der Supabase-Datenbank verbunden.
-    Einträge werden nur in diesem Browser gespeichert. Sobald die Zugangsdaten eingetragen
-    sind, arbeiten alle im Team auf denselben Daten.
+<div id="appview" style="display:none">
+  <div class="tabs">
+    <button class="tab active" id="tab_dash" onclick="App.setTab('dash')">Dashboard</button>
+    <button class="tab" id="tab_webinar" onclick="App.setTab('webinar')">Webinar-Leads</button>
+    <button class="tab" id="tab_evergreen" onclick="App.setTab('evergreen')">Evergreen-Leads</button>
   </div>
+  <div class="wrap">
 
-  <div class="pagehead">
-    <div>
-      <h1>Leads</h1>
-      <p>Webinar-Teilnehmer, Calls und Abschlüsse an einem Ort.</p>
+    <div class="notice" id="localNotice" style="display:none">
+      <b>Lokaler Modus:</b> Noch nicht mit der Team-Datenbank verbunden. Einträge werden nur in diesem Browser gespeichert.
     </div>
-    <button class="btn-primary" onclick="App.openModal()">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>
-      Neuer Lead
-    </button>
-  </div>
 
-  <div class="kpis" id="kpis"></div>
-
-  <div class="toolbar">
-    <input class="search" id="search" placeholder="Suchen nach Name, E-Mail oder Telefon" oninput="App.render()">
-    <select class="filter" id="f_filter_result" onchange="App.render()">
-      <option value="">Ergebnis: Alle</option>
-      <option value="close">Nur Close</option>
-      <option value="noclose">Nur No Close</option>
-      <option value="offen">Nur Offen</option>
-    </select>
-    <select class="filter" id="f_filter_paid" onchange="App.render()">
-      <option value="">Bezahlt: Alle</option>
-      <option value="ja">Bezahlt</option>
-      <option value="nein">Nicht bezahlt</option>
-      <option value="offen">Offen</option>
-    </select>
-    <select class="filter" id="f_sort" onchange="App.setSortFromSelect()">
-      <option value="created_desc">Neueste zuerst</option>
-      <option value="sum_desc">Umsatz: Hoch → Niedrig</option>
-      <option value="sum_asc">Umsatz: Niedrig → Hoch</option>
-      <option value="result_desc">Close zuerst</option>
-      <option value="paid_desc">Bezahlt zuerst</option>
-      <option value="name_asc">Name A → Z</option>
-    </select>
-    <button onclick="App.exportCSV()">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-      Export
-    </button>
-    <label class="filelabel"><button style="pointer-events:none">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
-      Import</button>
-      <input type="file" id="importFile" accept=".csv" onchange="App.importCSV(event)">
-    </label>
-  </div>
-
-  <div class="card">
-    <div class="tablescroll">
-      <table id="tbl">
-        <thead>
-          <tr>
-            <th class="sortable" onclick="App.sortBy('name')">Name<span class="arrow" id="ar_name"></span></th>
-            <th>Kontakt</th>
-            <th class="sortable" onclick="App.sortBy('webinar')">Webinar<span class="arrow" id="ar_webinar"></span></th>
-            <th>Call 1</th><th>Call 2</th>
-            <th class="sortable" onclick="App.sortBy('result')">Ergebnis<span class="arrow" id="ar_result"></span></th>
-            <th class="sortable" style="text-align:right" onclick="App.sortBy('sum')">Summe<span class="arrow" id="ar_sum"></span></th>
-            <th class="sortable" onclick="App.sortBy('paid')">Bezahlt<span class="arrow" id="ar_paid"></span></th>
-            <th>Abschluss über</th><th></th>
-          </tr>
-        </thead>
-        <tbody id="tbody"></tbody>
-        <tfoot id="tfoot"></tfoot>
-      </table>
+    <!-- DASHBOARD -->
+    <div id="view_dash">
+      <div class="pagehead">
+        <div><h1>Dashboard</h1><p>Alle Zahlen für den gewählten Zeitraum, beide Pipelines.</p></div>
+      </div>
+      <div class="rangebar">
+        <button class="chip" data-range="today" onclick="App.quickRange('today')">Heute</button>
+        <button class="chip" data-range="7" onclick="App.quickRange('7')">7 Tage</button>
+        <button class="chip" data-range="30" onclick="App.quickRange('30')">30 Tage</button>
+        <button class="chip active" data-range="all" onclick="App.quickRange('all')">Gesamt</button>
+        <label>von</label><input type="date" id="d_from" onchange="App.customRange()">
+        <label>bis</label><input type="date" id="d_to" onchange="App.customRange()">
+      </div>
+      <div class="kpis" id="dash_kpis"></div>
+      <div class="dashsplit">
+        <div class="panel"><h3>Pipeline Webinar</h3><div class="stagebar" id="funnel_webinar"></div></div>
+        <div class="panel"><h3>Pipeline Evergreen</h3><div class="stagebar" id="funnel_evergreen"></div></div>
+      </div>
     </div>
-    <div class="empty" id="empty" style="display:none">
-      <div class="t">Noch keine Leads</div>
-      Lege den ersten Lead an oder importiere eine CSV-Datei.
-    </div>
-  </div>
 
-  <div class="privacy" id="privacyNote"></div>
+    <!-- PIPELINE (webinar / evergreen) -->
+    <div id="view_pipe" style="display:none">
+      <div class="pagehead">
+        <div><h1 id="pipeTitle">Webinar-Leads</h1><p>Pipeline-Schritt direkt in der Tabelle umstellen.</p></div>
+        <button class="btn-primary" onclick="App.openModal()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>
+          Neuer Lead
+        </button>
+      </div>
+      <div class="toolbar">
+        <input class="search" id="search" placeholder="Suchen: Name, E-Mail, Telefon, Closer" oninput="App.render()">
+        <select class="filter" id="f_filter_stage" onchange="App.render()"></select>
+        <select class="filter" id="f_filter_paidtype" onchange="App.render()">
+          <option value="">Zahlung: Alle</option>
+          <option value="komplett">Komplett</option>
+          <option value="klarna">Klarna</option>
+          <option value="none">Noch nichts bezahlt</option>
+        </select>
+        <select class="filter" id="f_sort" onchange="App.setSortFromSelect()">
+          <option value="created_desc">Neueste zuerst</option>
+          <option value="wert_desc">Lead-Wert: Hoch → Niedrig</option>
+          <option value="wert_asc">Lead-Wert: Niedrig → Hoch</option>
+          <option value="bezahlt_desc">Bezahlt: Hoch → Niedrig</option>
+          <option value="stage_desc">Close zuerst</option>
+          <option value="name_asc">Name A → Z</option>
+        </select>
+        <button onclick="App.exportCSV()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+          Export
+        </button>
+        <label class="filelabel"><button style="pointer-events:none">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+          Import</button>
+          <input type="file" id="importFile" accept=".csv" onchange="App.importCSV(event)">
+        </label>
+      </div>
+      <div class="card">
+        <div class="tablescroll">
+          <table id="tbl">
+            <thead>
+              <tr>
+                <th class="sortable" onclick="App.sortBy('name')">Name<span class="arrow" id="ar_name"></span></th>
+                <th>Kontakt</th>
+                <th>Closer</th>
+                <th class="sortable" onclick="App.sortBy('stage')">Pipeline-Schritt<span class="arrow" id="ar_stage"></span></th>
+                <th class="sortable" style="text-align:right" onclick="App.sortBy('wert')">Lead-Wert<span class="arrow" id="ar_wert"></span></th>
+                <th class="sortable" style="text-align:right" onclick="App.sortBy('bezahlt')">Bezahlt<span class="arrow" id="ar_bezahlt"></span></th>
+                <th>Zahlung</th>
+                <th>Produkt</th>
+                <th style="text-align:right">Kosten</th>
+                <th>Notizen</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+            <tfoot id="tfoot"></tfoot>
+          </table>
+        </div>
+        <div class="empty" id="empty" style="display:none">
+          <div class="t">Noch keine Leads in dieser Pipeline</div>
+          Lege den ersten Lead an oder importiere eine CSV-Datei.
+        </div>
+      </div>
+    </div>
+
+    <div class="privacy" id="privacyNote"></div>
+  </div>
 </div>
 
+<!-- Lead-Modal -->
 <div class="overlay" id="overlay" onclick="if(event.target===this)App.closeModal()">
   <div class="modal">
     <h2 id="modalTitle">Neuer Lead</h2>
@@ -294,30 +351,37 @@
       <div class="field full"><label>Name</label><input id="f_name" placeholder="Max Mustermann"></div>
       <div class="field"><label>E-Mail</label><input id="f_email" type="email" placeholder="max@mail.de"></div>
       <div class="field"><label>Telefonnummer</label><input id="f_tel" placeholder="+49 …"></div>
-      <div class="field"><label>Webinar</label>
-        <select id="f_webinar"><option value="offen">Offen</option><option value="erschienen">Erschienen</option><option value="nicht">Nicht erschienen</option></select>
+      <div class="field"><label>Pipeline</label>
+        <select id="f_pipeline"><option value="webinar">Webinar</option><option value="evergreen">Evergreen</option></select>
       </div>
-      <div class="field"><label>Call 1</label>
-        <select id="f_call1"><option value="offen">Offen</option><option value="done">Stattgefunden</option><option value="noshow">No-Show</option></select>
+      <div class="field"><label>Pipeline-Schritt</label><select id="f_stage"></select></div>
+      <div class="field"><label>Closer</label><input id="f_closer" placeholder="Wer betreut den Lead?"></div>
+      <div class="field"><label>Lead-Wert (€)</label><input id="f_wert" type="number" min="0" step="0.01" placeholder="0"></div>
+      <div class="field"><label>Davon bezahlt (€)</label><input id="f_bezahlt" type="number" min="0" step="0.01" placeholder="0"></div>
+      <div class="field"><label>Zahlungsart</label>
+        <select id="f_zahlungsart"><option value="">Noch offen</option><option value="komplett">Komplett</option><option value="klarna">Klarna</option></select>
       </div>
-      <div class="field"><label>Call 2</label>
-        <select id="f_call2"><option value="offen">Offen</option><option value="done">Stattgefunden</option><option value="noshow">No-Show</option></select>
+      <div class="field"><label>Produkt</label>
+        <select id="f_produkt"><option value="">Noch offen</option><option value="kurs">Normaler Kurs</option><option value="selbstlernkurs">Selbstlernkurs</option></select>
       </div>
-      <div class="field"><label>Ergebnis</label>
-        <select id="f_result"><option value="offen">Offen</option><option value="close">Close</option><option value="noclose">No Close</option></select>
-      </div>
-      <div class="field"><label>Summe (€)</label><input id="f_sum" type="number" min="0" step="0.01" placeholder="0"></div>
-      <div class="field"><label>Abschluss über</label>
-        <select id="f_via"><option value="">Kein Abschluss</option><option value="ablefy">Ablefy</option><option value="contract">Contract</option></select>
-      </div>
-      <div class="field"><label>Bezahlt</label>
-        <select id="f_paid"><option value="offen">Offen</option><option value="ja">Bezahlt</option><option value="nein">Nicht bezahlt</option></select>
-      </div>
-      <div class="field full"><label>Notiz</label><input id="f_note" placeholder="Einwände, Follow-up, Details"></div>
+      <div class="field"><label>Lead-Kosten (€) <span class="hint" id="kostenHint"></span></label><input id="f_kosten" type="number" min="0" step="0.01" placeholder="0"></div>
     </div>
     <div class="actions">
       <button onclick="App.closeModal()">Abbrechen</button>
       <button class="btn-primary" onclick="App.save()">Speichern</button>
+    </div>
+  </div>
+</div>
+
+<!-- Notizen-Modal -->
+<div class="overlay" id="noteOverlay" onclick="if(event.target===this)App.closeNotes()">
+  <div class="modal">
+    <h2 id="noteTitle">Notizen</h2>
+    <div class="notelist" id="noteList"></div>
+    <div class="field full"><label>Neue Notiz</label><textarea id="noteText" placeholder="Einwände, Absprachen, nächste Schritte …"></textarea></div>
+    <div class="actions">
+      <button onclick="App.closeNotes()">Schließen</button>
+      <button class="btn-primary" onclick="App.addNote()">Notiz speichern</button>
     </div>
   </div>
 </div>
@@ -333,23 +397,42 @@
    ============================================================ */
 const SUPABASE_URL = 'PASTE_SUPABASE_URL';
 const SUPABASE_ANON_KEY = 'PASTE_SUPABASE_ANON_KEY';
+/* Standard-Kosten pro Lead (Reseller-Partnermodus).
+   Wert eintragen, sobald bekannt — wird bei neuen Leads vorausgefüllt. */
+const DEFAULT_LEAD_KOSTEN = 0;
 
 const App = (() => {
-  const KEY = 'closer_palace_crm_v1';
+  const KEY = 'closepilot_crm_v2';
   const CLOUD = SUPABASE_URL.startsWith('https://') && !SUPABASE_ANON_KEY.includes('PASTE');
   const sb = CLOUD ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
   let leads = [];
-  let editId = null;
-  let user = null, isAdmin = false;
+  let editId = null, noteId = null;
+  let user = null, isAdmin = true; // lokaler Modus: volle Rechte
+  let tab = 'dash', pipeline = 'webinar';
   let sort = {key:'created', dir:'desc'};
+  let range = {from:null, to:null, quick:'all'};
   let signupMode = false;
 
   const $ = id => document.getElementById(id);
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const eur = n => (Number(n)||0).toLocaleString('de-DE',{style:'currency',currency:'EUR'});
 
-  /* ---------- Storage (lokal vs. Supabase) ---------- */
+  const STAGES = [
+    ['neuer_termin','Neuer Termin'],
+    ['ersttermin','Ersttermin'],
+    ['zweittermin','Zweittermin'],
+    ['noshow','No Show'],
+    ['close','Close'],
+    ['noclose','No Close'],
+    ['onboarding','Onboarding-Termin gelegt'],
+  ];
+  const STAGE_LABEL = Object.fromEntries(STAGES);
+  const STAGE_ORDER = Object.fromEntries(STAGES.map(([k],i)=>[k,i]));
+  const PAY_LABEL = {komplett:'Komplett', klarna:'Klarna', '':'–'};
+  const PROD_LABEL = {kurs:'Normaler Kurs', selbstlernkurs:'Selbstlernkurs', '':'–'};
+
+  /* ---------- Storage ---------- */
   const localLoad = () => { try{ return JSON.parse(localStorage.getItem(KEY)) || []; }catch(e){ return []; } };
   const localSave = () => localStorage.setItem(KEY, JSON.stringify(leads));
 
@@ -362,7 +445,7 @@ const App = (() => {
   async function upsertLead(data, id){
     if(!CLOUD){
       if(id){ Object.assign(leads.find(x=>x.id===id), data); }
-      else leads.unshift({id:'l'+leads.length+'_'+Math.abs([...JSON.stringify(data)+performance.now()].reduce((a,c)=>a*31+c.charCodeAt(0)|0,7)), ...data});
+      else leads.unshift({id:'l'+leads.length+'_'+Math.abs([...JSON.stringify(data)+performance.now()].reduce((a,c)=>a*31+c.charCodeAt(0)|0,7)), created_at:new Date().toISOString(), notes:[], ...data});
       localSave(); return true;
     }
     const q = id ? sb.from('leads').update(data).eq('id',id) : sb.from('leads').insert({...data, created_by_email:user?.email||''});
@@ -373,7 +456,7 @@ const App = (() => {
   async function deleteLead(id){
     if(!CLOUD){ leads = leads.filter(x=>x.id!==id); localSave(); return true; }
     const {error} = await sb.from('leads').delete().eq('id',id);
-    if(error){ toast(error.code==='42501'||error.message.includes('policy') ? 'Nur Admins können löschen' : 'Fehler: '+error.message); return false; }
+    if(error){ toast(error.message.includes('policy')||error.code==='42501' ? 'Nur Admins können löschen' : 'Fehler: '+error.message); return false; }
     await fetchLeads(); return true;
   }
 
@@ -381,10 +464,10 @@ const App = (() => {
   async function initAuth(){
     if(!CLOUD){
       $('localchip').style.display='flex'; $('localNotice').style.display='block';
-      $('privacyNote').innerHTML='Lokaler Modus: Daten bleiben in diesem Browser. Regelmäßig CSV exportieren als Backup.';
+      $('privacyNote').textContent='Lokaler Modus: Daten bleiben in diesem Browser. Regelmäßig CSV exportieren als Backup.';
       showApp(); return;
     }
-    $('privacyNote').innerHTML='Alle Eingaben werden zentral und sicher in der Team-Datenbank gespeichert.';
+    $('privacyNote').textContent='Alle Eingaben werden zentral in der Team-Datenbank gespeichert.';
     const {data:{session}} = await sb.auth.getSession();
     if(session){ await onLogin(session.user); } else showAuth();
     sb.auth.onAuthStateChange((_e, s)=>{ if(!s && user){ user=null; showAuth(); } });
@@ -402,9 +485,6 @@ const App = (() => {
     $('adminBadge').style.display = isAdmin ? 'inline-block' : 'none';
     $('userchip').style.display='flex';
     showApp();
-    subscribeRealtime();
-  }
-  function subscribeRealtime(){
     sb.channel('leads-live').on('postgres_changes',{event:'*',schema:'public',table:'leads'},
       async ()=>{ await fetchLeads(); render(); }).subscribe();
   }
@@ -412,8 +492,7 @@ const App = (() => {
     const email = $('a_email').value.trim(), pass = $('a_pass').value;
     if(!email || pass.length<6) return authError('Bitte E-Mail und Passwort (mind. 6 Zeichen) eingeben.');
     $('authBtn').disabled = true;
-    const fn = signupMode ? sb.auth.signUp({email,password:pass}) : sb.auth.signInWithPassword({email,password:pass});
-    const {data,error} = await fn;
+    const {data,error} = await (signupMode ? sb.auth.signUp({email,password:pass}) : sb.auth.signInWithPassword({email,password:pass}));
     $('authBtn').disabled = false;
     if(error) return authError(error.message.includes('Invalid login') ? 'E-Mail oder Passwort falsch.' : error.message);
     if(signupMode && !data.session) return authError('Konto angelegt. Bitte bestätige die E-Mail in deinem Postfach und melde dich dann an.');
@@ -433,102 +512,158 @@ const App = (() => {
   function showAuth(){ $('authview').style.display='flex'; $('appview').style.display='none'; $('userchip').style.display='none'; }
   async function showApp(){ $('authview').style.display='none'; $('appview').style.display='block'; await fetchLeads(); render(); }
 
-  /* ---------- UI ---------- */
-  const PILLS = {
-    webinar:{erschienen:['p-green','Erschienen'], nicht:['p-red','Nicht erschienen'], offen:['p-open','Offen']},
-    call:{done:['p-accent','Stattgefunden'], noshow:['p-amber','No-Show'], offen:['p-open','Offen']},
-    result:{close:['p-green','Close'], noclose:['p-red','No Close'], offen:['p-open','Offen']},
-    paid:{ja:['p-green','Bezahlt'], nein:['p-red','Nicht bezahlt'], offen:['p-open','Offen']},
-    via:{ablefy:['p-cyan','Ablefy'], contract:['p-violet','Contract'], '':['p-open','–']}
+  /* ---------- Tabs & Zeitraum ---------- */
+  function setTab(t){
+    tab = t;
+    if(t==='webinar'||t==='evergreen') pipeline = t;
+    ['dash','webinar','evergreen'].forEach(x=>$('tab_'+x).classList.toggle('active', x===t));
+    $('view_dash').style.display = t==='dash' ? 'block':'none';
+    $('view_pipe').style.display = t==='dash' ? 'none':'block';
+    if(t!=='dash') $('pipeTitle').textContent = t==='webinar' ? 'Webinar-Leads' : 'Evergreen-Leads';
+    render();
+  }
+  function quickRange(q){
+    range.quick = q;
+    const now = new Date(); now.setHours(23,59,59,999);
+    if(q==='all'){ range.from=null; range.to=null; }
+    else {
+      const from = new Date();
+      if(q==='today') from.setHours(0,0,0,0);
+      else { from.setDate(from.getDate()-Number(q)); from.setHours(0,0,0,0); }
+      range.from = from; range.to = now;
+    }
+    $('d_from').value=''; $('d_to').value='';
+    document.querySelectorAll('.chip').forEach(c=>c.classList.toggle('active', c.dataset.range===q));
+    render();
+  }
+  function customRange(){
+    const f = $('d_from').value, t = $('d_to').value;
+    range.quick = null;
+    range.from = f ? new Date(f+'T00:00:00') : null;
+    range.to = t ? new Date(t+'T23:59:59') : null;
+    document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+    render();
+  }
+  const inRange = l => {
+    const d = new Date(l.created_at || 0);
+    return (!range.from || d>=range.from) && (!range.to || d<=range.to);
   };
-  const pill = (map,val) => { const [cls,txt] = map[val] || map.offen || map['']; return `<span class="pill ${cls}">${txt}</span>`; };
 
-  function kpis(){
-    const total = leads.length;
-    const shown = leads.filter(l=>l.webinar==='erschienen').length;
-    const closes = leads.filter(l=>l.result==='close');
-    const sum = closes.reduce((a,l)=>a+(Number(l.sum)||0),0);
-    const paidSum = closes.filter(l=>l.paid==='ja').reduce((a,l)=>a+(Number(l.sum)||0),0);
-    const rate = total ? Math.round(closes.length/total*100) : 0;
-    const showRate = total ? Math.round(shown/total*100) : 0;
-    $('kpis').innerHTML = [
-      ['Leads', total, ''],
-      ['Erschienen', shown, showRate+'% Show-Rate'],
-      ['Closes', closes.length, rate+'% Close-Rate'],
-      ['Offen (unbezahlt)', eur(sum-paidSum), 'aus Closes'],
-    ].map(([l,n,s])=>`<div class="kpi"><div class="lbl">${l}</div><div class="num">${n}</div>${s?`<div class="sub">${s}</div>`:''}</div>`).join('')
-    + `<div class="kpi hl"><div class="lbl">Umsatz gesamt</div><div class="num">${eur(sum)}</div><div class="sub">davon bezahlt: ${eur(paidSum)}</div></div>`;
+  /* ---------- Dashboard ---------- */
+  function renderDash(){
+    const rows = leads.filter(inRange);
+    const closes = rows.filter(l=>l.stage==='close'||l.stage==='onboarding');
+    const wert = closes.reduce((a,l)=>a+(Number(l.wert)||0),0);
+    const bezahlt = rows.reduce((a,l)=>a+(Number(l.bezahlt)||0),0);
+    const kosten = rows.reduce((a,l)=>a+(Number(l.kosten)||0),0);
+    const noclose = rows.filter(l=>l.stage==='noclose').length;
+    const rate = rows.length ? Math.round(closes.length/rows.length*100) : 0;
+    $('dash_kpis').innerHTML = [
+      ['','Leads gesamt', rows.length, `Webinar ${rows.filter(l=>l.pipeline==='webinar').length} · Evergreen ${rows.filter(l=>l.pipeline!=='webinar').length}`],
+      ['good','Closes', closes.length, rate+'% Close-Rate'],
+      ['bad','No Close', noclose, ''],
+      ['','Umsatz (Lead-Wert)', eur(wert), 'aus Closes'],
+      ['good','Bezahlt', eur(bezahlt), 'tatsächlich eingegangen'],
+      ['','Lead-Kosten', eur(kosten), 'Reseller-Partnermodus'],
+      ['hl','Ergebnis', eur(bezahlt-kosten), 'Bezahlt minus Kosten'],
+    ].map(([cls,l,n,s])=>`<div class="kpi ${cls}"><div class="lbl">${l}</div><div class="num">${n}</div>${s?`<div class="sub">${s}</div>`:''}</div>`).join('');
+    for(const p of ['webinar','evergreen']){
+      const pr = rows.filter(l=>(l.pipeline||'webinar')===p);
+      const max = Math.max(1,...STAGES.map(([k])=>pr.filter(l=>l.stage===k).length));
+      $('funnel_'+p).innerHTML = STAGES.map(([k,lab])=>{
+        const c = pr.filter(l=>l.stage===k).length;
+        return `<div class="stagerow"><span>${lab}</span><div class="bartrack"><div class="barfill" style="width:${c/max*100}%${k==='close'||k==='onboarding'?';background:var(--green)':k==='noclose'||k==='noshow'?';background:var(--red)':''}"></div></div><span class="cnt">${c}</span></div>`;
+      }).join('');
+    }
   }
 
-  const ORDER = {result:{close:2,noclose:1,offen:0}, paid:{ja:2,nein:1,offen:0}, webinar:{erschienen:2,nicht:1,offen:0}};
+  /* ---------- Pipeline-Tabelle ---------- */
   function sortRows(rows){
     const {key,dir} = sort, m = dir==='asc'?1:-1;
     return [...rows].sort((a,b)=>{
-      let va, vb;
-      if(key==='sum'){ va=Number(a.sum)||0; vb=Number(b.sum)||0; }
-      else if(key==='name'){ return m * String(a.name||'').localeCompare(String(b.name||''),'de'); }
-      else if(ORDER[key]){ va=ORDER[key][a[key]]??0; vb=ORDER[key][b[key]]??0; }
-      else { va=a.created_at||a.id||''; vb=b.created_at||b.id||''; return m*(va<vb?-1:va>vb?1:0); }
-      return m*(va-vb);
+      if(key==='name') return m*String(a.name||'').localeCompare(String(b.name||''),'de');
+      if(key==='wert'||key==='bezahlt') return m*((Number(a[key])||0)-(Number(b[key])||0));
+      if(key==='stage'){
+        const w = s=>s==='close'?100:s==='onboarding'?99:(STAGE_ORDER[s]??0);
+        return m*(w(a.stage)-w(b.stage));
+      }
+      const va=a.created_at||'', vb=b.created_at||'';
+      return m*(va<vb?-1:va>vb?1:0);
     });
   }
-  function sortBy(key){
-    sort = sort.key===key ? {key, dir:sort.dir==='asc'?'desc':'asc'} : {key, dir:key==='name'?'asc':'desc'};
-    render();
-  }
-  function setSortFromSelect(){
-    const [key,dir] = $('f_sort').value.split('_');
-    sort = {key:key==='created'?'created':key, dir};
-    render();
-  }
+  function sortBy(key){ sort = sort.key===key ? {key,dir:sort.dir==='asc'?'desc':'asc'} : {key,dir:key==='name'?'asc':'desc'}; render(); }
+  function setSortFromSelect(){ const [key,dir]=$('f_sort').value.split('_'); sort={key,dir}; render(); }
 
-  function render(){
-    kpis();
+  function renderPipe(){
     const q = ($('search').value||'').toLowerCase();
-    const fr = $('f_filter_result').value, fp = $('f_filter_paid').value;
+    const fs = $('f_filter_stage').value, fp = $('f_filter_paidtype').value;
     let rows = leads.filter(l =>
-      (!q || [l.name,l.email,l.tel].join(' ').toLowerCase().includes(q)) &&
-      (!fr || l.result===fr) && (!fp || (l.paid||'offen')===fp));
+      (l.pipeline||'webinar')===pipeline &&
+      (!q || [l.name,l.email,l.tel,l.closer].join(' ').toLowerCase().includes(q)) &&
+      (!fs || l.stage===fs) &&
+      (!fp || (fp==='none' ? !(l.zahlungsart) : l.zahlungsart===fp)));
     rows = sortRows(rows);
-    ['name','webinar','result','sum','paid'].forEach(k=>{
-      $('ar_'+k).textContent = sort.key===k ? (sort.dir==='asc'?'▲':'▼') : '';
-    });
+    ['name','stage','wert','bezahlt'].forEach(k=>{ $('ar_'+k).textContent = sort.key===k ? (sort.dir==='asc'?'▲':'▼') : ''; });
     $('empty').style.display = rows.length ? 'none':'block';
     $('tbl').style.display = rows.length ? 'table':'none';
-    $('tbody').innerHTML = rows.map(l=>`
-      <tr>
-        <td class="name">${esc(l.name)}${l.note?`<div class="note" title="${esc(l.note)}">${esc(l.note)}</div>`:''}</td>
+    $('tbody').innerHTML = rows.map(l=>{
+      const notes = Array.isArray(l.notes) ? l.notes : [];
+      return `<tr>
+        <td class="name">${esc(l.name)}${notes.length?`<div class="sub">${esc(notes[notes.length-1].text).slice(0,60)}</div>`:''}</td>
         <td class="contact">${esc(l.email)}${l.email&&l.tel?'<br>':''}${esc(l.tel)}</td>
-        <td>${pill(PILLS.webinar,l.webinar)}</td>
-        <td>${pill(PILLS.call,l.call1)}</td>
-        <td>${pill(PILLS.call,l.call2)}</td>
-        <td>${pill(PILLS.result,l.result)}</td>
-        <td class="money ${l.result==='close'?'win':''}">${l.result==='close' ? eur(l.sum) : '–'}</td>
-        <td>${pill(PILLS.paid,l.paid||'offen')}</td>
-        <td>${pill(PILLS.via,l.via||'')}</td>
-        <td>
-          <div class="rowactions">
-            <button class="iconbtn" title="Bearbeiten" onclick="App.openModal('${l.id}')">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
-            </button>
-            ${(!CLOUD || isAdmin)?`<button class="iconbtn danger" title="Löschen" onclick="App.del('${l.id}')">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>
-            </button>`:''}
-          </div>
-        </td>
-      </tr>`).join('');
-    const sum = rows.filter(l=>l.result==='close').reduce((a,l)=>a+(Number(l.sum)||0),0);
-    $('tfoot').innerHTML =
-      `<tr><td colspan="6" style="text-align:right;color:var(--muted);font-weight:500">Gesamt aus Closes (Auswahl)</td><td class="money" style="color:var(--green);text-align:right">${eur(sum)}</td><td colspan="3"></td></tr>`;
+        <td>${esc(l.closer)||'<span style="color:var(--faint)">–</span>'}</td>
+        <td><select class="stagesel s-${l.stage}" onchange="App.setStage('${l.id}',this.value)">
+          ${STAGES.map(([k,lab])=>`<option value="${k}" ${l.stage===k?'selected':''}>${lab}</option>`).join('')}
+        </select></td>
+        <td class="money">${eur(l.wert)}</td>
+        <td class="money ${(Number(l.bezahlt)||0)>0?'win':''}">${eur(l.bezahlt)}</td>
+        <td>${l.zahlungsart?`<span class="pill ${l.zahlungsart==='komplett'?'p-green':'p-cyan'}">${PAY_LABEL[l.zahlungsart]}</span>`:'<span class="pill p-open">Offen</span>'}</td>
+        <td>${l.produkt?`<span class="pill ${l.produkt==='kurs'?'p-violet':'p-accent'}">${PROD_LABEL[l.produkt]}</span>`:'<span class="pill p-open">–</span>'}</td>
+        <td class="money cost">${eur(l.kosten)}</td>
+        <td><button class="iconbtn" title="Notizen" onclick="App.openNotes('${l.id}')" style="width:auto;padding:0 6px;gap:4px">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          ${notes.length?`<span class="notecount">${notes.length}</span>`:''}
+        </button></td>
+        <td><div class="rowactions">
+          <button class="iconbtn" title="Bearbeiten" onclick="App.openModal('${l.id}')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+          </button>
+          ${isAdmin?`<button class="iconbtn danger" title="Löschen" onclick="App.del('${l.id}')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>
+          </button>`:''}
+        </div></td>
+      </tr>`;
+    }).join('');
+    const wert = rows.reduce((a,l)=>a+(Number(l.wert)||0),0);
+    const bez = rows.reduce((a,l)=>a+(Number(l.bezahlt)||0),0);
+    const kos = rows.reduce((a,l)=>a+(Number(l.kosten)||0),0);
+    $('tfoot').innerHTML = `<tr>
+      <td colspan="4" style="text-align:right;color:var(--muted);font-weight:500">Summe (Auswahl)</td>
+      <td class="money">${eur(wert)}</td><td class="money" style="color:var(--green)">${eur(bez)}</td>
+      <td colspan="2"></td><td class="money" style="color:var(--amber)">${eur(kos)}</td><td colspan="2"></td></tr>`;
   }
 
+  function render(){ if(tab==='dash') renderDash(); else renderPipe(); }
+
+  async function setStage(id, stage){
+    if(await upsertLead({stage}, id)) { toast('Schritt: '+STAGE_LABEL[stage]); render(); }
+  }
+
+  /* ---------- Lead-Modal ---------- */
+  function fillStageSelects(){
+    $('f_stage').innerHTML = STAGES.map(([k,l])=>`<option value="${k}">${l}</option>`).join('');
+    $('f_filter_stage').innerHTML = '<option value="">Schritt: Alle</option>'+STAGES.map(([k,l])=>`<option value="${k}">${l}</option>`).join('');
+  }
   function openModal(id){
     editId = id || null;
     $('modalTitle').textContent = id ? 'Lead bearbeiten' : 'Neuer Lead';
-    const l = leads.find(x=>x.id===id) || {webinar:'offen',call1:'offen',call2:'offen',result:'offen',via:'',paid:'offen'};
-    for (const [f,k] of [['f_name','name'],['f_email','email'],['f_tel','tel'],['f_webinar','webinar'],
-      ['f_call1','call1'],['f_call2','call2'],['f_result','result'],['f_sum','sum'],['f_via','via'],['f_paid','paid'],['f_note','note']])
-      $(f).value = l[k] ?? (k==='paid'?'offen':'');
+    const l = leads.find(x=>x.id===id) || {pipeline, stage:'neuer_termin', zahlungsart:'', produkt:'', kosten:DEFAULT_LEAD_KOSTEN};
+    for (const [f,k] of [['f_name','name'],['f_email','email'],['f_tel','tel'],['f_pipeline','pipeline'],
+      ['f_stage','stage'],['f_closer','closer'],['f_wert','wert'],['f_bezahlt','bezahlt'],
+      ['f_zahlungsart','zahlungsart'],['f_produkt','produkt'],['f_kosten','kosten']])
+      $(f).value = l[k] ?? '';
+    $('f_kosten').disabled = !isAdmin;
+    $('kostenHint').textContent = isAdmin ? '' : '(nur Admin)';
     $('overlay').classList.add('open');
     $('f_name').focus();
   }
@@ -537,9 +672,11 @@ const App = (() => {
   async function save(){
     const v = f => $(f).value.trim();
     if(!v('f_name')) return toast('Bitte einen Namen eingeben');
-    const data = {name:v('f_name'),email:v('f_email'),tel:v('f_tel'),webinar:v('f_webinar'),
-      call1:v('f_call1'),call2:v('f_call2'),result:v('f_result'),sum:Number(v('f_sum'))||0,
-      via:v('f_via'),paid:v('f_paid'),note:v('f_note')};
+    const data = {name:v('f_name'),email:v('f_email'),tel:v('f_tel'),pipeline:v('f_pipeline'),
+      stage:v('f_stage'),closer:v('f_closer'),wert:Number(v('f_wert'))||0,bezahlt:Number(v('f_bezahlt'))||0,
+      zahlungsart:v('f_zahlungsart'),produkt:v('f_produkt')};
+    if(isAdmin) data.kosten = Number(v('f_kosten'))||0;
+    else if(!editId) data.kosten = DEFAULT_LEAD_KOSTEN;
     if(await upsertLead(data, editId)){ toast(editId?'Änderungen gespeichert':'Lead angelegt'); render(); closeModal(); }
   }
 
@@ -549,20 +686,47 @@ const App = (() => {
     if(await deleteLead(id)){ render(); toast('Lead gelöscht'); }
   }
 
+  /* ---------- Notizen ---------- */
+  function openNotes(id){
+    noteId = id;
+    const l = leads.find(x=>x.id===id);
+    $('noteTitle').textContent = 'Notizen: '+(l?.name||'');
+    renderNotes();
+    $('noteOverlay').classList.add('open');
+    $('noteText').focus();
+  }
+  function renderNotes(){
+    const l = leads.find(x=>x.id===noteId);
+    const notes = Array.isArray(l?.notes) ? l.notes : [];
+    $('noteList').innerHTML = notes.length ? notes.map(n=>`
+      <div class="noteitem"><div class="meta">${new Date(n.t).toLocaleString('de-DE',{dateStyle:'short',timeStyle:'short'})}${n.by?' · '+esc(n.by):''}</div>
+      <div class="txt">${esc(n.text)}</div></div>`).reverse().join('')
+      : '<div class="hint">Noch keine Notizen zu diesem Lead.</div>';
+  }
+  async function addNote(){
+    const text = $('noteText').value.trim();
+    if(!text) return;
+    const l = leads.find(x=>x.id===noteId);
+    const notes = [...(Array.isArray(l.notes)?l.notes:[]), {t:new Date().toISOString(), by:user?.email||'', text}];
+    if(await upsertLead({notes}, noteId)){ $('noteText').value=''; renderNotes(); render(); toast('Notiz gespeichert'); }
+  }
+  function closeNotes(){ $('noteOverlay').classList.remove('open'); noteId=null; }
+
   function toast(msg){
     const t = $('toast'); t.textContent = msg; t.classList.add('show');
     clearTimeout(t._h); t._h = setTimeout(()=>t.classList.remove('show'), 2600);
   }
 
   /* ---------- CSV ---------- */
-  const COLS=[['name','Name'],['email','E-Mail'],['tel','Telefon'],['webinar','Webinar'],['call1','Call 1'],
-    ['call2','Call 2'],['result','Ergebnis'],['sum','Summe'],['paid','Bezahlt'],['via','Abschluss über'],['note','Notiz']];
+  const COLS=[['name','Name'],['email','E-Mail'],['tel','Telefon'],['pipeline','Pipeline'],['stage','Schritt'],
+    ['closer','Closer'],['wert','Lead-Wert'],['bezahlt','Bezahlt'],['zahlungsart','Zahlungsart'],['produkt','Produkt'],['kosten','Kosten']];
   function exportCSV(){
     const q = s => `"${String(s??'').replace(/"/g,'""')}"`;
-    const lines=[COLS.map(c=>q(c[1])).join(';'), ...leads.map(l=>COLS.map(c=>q(l[c[0]])).join(';'))];
+    const rows = leads.filter(l=>(l.pipeline||'webinar')===pipeline);
+    const lines=[COLS.map(c=>q(c[1])).join(';'), ...rows.map(l=>COLS.map(c=>q(l[c[0]])).join(';'))];
     const blob=new Blob(['﻿'+lines.join('\r\n')],{type:'text/csv;charset=utf-8'});
     const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
-    a.download='closepilot-export.csv'; a.click(); URL.revokeObjectURL(a.href);
+    a.download='closepilot-'+pipeline+'.csv'; a.click(); URL.revokeObjectURL(a.href);
     toast('CSV exportiert');
   }
   function importCSV(ev){
@@ -572,14 +736,18 @@ const App = (() => {
       const rows=parseCSV(r.result.replace(/^﻿/,''));
       if(rows.length<2) return toast('Keine Daten in der CSV gefunden');
       const items=rows.slice(1).filter(c=>c[0]).map(c=>{
-        const o={}; COLS.forEach(([k],j)=>o[k]=c[j]??''); o.sum=Number(String(o.sum).replace(',','.'))||0; return o;
+        const o={}; COLS.forEach(([k],j)=>o[k]=c[j]??'');
+        ['wert','bezahlt','kosten'].forEach(k=>o[k]=Number(String(o[k]).replace(',','.'))||0);
+        if(!o.pipeline) o.pipeline=pipeline;
+        if(!o.stage||!STAGE_LABEL[o.stage]) o.stage='neuer_termin';
+        return o;
       });
       if(CLOUD){
         const {error}=await sb.from('leads').insert(items.map(o=>({...o, created_by_email:user?.email||''})));
         if(error) return toast('Import-Fehler: '+error.message);
         await fetchLeads();
       } else {
-        items.forEach((o,i)=>leads.unshift({id:'imp'+i+'_'+o.name.length+'_'+leads.length, ...o}));
+        items.forEach((o,i)=>leads.unshift({id:'imp'+i+'_'+o.name.length+'_'+leads.length, created_at:new Date().toISOString(), notes:[], ...o}));
         localSave();
       }
       render(); toast(`${items.length} Leads importiert`); ev.target.value='';
@@ -600,8 +768,10 @@ const App = (() => {
     return rows;
   }
 
+  fillStageSelects();
   initAuth();
-  return {openModal,closeModal,save,del,exportCSV,importCSV,render,sortBy,setSortFromSelect,auth,logout,toggleAuthMode};
+  return {setTab,quickRange,customRange,openModal,closeModal,save,del,setStage,
+    openNotes,closeNotes,addNote,exportCSV,importCSV,render,sortBy,setSortFromSelect,auth,logout,toggleAuthMode};
 })();
 </script>
 </body>
