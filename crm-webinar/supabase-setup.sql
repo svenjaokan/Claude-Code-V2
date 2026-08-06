@@ -14,7 +14,7 @@ insert into public.allowed_users (email, is_admin) values
   ('hello@svenjaokan.de', true),          -- Svenja Okan (Admin)
   ('keller.danny1990@gmail.com', true),   -- Danny Keller (Admin)
   ('deliaraphael@icloud.com', false),     -- Raphael
-  ('khato.1983@gmail.com', false),        -- Khato
+  ('khato.1983@gmail.com', false),        -- Khatuna (Onboarding)
   ('dettmardominic@gmail.com', false)     -- Dominic Dettmar
 on conflict (email) do nothing;
 
