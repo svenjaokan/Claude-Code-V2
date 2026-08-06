@@ -26,7 +26,9 @@ create table if not exists public.leads (
   tel text default '',
   pipeline text not null default 'webinar',      -- webinar | evergreen
   stage text not null default 'neuer_termin',    -- neuer_termin | ersttermin | zweittermin | noshow | close | noclose | onboarding
-  closer text default '',
+  closer text default '',                        -- Raphael | Dominik | René
+  termin1 date,                                  -- Termin Erstgespräch
+  termin2 date,                                  -- Termin Zweitgespräch
   wert numeric not null default 0,               -- Lead-Wert (Deal-Summe)
   bezahlt numeric not null default 0,            -- davon tatsächlich bezahlt
   zahlungsart text not null default '',          -- '' | komplett | klarna

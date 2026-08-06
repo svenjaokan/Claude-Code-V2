@@ -270,6 +270,20 @@
         <label>bis</label><input type="date" id="d_to" onchange="App.customRange()">
       </div>
       <div class="kpis" id="dash_kpis"></div>
+      <div class="panel" style="margin-bottom:12px">
+        <h3>Closer-Übersicht</h3>
+        <div class="tablescroll">
+          <table id="closer_tbl" style="min-width:680px">
+            <thead><tr>
+              <th>Closer</th><th style="text-align:right">Betreut</th>
+              <th style="text-align:right">Zweitgespräche</th><th style="text-align:right">No Shows</th>
+              <th style="text-align:right">Closes</th><th style="text-align:right">Close-Rate</th>
+              <th style="text-align:right">Umsatz</th><th style="text-align:right">Davon bezahlt</th>
+            </tr></thead>
+            <tbody id="closer_tbody"></tbody>
+          </table>
+        </div>
+      </div>
       <div class="dashsplit">
         <div class="panel"><h3>Pipeline Webinar</h3><div class="stagebar" id="funnel_webinar"></div></div>
         <div class="panel"><h3>Pipeline Evergreen</h3><div class="stagebar" id="funnel_evergreen"></div></div>
@@ -290,9 +304,10 @@
         <select class="filter" id="f_filter_stage" onchange="App.render()"></select>
         <select class="filter" id="f_filter_paidtype" onchange="App.render()">
           <option value="">Zahlung: Alle</option>
-          <option value="komplett">Komplett</option>
+          <option value="komplett">Voll bezahlt</option>
           <option value="klarna">Klarna</option>
-          <option value="none">Noch nichts bezahlt</option>
+          <option value="raten3">3 Raten</option>
+          <option value="none">Noch offen</option>
         </select>
         <select class="filter" id="f_sort" onchange="App.setSortFromSelect()">
           <option value="created_desc">Neueste zuerst</option>
@@ -321,6 +336,7 @@
                 <th>Kontakt</th>
                 <th>Closer</th>
                 <th class="sortable" onclick="App.sortBy('stage')">Pipeline-Schritt<span class="arrow" id="ar_stage"></span></th>
+                <th>Termine</th>
                 <th class="sortable" style="text-align:right" onclick="App.sortBy('wert')">Lead-Wert<span class="arrow" id="ar_wert"></span></th>
                 <th class="sortable" style="text-align:right" onclick="App.sortBy('bezahlt')">Bezahlt<span class="arrow" id="ar_bezahlt"></span></th>
                 <th>Zahlung</th>
@@ -362,7 +378,7 @@
                 <th>Name</th><th>Kontakt</th><th>Onboarding-Infos</th>
                 <th style="text-align:right">Bezahlt</th>
                 <th>Onboarding-Termin</th><th>Checkliste</th>
-                <th>Angefangen am</th><th></th>
+                <th></th>
               </tr>
             </thead>
             <tbody id="ob_tbody"></tbody>
@@ -391,18 +407,21 @@
         <select id="f_pipeline"><option value="webinar">Webinar</option><option value="evergreen">Evergreen</option></select>
       </div>
       <div class="field"><label>Pipeline-Schritt</label><select id="f_stage"></select></div>
-      <div class="field"><label>Closer</label><input id="f_closer" placeholder="Wer betreut den Lead?"></div>
+      <div class="field"><label>Closer (wer betreut den Kontakt)</label>
+        <select id="f_closer"><option value="">Noch offen</option><option value="Raphael">Closer Raphael</option><option value="Dominik">Closer Dominik</option><option value="René">Closer René</option></select>
+      </div>
+      <div class="field"><label>Termin Erstgespräch</label><input id="f_termin1" type="date"></div>
+      <div class="field"><label>Termin Zweitgespräch</label><input id="f_termin2" type="date"></div>
       <div class="field"><label>Lead-Wert (€)</label><input id="f_wert" type="number" min="0" step="0.01" placeholder="0"></div>
       <div class="field"><label>Davon bezahlt (€)</label><input id="f_bezahlt" type="number" min="0" step="0.01" placeholder="0"></div>
       <div class="field"><label>Zahlungsart</label>
-        <select id="f_zahlungsart"><option value="">Noch offen</option><option value="komplett">Komplett</option><option value="klarna">Klarna</option></select>
+        <select id="f_zahlungsart"><option value="">Noch offen</option><option value="komplett">Voll bezahlt</option><option value="klarna">Klarna</option><option value="raten3">3 Raten</option></select>
       </div>
       <div class="field"><label>Produkt</label>
         <select id="f_produkt"><option value="">Noch offen</option><option value="kurs">Normaler Kurs</option><option value="selbstlernkurs">Selbstlernkurs</option></select>
       </div>
       <div class="field"><label>Lead-Kosten (€) <span class="hint" id="kostenHint"></span></label><input id="f_kosten" type="number" min="0" step="0.01" placeholder="0"></div>
-      <div class="field"><label>Angefangen am</label><input id="f_start" type="date"></div>
-      <div class="field"><label>Onboarding-Termin</label><input id="f_obtermin" type="date"></div>
+      <div class="field"><label>Termin Onboarding</label><input id="f_obtermin" type="date"></div>
       <div class="field full"><label>Onboarding-Infos (für die Assistentin)</label>
         <textarea id="f_obinfo" placeholder="Alles, was fürs Onboarding wichtig ist: Ziele, Besonderheiten, Absprachen aus dem Call …"></textarea>
       </div>
@@ -479,6 +498,7 @@ const App = (() => {
   const $ = id => document.getElementById(id);
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const eur = n => (Number(n)||0).toLocaleString('de-DE',{style:'currency',currency:'EUR'});
+  const fmtDate = d => d ? new Date(d+'T00:00:00').toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'}) : '–';
 
   const STAGES = [
     ['neuer_termin','Neuer Termin'],
@@ -491,7 +511,7 @@ const App = (() => {
   ];
   const STAGE_LABEL = Object.fromEntries(STAGES);
   const STAGE_ORDER = Object.fromEntries(STAGES.map(([k],i)=>[k,i]));
-  const PAY_LABEL = {komplett:'Komplett', klarna:'Klarna', '':'–'};
+  const PAY_LABEL = {komplett:'Voll bezahlt', klarna:'Klarna', raten3:'3 Raten', '':'–'};
   const PROD_LABEL = {kurs:'Normaler Kurs', selbstlernkurs:'Selbstlernkurs', '':'–'};
 
   /* ---------- Storage ---------- */
@@ -630,6 +650,30 @@ const App = (() => {
       ['','Lead-Kosten', eur(kosten), 'Reseller-Partnermodus'],
       ['hl','Ergebnis', eur(bezahlt-kosten), 'Bezahlt minus Kosten'],
     ].map(([cls,l,n,s])=>`<div class="kpi ${cls}"><div class="lbl">${l}</div><div class="num">${n}</div>${s?`<div class="sub">${s}</div>`:''}</div>`).join('');
+    // Closer-Auswertung
+    const CLOSERS = ['Raphael','Dominik','René'];
+    const extra = [...new Set(rows.map(l=>l.closer).filter(c=>c && !CLOSERS.includes(c)))];
+    const hadSecond = l => !!l.termin2 || ['zweittermin','close','noclose','onboarding'].includes(l.stage);
+    $('closer_tbody').innerHTML = [...CLOSERS, ...extra].map(c=>{
+      const cl = rows.filter(l=>l.closer===c);
+      const cCloses = cl.filter(l=>l.stage==='close'||l.stage==='onboarding');
+      const umsatz = cCloses.reduce((a,l)=>a+(Number(l.wert)||0),0);
+      const bez = cl.reduce((a,l)=>a+(Number(l.bezahlt)||0),0);
+      const cRate = cl.length ? Math.round(cCloses.length/cl.length*100) : 0;
+      return `<tr>
+        <td class="name">${esc(c)}</td>
+        <td class="money" style="color:var(--text)">${cl.length}</td>
+        <td class="money" style="color:var(--text)">${cl.filter(hadSecond).length}</td>
+        <td class="money" style="color:${cl.filter(l=>l.stage==='noshow').length?'var(--red)':'var(--muted)'}">${cl.filter(l=>l.stage==='noshow').length}</td>
+        <td class="money" style="color:var(--green)">${cCloses.length}</td>
+        <td class="money" style="color:var(--muted)">${cRate}%</td>
+        <td class="money">${eur(umsatz)}</td>
+        <td class="money win">${eur(bez)}</td>
+      </tr>`;
+    }).join('') + (rows.some(l=>!l.closer) ? `<tr>
+        <td style="color:var(--faint)">Ohne Closer</td>
+        <td class="money" style="color:var(--muted)">${rows.filter(l=>!l.closer).length}</td>
+        <td colspan="6"></td></tr>` : '');
     for(const p of ['webinar','evergreen']){
       const pr = rows.filter(l=>(l.pipeline||'webinar')===p);
       const max = Math.max(1,...STAGES.map(([k])=>pr.filter(l=>l.stage===k).length));
@@ -678,6 +722,8 @@ const App = (() => {
         <td><select class="stagesel s-${l.stage}" onchange="App.setStage('${l.id}',this.value)">
           ${STAGES.map(([k,lab])=>`<option value="${k}" ${l.stage===k?'selected':''}>${lab}</option>`).join('')}
         </select></td>
+        <td style="font-size:11.5px;line-height:1.6;color:var(--muted);white-space:nowrap">
+          1: ${fmtDate(l.termin1)}<br>2: ${fmtDate(l.termin2)}<br>OB: ${fmtDate(l.ob_termin)}</td>
         <td class="money">${eur(l.wert)}</td>
         <td class="money ${(Number(l.bezahlt)||0)>0?'win':''}">${eur(l.bezahlt)}</td>
         <td>${l.zahlungsart?`<span class="pill ${l.zahlungsart==='komplett'?'p-green':'p-cyan'}">${PAY_LABEL[l.zahlungsart]}</span>`:'<span class="pill p-open">Offen</span>'}</td>
@@ -751,7 +797,6 @@ const App = (() => {
             <input type="checkbox" ${l[k]?'checked':''} onchange="App.setObField('${l.id}','${k}',this.checked)"
               style="width:15px;height:15px;accent-color:var(--green);cursor:pointer">${lab}</label>`).join('')}
         </div></td>
-        <td>${l.start_datum ? new Date(l.start_datum+'T00:00:00').toLocaleDateString('de-DE') : '<span style="color:var(--faint)">–</span>'}</td>
         <td><div class="rowactions" style="opacity:1">
           <button class="iconbtn" title="Mail an Assistentin" onclick="App.mailAssistant('${l.id}')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 7L2 7"/></svg>
@@ -800,7 +845,7 @@ const App = (() => {
     for (const [f,k] of [['f_name','name'],['f_email','email'],['f_tel','tel'],['f_pipeline','pipeline'],
       ['f_stage','stage'],['f_closer','closer'],['f_wert','wert'],['f_bezahlt','bezahlt'],
       ['f_zahlungsart','zahlungsart'],['f_produkt','produkt'],['f_kosten','kosten'],
-      ['f_start','start_datum'],['f_obtermin','ob_termin'],['f_obinfo','onboarding_info']])
+      ['f_termin1','termin1'],['f_termin2','termin2'],['f_obtermin','ob_termin'],['f_obinfo','onboarding_info']])
       $(f).value = l[k] ?? '';
     $('f_kosten').disabled = !isAdmin;
     $('kostenHint').textContent = isAdmin ? '' : '(nur Admin)';
@@ -815,7 +860,7 @@ const App = (() => {
     const data = {name:v('f_name'),email:v('f_email'),tel:v('f_tel'),pipeline:v('f_pipeline'),
       stage:v('f_stage'),closer:v('f_closer'),wert:Number(v('f_wert'))||0,bezahlt:Number(v('f_bezahlt'))||0,
       zahlungsart:v('f_zahlungsart'),produkt:v('f_produkt'),
-      start_datum:v('f_start')||null,ob_termin:v('f_obtermin')||null,onboarding_info:v('f_obinfo')};
+      termin1:v('f_termin1')||null,termin2:v('f_termin2')||null,ob_termin:v('f_obtermin')||null,onboarding_info:v('f_obinfo')};
     if(isAdmin) data.kosten = Number(v('f_kosten'))||0;
     else if(!editId) data.kosten = DEFAULT_LEAD_KOSTEN;
     if(await upsertLead(data, editId)){ toast(editId?'Änderungen gespeichert':'Lead angelegt'); render(); closeModal(); }
@@ -861,7 +906,7 @@ const App = (() => {
   /* ---------- CSV ---------- */
   const COLS=[['name','Name'],['email','E-Mail'],['tel','Telefon'],['pipeline','Pipeline'],['stage','Schritt'],
     ['closer','Closer'],['wert','Lead-Wert'],['bezahlt','Bezahlt'],['zahlungsart','Zahlungsart'],['produkt','Produkt'],
-    ['kosten','Kosten'],['start_datum','Angefangen am'],['ob_termin','Onboarding-Termin'],
+    ['kosten','Kosten'],['termin1','Termin Erstgespräch'],['termin2','Termin Zweitgespräch'],['ob_termin','Termin Onboarding'],
     ['ob_termin_gemacht','Termin gemacht'],['ob_stattgefunden','Termin stattgefunden'],['ob_zugaenge','Zugänge versendet'],
     ['onboarding_info','Onboarding-Infos']];
   function exportCSV(){
@@ -884,8 +929,7 @@ const App = (() => {
         ['wert','bezahlt','kosten'].forEach(k=>o[k]=Number(String(o[k]).replace(',','.'))||0);
         if(!o.pipeline) o.pipeline=pipeline;
         if(!o.stage||!STAGE_LABEL[o.stage]) o.stage='neuer_termin';
-        if(!o.start_datum) o.start_datum=null;
-        if(!o.ob_termin) o.ob_termin=null;
+        ['termin1','termin2','ob_termin'].forEach(k=>{ if(!o[k]) o[k]=null; });
         ['ob_termin_gemacht','ob_stattgefunden','ob_zugaenge'].forEach(k=>o[k]=/^(true|ja|1|x)$/i.test(String(o[k]).trim()));
         return o;
       });
