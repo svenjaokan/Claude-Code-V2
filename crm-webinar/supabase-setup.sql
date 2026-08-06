@@ -15,7 +15,8 @@ insert into public.allowed_users (email, is_admin) values
   ('keller.danny1990@gmail.com', true),   -- Danny Keller (Admin)
   ('deliaraphael@icloud.com', false),     -- Raphael
   ('khato.1983@gmail.com', false),        -- Khatuna (Onboarding)
-  ('dettmardominic@gmail.com', false)     -- Dominic Dettmar
+  ('dettmardominic@gmail.com', false),    -- Dominic Dettmar
+  ('pretterhofer.rene@gmail.com', false)  -- René Pretterhofer
 on conflict (email) do nothing;
 
 -- Leads (beide Pipelines in einer Tabelle)
