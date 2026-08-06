@@ -34,7 +34,10 @@ create table if not exists public.leads (
   kosten numeric not null default 0,             -- Lead-Kosten (Reseller-Partnermodus)
   notes jsonb not null default '[]',             -- [{t, by, text}]
   onboarding_info text default '',               -- Infos für die Assistentin
-  onboarding_status text not null default 'offen', -- offen | termin | erledigt
+  ob_termin date,                                -- Onboarding-Termin
+  ob_termin_gemacht boolean not null default false,
+  ob_stattgefunden boolean not null default false,
+  ob_zugaenge boolean not null default false,    -- Zugänge zum Programm versendet
   start_datum date,                              -- wann angefangen
   created_by_email text default '',
   created_at timestamptz not null default now(),
