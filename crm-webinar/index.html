@@ -340,9 +340,10 @@
         <select class="filter" id="f_filter_stage" onchange="App.render()"></select>
         <select class="filter" id="f_filter_paidtype" onchange="App.render()">
           <option value="">Zahlung: Alle</option>
-          <option value="komplett">Voll bezahlt</option>
+          <option value="komplett">Einmalzahlung</option>
           <option value="klarna">Klarna</option>
           <option value="raten3">3 Raten</option>
+          <option value="rechnung">Rechnung &amp; Vertrag</option>
           <option value="none">Noch offen</option>
         </select>
         <select class="filter" id="f_sort" onchange="App.setSortFromSelect()">
@@ -412,7 +413,7 @@
           <table id="ob_tbl" style="min-width:1100px">
             <thead>
               <tr>
-                <th>Name</th><th>Kontakt</th><th>Onboarding-Infos</th>
+                <th>Name</th><th>Kontakt</th><th>Infos vom Closer</th><th>Ergebnis (Khatuna)</th>
                 <th style="text-align:right">Bezahlt</th>
                 <th>Onboarding-Termin</th><th>Checkliste</th>
                 <th></th>
@@ -445,22 +446,36 @@
       </div>
       <div class="field"><label>Pipeline-Schritt</label><select id="f_stage"></select></div>
       <div class="field"><label>Closer (wer betreut den Kontakt)</label>
-        <select id="f_closer"><option value="">Noch offen</option><option value="Raphael">Closer Raphael</option><option value="Dominik">Closer Dominik</option><option value="René">Closer René</option></select>
+        <select id="f_closer"><option value="">Noch offen</option><option value="Raphael">Closer Raphael</option><option value="Dominik">Closer Dominik</option><option value="René">Closer René</option><option value="Tamara">Closer Tamara</option><option value="Christina">Closer Christina</option></select>
       </div>
       <div class="field"><label>Termin Erstgespräch</label><input id="f_termin1" type="date"></div>
       <div class="field"><label>Termin Zweitgespräch</label><input id="f_termin2" type="date"></div>
       <div class="field"><label>Lead-Wert (€)</label><input id="f_wert" type="number" min="0" step="0.01" placeholder="0"></div>
       <div class="field"><label>Davon bezahlt (€)</label><input id="f_bezahlt" type="number" min="0" step="0.01" placeholder="0"></div>
       <div class="field"><label>Zahlungsart</label>
-        <select id="f_zahlungsart"><option value="">Noch offen</option><option value="komplett">Voll bezahlt</option><option value="klarna">Klarna</option><option value="raten3">3 Raten</option></select>
+        <select id="f_zahlungsart" onchange="App.toggleRaten()"><option value="">Noch offen</option><option value="komplett">Einmalzahlung</option><option value="klarna">Klarna</option><option value="raten3">3 Raten (Monat 1/2/3)</option><option value="rechnung">Rechnung &amp; Vertrag (VIP)</option></select>
       </div>
       <div class="field"><label>Produkt</label>
-        <select id="f_produkt"><option value="">Noch offen</option><option value="kurs">Normaler Kurs</option><option value="selbstlernkurs">Selbstlernkurs</option></select>
+        <select id="f_produkt"><option value="">Noch offen</option><option value="kurs">Normaler Kurs</option><option value="selbstlernkurs">Selbstlernkurs</option><option value="vip">VIP</option></select>
+      </div>
+      <div class="field full" id="ratenBox" style="display:none">
+        <label>Raten bezahlt</label>
+        <div style="display:flex;gap:18px;padding:8px 2px;flex-wrap:wrap">
+          <label style="display:flex;align-items:center;gap:7px;font-size:13px;color:var(--text);cursor:pointer;text-transform:none;letter-spacing:0">
+            <input type="checkbox" id="f_rate1" style="width:16px;height:16px;accent-color:var(--green)">Rate 1 (Monat 1)</label>
+          <label style="display:flex;align-items:center;gap:7px;font-size:13px;color:var(--text);cursor:pointer;text-transform:none;letter-spacing:0">
+            <input type="checkbox" id="f_rate2" style="width:16px;height:16px;accent-color:var(--green)">Rate 2 (Monat 2)</label>
+          <label style="display:flex;align-items:center;gap:7px;font-size:13px;color:var(--text);cursor:pointer;text-transform:none;letter-spacing:0">
+            <input type="checkbox" id="f_rate3" style="width:16px;height:16px;accent-color:var(--green)">Rate 3 (Monat 3)</label>
+        </div>
       </div>
       <div class="field"><label>Lead-Kosten (€) <span class="hint" id="kostenHint"></span></label><input id="f_kosten" type="number" min="0" step="0.01" placeholder="0"></div>
       <div class="field"><label>Termin Onboarding</label><input id="f_obtermin" type="date"></div>
-      <div class="field full"><label>Onboarding-Infos (für die Assistentin)</label>
+      <div class="field full"><label>Onboarding-Infos vom Closer (für Khatuna)</label>
         <textarea id="f_obinfo" placeholder="Alles, was fürs Onboarding wichtig ist: Ziele, Besonderheiten, Absprachen aus dem Call …"></textarea>
+      </div>
+      <div class="field full"><label>Onboarding-Ergebnis (von Khatuna)</label>
+        <textarea id="f_obnotizen" placeholder="Erkenntnisse aus dem Onboarding: Vereinbarungen, nächste Schritte, Besonderheiten …"></textarea>
       </div>
     </div>
     <div class="actions">
@@ -598,8 +613,18 @@ const App = (() => {
     if(error){ toast('Fehler: '+error.message); return false; }
     stageDefs[p]=list; return true;
   }
-  const PAY_LABEL = {komplett:'Voll bezahlt', klarna:'Klarna', raten3:'3 Raten', '':'–'};
-  const PROD_LABEL = {kurs:'Normaler Kurs', selbstlernkurs:'Selbstlernkurs', '':'–'};
+  const PAY_LABEL = {komplett:'Einmalzahlung', klarna:'Klarna', raten3:'3 Raten', rechnung:'Rechnung & Vertrag', '':'–'};
+  const payPill = l => {
+    if(!l.zahlungsart) return '<span class="pill p-open">Offen</span>';
+    const cls = l.zahlungsart==='komplett'?'p-green':l.zahlungsart==='rechnung'?'p-amber':'p-cyan';
+    let txt = PAY_LABEL[l.zahlungsart];
+    if(l.zahlungsart==='raten3'){
+      const paid = ['rate1_bezahlt','rate2_bezahlt','rate3_bezahlt'].filter(k=>l[k]).length;
+      txt += ` (${paid}/3)`;
+    }
+    return `<span class="pill ${cls}">${txt}</span>`;
+  };
+  const PROD_LABEL = {kurs:'Normaler Kurs', selbstlernkurs:'Selbstlernkurs', vip:'VIP', '':'–'};
 
   /* ---------- Storage ---------- */
   const localLoad = () => { try{ return JSON.parse(localStorage.getItem(KEY)) || []; }catch(e){ return []; } };
@@ -738,7 +763,7 @@ const App = (() => {
       ['hl','Ergebnis', eur(bezahlt-kosten), 'Bezahlt minus Kosten'],
     ].map(([cls,l,n,s])=>`<div class="kpi ${cls}"><div class="lbl">${l}</div><div class="num">${n}</div>${s?`<div class="sub">${s}</div>`:''}</div>`).join('');
     // Closer-Auswertung
-    const CLOSERS = ['Raphael','Dominik','René'];
+    const CLOSERS = ['Raphael','Dominik','René','Tamara','Christina'];
     const extra = [...new Set(rows.map(l=>l.closer).filter(c=>c && !CLOSERS.includes(c)))];
     const hadSecond = l => !!l.termin2 || l.stage==='zweittermin' || typeOf(l)!=='normal';
     $('closer_tbody').innerHTML = [...CLOSERS, ...extra].map(c=>{
@@ -819,8 +844,8 @@ const App = (() => {
           1: ${fmtDate(l.termin1)}<br>2: ${fmtDate(l.termin2)}<br>OB: ${fmtDate(l.ob_termin)}</td>
         <td class="money">${eur(l.wert)}</td>
         <td class="money ${(Number(l.bezahlt)||0)>0?'win':''}">${eur(l.bezahlt)}</td>
-        <td>${l.zahlungsart?`<span class="pill ${l.zahlungsart==='komplett'?'p-green':'p-cyan'}">${PAY_LABEL[l.zahlungsart]}</span>`:'<span class="pill p-open">Offen</span>'}</td>
-        <td>${l.produkt?`<span class="pill ${l.produkt==='kurs'?'p-violet':'p-accent'}">${PROD_LABEL[l.produkt]}</span>`:'<span class="pill p-open">–</span>'}</td>
+        <td>${payPill(l)}</td>
+        <td>${l.produkt?`<span class="pill ${l.produkt==='vip'?'p-amber':l.produkt==='kurs'?'p-violet':'p-accent'}">${PROD_LABEL[l.produkt]}</span>`:'<span class="pill p-open">–</span>'}</td>
         <td class="money cost">${eur(l.kosten)}</td>
         <td><button class="iconbtn" title="Notizen" onclick="App.openNotes('${l.id}')" style="width:auto;padding:0 6px;gap:4px">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
@@ -982,8 +1007,9 @@ const App = (() => {
       return `<tr>
         <td class="name">${esc(l.name)}${obDone(l)?' <span class="pill p-green" style="margin-left:4px">Fertig</span>':''}<div class="sub">${l.pipeline==='evergreen'?'Evergreen':'Webinar'}${l.closer?' · Closer: '+esc(l.closer):''}${l.produkt?' · '+PROD_LABEL[l.produkt]:''}</div></td>
         <td class="contact">${esc(l.email)}${l.email&&l.tel?'<br>':''}${esc(l.tel)}</td>
-        <td style="max-width:240px"><div style="font-size:12.5px;line-height:1.5;color:var(--muted);white-space:pre-wrap">${esc(l.onboarding_info)||'<i>Noch keine Infos</i>'}</div></td>
-        <td class="money ${(Number(l.bezahlt)||0)>0?'win':''}">${eur(l.bezahlt)}${rest>0?`<div class="sub" style="color:var(--amber)">offen: ${eur(rest)}</div>`:''}</td>
+        <td style="max-width:220px"><div style="font-size:12.5px;line-height:1.5;color:var(--muted);white-space:pre-wrap">${esc(l.onboarding_info)||'<i>Noch keine Infos</i>'}</div></td>
+        <td style="max-width:220px"><div style="font-size:12.5px;line-height:1.5;color:var(--muted);white-space:pre-wrap">${esc(l.ob_notizen)||'<i>Noch nichts eingetragen</i>'}</div></td>
+        <td class="money ${(Number(l.bezahlt)||0)>0?'win':''}">${eur(l.bezahlt)}${rest>0?`<div class="sub" style="color:var(--amber)">offen: ${eur(rest)}</div>`:''}<div style="margin-top:4px">${payPill(l)}</div></td>
         <td><input type="date" value="${esc(l.ob_termin||'')}" onchange="App.setObField('${l.id}','ob_termin',this.value||null)"
           style="background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);height:32px;padding:0 8px;font-family:inherit;font-size:12.5px;color-scheme:dark"></td>
         <td><div style="display:flex;flex-direction:column;gap:5px">
@@ -992,6 +1018,9 @@ const App = (() => {
               style="width:15px;height:15px;accent-color:var(--green);cursor:pointer">${lab}</label>`).join('')}
         </div></td>
         <td><div class="rowactions" style="opacity:1">
+          <button class="iconbtn" title="Info-Blatt herunterladen (PDF)" onclick="App.printLead('${l.id}')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+          </button>
           <button class="iconbtn" title="Mail an Assistentin" onclick="App.mailAssistant('${l.id}')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 7L2 7"/></svg>
           </button>
@@ -1008,6 +1037,39 @@ const App = (() => {
   async function setObField(id, field, value){
     if(await upsertLead({[field]:value}, id)){ toast('Gespeichert'); render(); }
   }
+  function printLead(id){
+    const l = leads.find(x=>x.id===id);
+    const row = (k,v) => v ? `<tr><td class="k">${k}</td><td>${String(v).replace(/</g,'&lt;').replace(/\n/g,'<br>')}</td></tr>` : '';
+    const w = window.open('','_blank');
+    w.document.write(`<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><title>Kundin: ${l.name}</title>
+      <style>body{font-family:-apple-system,'Segoe UI',sans-serif;color:#1a1a2e;max-width:700px;margin:40px auto;padding:0 20px}
+      h1{font-size:22px;border-bottom:2px solid #5b8cff;padding-bottom:8px}
+      .sub{color:#666;font-size:13px;margin-bottom:24px}
+      table{width:100%;border-collapse:collapse;font-size:14px}
+      td{padding:9px 10px;border-bottom:1px solid #e5e5ee;vertical-align:top;line-height:1.55}
+      td.k{width:200px;color:#666;font-weight:600}
+      @media print{body{margin:16px auto}}</style></head><body>
+      <h1>${l.name}</h1>
+      <div class="sub">ClosePilot · The Identity Atelier · Kunden-Infoblatt</div>
+      <table>
+      ${row('E-Mail',l.email)}${row('Telefon',l.tel)}
+      ${row('Pipeline',l.pipeline==='evergreen'?'Evergreen':'Webinar')}
+      ${row('Status',labelOf(l))}
+      ${row('Closer',l.closer)}
+      ${row('Produkt',PROD_LABEL[l.produkt])}
+      ${row('Lead-Wert',eur(l.wert))}${row('Davon bezahlt',eur(l.bezahlt))}
+      ${row('Zahlungsart',PAY_LABEL[l.zahlungsart]+(l.zahlungsart==='raten3'?' – bezahlt: '+['rate1_bezahlt','rate2_bezahlt','rate3_bezahlt'].filter(k=>l[k]).length+'/3':''))}
+      ${row('Termin Erstgespräch',l.termin1?new Date(l.termin1+'T00:00:00').toLocaleDateString('de-DE'):'')}
+      ${row('Termin Zweitgespräch',l.termin2?new Date(l.termin2+'T00:00:00').toLocaleDateString('de-DE'):'')}
+      ${row('Termin Onboarding',l.ob_termin?new Date(l.ob_termin+'T00:00:00').toLocaleDateString('de-DE'):'')}
+      ${row('Onboarding-Infos vom Closer',l.onboarding_info)}
+      ${row('Onboarding-Ergebnis (Khatuna)',l.ob_notizen)}
+      ${row('Notizen',(Array.isArray(l.notes)?l.notes:[]).map(n=>new Date(n.t).toLocaleDateString('de-DE')+(n.by?' ('+n.by+')':'')+': '+n.text).join('\n'))}
+      </table>
+      <script>window.onload=()=>window.print()<\/script></body></html>`);
+    w.document.close();
+  }
+
   function mailAssistant(id){
     const l = leads.find(x=>x.id===id);
     const subject = 'Neues Onboarding: '+(l.name||'');
@@ -1021,6 +1083,8 @@ const App = (() => {
       'Closer: '+(l.closer||'-'),'',
       'Infos fürs Onboarding:',
       (l.onboarding_info||'-'),'',
+      'Bisheriges Onboarding-Ergebnis:',
+      (l.ob_notizen||'-'),'',
       'Viele Grüße'
     ].join('\n');
     location.href = 'mailto:'+encodeURIComponent(ASSISTANT_EMAIL)
@@ -1043,13 +1107,16 @@ const App = (() => {
     for (const [f,k] of [['f_name','name'],['f_email','email'],['f_tel','tel'],['f_pipeline','pipeline'],
       ['f_stage','stage'],['f_closer','closer'],['f_wert','wert'],['f_bezahlt','bezahlt'],
       ['f_zahlungsart','zahlungsart'],['f_produkt','produkt'],['f_kosten','kosten'],
-      ['f_termin1','termin1'],['f_termin2','termin2'],['f_obtermin','ob_termin'],['f_obinfo','onboarding_info']])
+      ['f_termin1','termin1'],['f_termin2','termin2'],['f_obtermin','ob_termin'],['f_obinfo','onboarding_info'],['f_obnotizen','ob_notizen']])
       $(f).value = l[k] ?? '';
+    ['1','2','3'].forEach(n=>$('f_rate'+n).checked = !!l['rate'+n+'_bezahlt']);
+    toggleRaten();
     $('f_kosten').disabled = !isAdmin;
     $('kostenHint').textContent = isAdmin ? '' : '(nur Admin)';
     $('overlay').classList.add('open');
     $('f_name').focus();
   }
+  function toggleRaten(){ $('ratenBox').style.display = $('f_zahlungsart').value==='raten3' ? 'block':'none'; }
   function closeModal(){ $('overlay').classList.remove('open'); }
 
   async function save(){
@@ -1058,7 +1125,8 @@ const App = (() => {
     const data = {name:v('f_name'),email:v('f_email'),tel:v('f_tel'),pipeline:v('f_pipeline'),
       stage:v('f_stage'),closer:v('f_closer'),wert:Number(v('f_wert'))||0,bezahlt:Number(v('f_bezahlt'))||0,
       zahlungsart:v('f_zahlungsart'),produkt:v('f_produkt'),
-      termin1:v('f_termin1')||null,termin2:v('f_termin2')||null,ob_termin:v('f_obtermin')||null,onboarding_info:v('f_obinfo')};
+      termin1:v('f_termin1')||null,termin2:v('f_termin2')||null,ob_termin:v('f_obtermin')||null,onboarding_info:v('f_obinfo'),ob_notizen:v('f_obnotizen'),
+      rate1_bezahlt:$('f_rate1').checked,rate2_bezahlt:$('f_rate2').checked,rate3_bezahlt:$('f_rate3').checked};
     if(isAdmin) data.kosten = Number(v('f_kosten'))||0;
     else if(!editId) data.kosten = DEFAULT_LEAD_KOSTEN;
     if(await upsertLead(data, editId)){ toast(editId?'Änderungen gespeichert':'Lead angelegt'); render(); closeModal(); }
@@ -1103,10 +1171,10 @@ const App = (() => {
 
   /* ---------- CSV ---------- */
   const COLS=[['name','Name'],['email','E-Mail'],['tel','Telefon'],['pipeline','Pipeline'],['stage','Schritt'],
-    ['closer','Closer'],['wert','Lead-Wert'],['bezahlt','Bezahlt'],['zahlungsart','Zahlungsart'],['produkt','Produkt'],
+    ['closer','Closer'],['wert','Lead-Wert'],['bezahlt','Bezahlt'],['zahlungsart','Zahlungsart'],['rate1_bezahlt','Rate 1 bezahlt'],['rate2_bezahlt','Rate 2 bezahlt'],['rate3_bezahlt','Rate 3 bezahlt'],['produkt','Produkt'],
     ['kosten','Kosten'],['termin1','Termin Erstgespräch'],['termin2','Termin Zweitgespräch'],['ob_termin','Termin Onboarding'],
     ['ob_termin_gemacht','Termin gemacht'],['ob_stattgefunden','Termin stattgefunden'],['ob_zugaenge','Zugänge versendet'],
-    ['onboarding_info','Onboarding-Infos']];
+    ['onboarding_info','Onboarding-Infos (Closer)'],['ob_notizen','Onboarding-Ergebnis (Khatuna)']];
   function exportCSV(){
     const q = s => `"${String(s??'').replace(/"/g,'""')}"`;
     const rows = leads.filter(l=>(l.pipeline||'webinar')===pipeline);
@@ -1128,7 +1196,7 @@ const App = (() => {
         if(!o.pipeline) o.pipeline=pipeline;
         if(!o.stage||!stagesFor(o.pipeline).some(s=>s.key===o.stage)){ const byLabel=stagesFor(o.pipeline).find(s=>s.label===o.stage); o.stage = byLabel?byLabel.key:stagesFor(o.pipeline)[0].key; }
         ['termin1','termin2','ob_termin'].forEach(k=>{ if(!o[k]) o[k]=null; });
-        ['ob_termin_gemacht','ob_stattgefunden','ob_zugaenge'].forEach(k=>o[k]=/^(true|ja|1|x)$/i.test(String(o[k]).trim()));
+        ['ob_termin_gemacht','ob_stattgefunden','ob_zugaenge','rate1_bezahlt','rate2_bezahlt','rate3_bezahlt'].forEach(k=>o[k]=/^(true|ja|1|x)$/i.test(String(o[k]).trim()));
         return o;
       });
       if(CLOUD){
@@ -1159,7 +1227,7 @@ const App = (() => {
 
   fillStageSelects();
   initAuth();
-  return {setTab,quickRange,customRange,openModal,closeModal,save,del,setStage,setObField,mailAssistant,setView,dropCard,fillStageSelects,
+  return {setTab,quickRange,customRange,openModal,closeModal,save,del,setStage,setObField,mailAssistant,printLead,toggleRaten,setView,dropCard,fillStageSelects,
     openStageEditor,closeStageEditor,saveStages,addStageRow,moveStage,editStageLabel,editStageType,removeStage,
     openNotes,closeNotes,addNote,exportCSV,importCSV,render,sortBy,setSortFromSelect,auth,logout,toggleAuthMode};
 })();

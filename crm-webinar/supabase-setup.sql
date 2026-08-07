@@ -32,11 +32,15 @@ create table if not exists public.leads (
   termin2 date,                                  -- Termin Zweitgespräch
   wert numeric not null default 0,               -- Lead-Wert (Deal-Summe)
   bezahlt numeric not null default 0,            -- davon tatsächlich bezahlt
-  zahlungsart text not null default '',          -- '' | komplett | klarna
-  produkt text not null default '',              -- '' | kurs | selbstlernkurs
+  zahlungsart text not null default '',          -- '' | komplett | klarna | raten3 | rechnung
+  rate1_bezahlt boolean not null default false,
+  rate2_bezahlt boolean not null default false,
+  rate3_bezahlt boolean not null default false,
+  produkt text not null default '',              -- '' | kurs | selbstlernkurs | vip
   kosten numeric not null default 0,             -- Lead-Kosten (Reseller-Partnermodus)
   notes jsonb not null default '[]',             -- [{t, by, text}]
-  onboarding_info text default '',               -- Infos für die Assistentin
+  onboarding_info text default '',               -- Infos vom Closer für Khatuna
+  ob_notizen text default '',                    -- Ergebnis aus dem Onboarding (Khatuna)
   ob_termin date,                                -- Onboarding-Termin
   ob_termin_gemacht boolean not null default false,
   ob_stattgefunden boolean not null default false,
