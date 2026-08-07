@@ -16,7 +16,9 @@ insert into public.allowed_users (email, is_admin) values
   ('deliaraphael@icloud.com', false),     -- Raphael
   ('khato.1983@gmail.com', false),        -- Khatuna (Onboarding)
   ('dettmardominic@gmail.com', false),    -- Dominic Dettmar
-  ('pretterhofer.rene@gmail.com', false)  -- René Pretterhofer
+  ('pretterhofer.rene@gmail.com', false), -- René Pretterhofer
+  ('web.tamara@yahoo.de', false),         -- Tamara Weber
+  ('info@up-field.de', false)             -- Christina Neufeld
 on conflict (email) do nothing;
 
 -- Leads (beide Pipelines in einer Tabelle)
