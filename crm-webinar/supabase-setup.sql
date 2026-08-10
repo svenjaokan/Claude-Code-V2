@@ -13,7 +13,7 @@ create table if not exists public.allowed_users (
 insert into public.allowed_users (email, is_admin) values
   ('hello@svenjaokan.de', true),          -- Svenja Okan (Admin)
   ('keller.danny1990@gmail.com', true),   -- Danny Keller (Admin)
-  ('deliaraphael@icloud.com', false),     -- Raphael
+  ('raphaeldelia@deliabusiness.com', false), -- Raphael Delia
   ('khato.1983@gmail.com', false),        -- Khatuna (Onboarding)
   ('dettmardominic@gmail.com', false),    -- Dominic Dettmar
   ('pretterhofer.rene@gmail.com', false), -- René Pretterhofer
