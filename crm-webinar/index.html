@@ -458,6 +458,12 @@
       <div class="field"><label>Produkt</label>
         <select id="f_produkt"><option value="">Noch offen</option><option value="kurs">Normaler Kurs</option><option value="selbstlernkurs">Selbstlernkurs</option><option value="vip">VIP</option></select>
       </div>
+      <div class="field full">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;text-transform:none;letter-spacing:0;font-size:13px;color:var(--text)">
+          <input type="checkbox" id="f_closed" style="width:16px;height:16px;accent-color:var(--green)">
+          Gecloset (bleibt gesetzt, auch wenn der Lead weitergeschoben wird)
+        </label>
+      </div>
       <div class="field full" id="ratenBox" style="display:none">
         <label>Raten bezahlt</label>
         <div style="display:flex;gap:18px;padding:8px 2px;flex-wrap:wrap">
@@ -585,6 +591,7 @@ const App = (() => {
   const typeOf = l => (stageOf(l)||{}).type || 'normal';
   const labelOf = l => (stageOf(l)||{}).label || l.stage;
   const isWin = l => typeOf(l)==='win';
+  const isClosed = l => !!l.closed || isWin(l);
   const TYPE_COLOR = {win:'var(--green)', lose:'var(--red)', noshow:'var(--red)', normal:'var(--accent)'};
 
   async function fetchStages(){
@@ -747,7 +754,7 @@ const App = (() => {
   /* ---------- Dashboard ---------- */
   function renderDash(){
     const rows = leads.filter(inRange);
-    const closes = rows.filter(isWin);
+    const closes = rows.filter(isClosed);
     const wert = closes.reduce((a,l)=>a+(Number(l.wert)||0),0);
     const bezahlt = rows.reduce((a,l)=>a+(Number(l.bezahlt)||0),0);
     const kosten = rows.reduce((a,l)=>a+(Number(l.kosten)||0),0);
@@ -768,7 +775,7 @@ const App = (() => {
     const hadSecond = l => !!l.termin2 || l.stage==='zweittermin' || typeOf(l)!=='normal';
     $('closer_tbody').innerHTML = [...CLOSERS, ...extra].map(c=>{
       const cl = rows.filter(l=>l.closer===c);
-      const cCloses = cl.filter(isWin);
+      const cCloses = cl.filter(isClosed);
       const umsatz = cCloses.reduce((a,l)=>a+(Number(l.wert)||0),0);
       const bez = cl.reduce((a,l)=>a+(Number(l.bezahlt)||0),0);
       const cRate = cl.length ? Math.round(cCloses.length/cl.length*100) : 0;
@@ -895,7 +902,7 @@ const App = (() => {
           return `<div class="bcard" draggable="true"
             ondragstart="event.dataTransfer.setData('text/plain','${l.id}');this.classList.add('dragging')"
             ondragend="this.classList.remove('dragging')">
-            <div class="n"><span>${esc(l.name)}</span><span class="w">${(Number(l.wert)||0)?eur(l.wert):''}</span></div>
+            <div class="n"><span>${esc(l.name)}${l.closed&&typeOf(l)!=='win'?' <span class="pill p-green" style="font-size:10px;padding:1px 7px">Gecloset</span>':''}</span><span class="w">${(Number(l.wert)||0)?eur(l.wert):''}</span></div>
             <div class="m">${esc(l.email)||''}${l.email&&l.tel?' · ':''}${esc(l.tel)||''}</div>
             ${l.termin1||l.termin2||l.ob_termin?`<div class="m">1: ${fmtDate(l.termin1)} · 2: ${fmtDate(l.termin2)} · OB: ${fmtDate(l.ob_termin)}</div>`:''}
             <div class="foot">
@@ -979,9 +986,12 @@ const App = (() => {
   }
 
   async function setStage(id, stage){
-    if(await upsertLead({stage}, id)) {
+    const lead = leads.find(x=>x.id===id);
+    const winStage = lead && (stagesFor(lead.pipeline).find(s=>s.key===stage)||{}).type==='win';
+    const data = winStage && !lead.closed ? {stage, closed:true} : {stage};
+    if(await upsertLead(data, id)) {
       const l = leads.find(x=>x.id===id);
-      toast(l && isWin(l) ? labelOf(l)+' – Lead ist jetzt im Onboarding-Tab' : 'Schritt geändert');
+      toast(l && (l.closed||winStage) ? labelOf(l)+' – Lead bleibt als Gecloset markiert' : 'Schritt geändert');
       render();
     }
   }
@@ -993,7 +1003,7 @@ const App = (() => {
     ['ob_zugaenge','Zugänge versendet'],
   ];
   const obDone = l => OB_CHECKS.every(([k])=>!!l[k]);
-  const isOnboarding = l => isWin(l);
+  const isOnboarding = l => isClosed(l);
   function renderOnboarding(){
     const q = ($('ob_search').value||'').toLowerCase();
     const fs = $('ob_filter_status').value;
@@ -1005,11 +1015,11 @@ const App = (() => {
     $('ob_tbody').innerHTML = rows.map(l=>{
       const rest = (Number(l.wert)||0)-(Number(l.bezahlt)||0);
       return `<tr>
-        <td class="name">${esc(l.name)}${obDone(l)?' <span class="pill p-green" style="margin-left:4px">Fertig</span>':''}<div class="sub">${l.pipeline==='evergreen'?'Evergreen':'Webinar'}${l.closer?' · Closer: '+esc(l.closer):''}${l.produkt?' · '+PROD_LABEL[l.produkt]:''}</div></td>
+        <td class="name">${esc(l.name)} <span class="pill p-green" style="margin-left:4px">Gecloset</span>${obDone(l)?' <span class="pill p-accent" style="margin-left:2px">Fertig</span>':''}<div class="sub">${l.pipeline==='evergreen'?'Evergreen':'Webinar'}${l.closer?' · Closer: '+esc(l.closer):''}${l.produkt?' · '+PROD_LABEL[l.produkt]:''}${l.stage&&stageOf(l)?' · Schritt: '+esc(labelOf(l)):''}</div></td>
         <td class="contact">${esc(l.email)}${l.email&&l.tel?'<br>':''}${esc(l.tel)}</td>
         <td style="max-width:220px"><div style="font-size:12.5px;line-height:1.5;color:var(--muted);white-space:pre-wrap">${esc(l.onboarding_info)||'<i>Noch keine Infos</i>'}</div></td>
         <td style="max-width:220px"><div style="font-size:12.5px;line-height:1.5;color:var(--muted);white-space:pre-wrap">${esc(l.ob_notizen)||'<i>Noch nichts eingetragen</i>'}</div></td>
-        <td class="money ${(Number(l.bezahlt)||0)>0?'win':''}">${eur(l.bezahlt)}${rest>0?`<div class="sub" style="color:var(--amber)">offen: ${eur(rest)}</div>`:''}<div style="margin-top:4px">${payPill(l)}</div></td>
+        <td class="money ${(Number(l.bezahlt)||0)>0?'win':''}">${eur(l.bezahlt)}<div class="sub">von ${eur(l.wert)}</div>${rest>0?`<div class="sub" style="color:var(--amber)">offen: ${eur(rest)}</div>`:''}<div style="margin-top:4px">${payPill(l)}</div></td>
         <td><input type="date" value="${esc(l.ob_termin||'')}" onchange="App.setObField('${l.id}','ob_termin',this.value||null)"
           style="background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);height:32px;padding:0 8px;font-family:inherit;font-size:12.5px;color-scheme:dark"></td>
         <td><div style="display:flex;flex-direction:column;gap:5px">
@@ -1054,7 +1064,7 @@ const App = (() => {
       <table>
       ${row('E-Mail',l.email)}${row('Telefon',l.tel)}
       ${row('Pipeline',l.pipeline==='evergreen'?'Evergreen':'Webinar')}
-      ${row('Status',labelOf(l))}
+      ${row('Status',labelOf(l)+(l.closed?' · GECLOSET':''))}
       ${row('Closer',l.closer)}
       ${row('Produkt',PROD_LABEL[l.produkt])}
       ${row('Lead-Wert',eur(l.wert))}${row('Davon bezahlt',eur(l.bezahlt))}
@@ -1110,6 +1120,7 @@ const App = (() => {
       ['f_termin1','termin1'],['f_termin2','termin2'],['f_obtermin','ob_termin'],['f_obinfo','onboarding_info'],['f_obnotizen','ob_notizen']])
       $(f).value = l[k] ?? '';
     ['1','2','3'].forEach(n=>$('f_rate'+n).checked = !!l['rate'+n+'_bezahlt']);
+    $('f_closed').checked = !!l.closed;
     toggleRaten();
     $('f_kosten').disabled = !isAdmin;
     $('kostenHint').textContent = isAdmin ? '' : '(nur Admin)';
@@ -1127,6 +1138,8 @@ const App = (() => {
       zahlungsart:v('f_zahlungsart'),produkt:v('f_produkt'),
       termin1:v('f_termin1')||null,termin2:v('f_termin2')||null,ob_termin:v('f_obtermin')||null,onboarding_info:v('f_obinfo'),ob_notizen:v('f_obnotizen'),
       rate1_bezahlt:$('f_rate1').checked,rate2_bezahlt:$('f_rate2').checked,rate3_bezahlt:$('f_rate3').checked};
+    const st = stagesFor(data.pipeline).find(s=>s.key===data.stage);
+    data.closed = $('f_closed').checked || (st&&st.type==='win');
     if(isAdmin) data.kosten = Number(v('f_kosten'))||0;
     else if(!editId) data.kosten = DEFAULT_LEAD_KOSTEN;
     if(await upsertLead(data, editId)){ toast(editId?'Änderungen gespeichert':'Lead angelegt'); render(); closeModal(); }
@@ -1171,7 +1184,7 @@ const App = (() => {
 
   /* ---------- CSV ---------- */
   const COLS=[['name','Name'],['email','E-Mail'],['tel','Telefon'],['pipeline','Pipeline'],['stage','Schritt'],
-    ['closer','Closer'],['wert','Lead-Wert'],['bezahlt','Bezahlt'],['zahlungsart','Zahlungsart'],['rate1_bezahlt','Rate 1 bezahlt'],['rate2_bezahlt','Rate 2 bezahlt'],['rate3_bezahlt','Rate 3 bezahlt'],['produkt','Produkt'],
+    ['closer','Closer'],['closed','Gecloset'],['wert','Lead-Wert'],['bezahlt','Bezahlt'],['zahlungsart','Zahlungsart'],['rate1_bezahlt','Rate 1 bezahlt'],['rate2_bezahlt','Rate 2 bezahlt'],['rate3_bezahlt','Rate 3 bezahlt'],['produkt','Produkt'],
     ['kosten','Kosten'],['termin1','Termin Erstgespräch'],['termin2','Termin Zweitgespräch'],['ob_termin','Termin Onboarding'],
     ['ob_termin_gemacht','Termin gemacht'],['ob_stattgefunden','Termin stattgefunden'],['ob_zugaenge','Zugänge versendet'],
     ['onboarding_info','Onboarding-Infos (Closer)'],['ob_notizen','Onboarding-Ergebnis (Khatuna)']];
@@ -1196,7 +1209,7 @@ const App = (() => {
         if(!o.pipeline) o.pipeline=pipeline;
         if(!o.stage||!stagesFor(o.pipeline).some(s=>s.key===o.stage)){ const byLabel=stagesFor(o.pipeline).find(s=>s.label===o.stage); o.stage = byLabel?byLabel.key:stagesFor(o.pipeline)[0].key; }
         ['termin1','termin2','ob_termin'].forEach(k=>{ if(!o[k]) o[k]=null; });
-        ['ob_termin_gemacht','ob_stattgefunden','ob_zugaenge','rate1_bezahlt','rate2_bezahlt','rate3_bezahlt'].forEach(k=>o[k]=/^(true|ja|1|x)$/i.test(String(o[k]).trim()));
+        ['ob_termin_gemacht','ob_stattgefunden','ob_zugaenge','rate1_bezahlt','rate2_bezahlt','rate3_bezahlt','closed'].forEach(k=>o[k]=/^(true|ja|1|x)$/i.test(String(o[k]).trim()));
         return o;
       });
       if(CLOUD){

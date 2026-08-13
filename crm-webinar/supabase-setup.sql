@@ -32,6 +32,7 @@ create table if not exists public.leads (
   closer text default '',                        -- Raphael | Dominik | René
   termin1 date,                                  -- Termin Erstgespräch
   termin2 date,                                  -- Termin Zweitgespräch
+  closed boolean not null default false,         -- dauerhaft: wurde gecloset
   wert numeric not null default 0,               -- Lead-Wert (Deal-Summe)
   bezahlt numeric not null default 0,            -- davon tatsächlich bezahlt
   zahlungsart text not null default '',          -- '' | komplett | klarna | raten3 | rechnung
