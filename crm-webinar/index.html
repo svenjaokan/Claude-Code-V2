@@ -1282,6 +1282,7 @@ const App = (() => {
     ['zahlungsart','Zahlungsart'],['produkt','Produkt'],['kosten','Lead-Kosten (€)'],
     ['termin1','Termin Erstgespräch'],['termin2','Termin Zweitgespräch'],['ob_termin','Termin Onboarding'],
     ['onboarding_info','Onboarding-Infos'],['ob_notizen','Onboarding-Ergebnis'],['pipeline','Pipeline'],
+    ['note','Notiz (mehrfach möglich)'],
   ];
   let importPending = null;
   const selected = new Set();
@@ -1303,7 +1304,7 @@ const App = (() => {
       });
       const hasHeader = Object.keys(prefill).length>0 || /name|mail|tel/i.test(rows[0].join(' '));
       if(!hasHeader){ prefill[0]='name'; if(rows[0].length>1) prefill[1]='email'; if(rows[0].length>2) prefill[2]='tel'; }
-      importPending = {rows, hasHeader};
+      importPending = {rows, hasHeader, headerCells: rows[0].map((c,i)=>hasHeader?String(c).replace(/"/g,'').trim():'Spalte '+(i+1))};
       const sample = (hasHeader ? rows[1] : rows[0]) || [];
       $('importMapList').innerHTML = rows[0].map((cell,idx)=>`
         <div class="stageitem" style="grid-template-columns:1fr auto">
@@ -1323,9 +1324,10 @@ const App = (() => {
   function closeImport(){ $('importOverlay').classList.remove('open'); importPending=null; }
   async function confirmImport(){
     if(!importPending) return;
-    const map={};
+    const map={}; const noteCols=[];
     document.querySelectorAll('#importMapList select').forEach(s=>{
-      if(s.value && !(s.value in map)) map[s.value]=Number(s.dataset.col);
+      if(s.value==='note') noteCols.push(Number(s.dataset.col));
+      else if(s.value && !(s.value in map)) map[s.value]=Number(s.dataset.col);
     });
     if(!('name' in map)) return toast('Bitte einer Spalte das Feld „Name" zuordnen');
     const dataRows = importPending.hasHeader ? importPending.rows.slice(1) : importPending.rows;
@@ -1350,6 +1352,11 @@ const App = (() => {
       if('zahlungsart' in o) o.zahlungsart = payMap[String(o.zahlungsart||'').toLowerCase()]||'';
       const prodMap={'normaler kurs':'kurs','kurs':'kurs','selbstlernkurs':'selbstlernkurs','vip':'vip'};
       if('produkt' in o) o.produkt = prodMap[String(o.produkt||'').toLowerCase()]||'';
+      const noteText = noteCols
+        .map(idx=>({lab: importPending.headerCells[idx]||('Spalte '+(idx+1)), val: String(c[idx]??'').trim()}))
+        .filter(n=>n.val)
+        .map(n=>n.lab+': '+n.val).join('\n');
+      if(noteText) o.notes = [{t:new Date().toISOString(), by:(user?.email||'Import'), text:noteText}];
       return o;
     });
     if(!items.length) return toast('Keine Leads mit Namen in der Datei gefunden');
