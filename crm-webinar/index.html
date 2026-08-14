@@ -593,6 +593,16 @@ const App = (() => {
   const $ = id => document.getElementById(id);
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const eur = n => (Number(n)||0).toLocaleString('de-DE',{style:'currency',currency:'EUR'});
+  const localPhone = t => {
+    const s = String(t||'').trim();
+    const m = s.replace(/[()\s\/-]/g,'').match(/^(?:\+49|0049)(\d+)$/);
+    return m ? '0'+m[1] : '';
+  };
+  const telHtml = t => {
+    if(!t) return '';
+    const lp = localPhone(t);
+    return esc(t) + (lp ? `<br><span style="color:var(--faint)">${esc(lp)}</span>` : '');
+  };
   const fmtDate = d => d ? new Date(d+'T00:00:00').toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'}) : '–';
 
   /* ---------- Pipeline-Schritte (frei definierbar) ---------- */
@@ -876,7 +886,7 @@ const App = (() => {
       return `<tr>
         <td>${isAdmin?`<input type="checkbox" ${selected.has(l.id)?'checked':''} onchange="App.toggleSelect('${l.id}',this.checked)" style="width:15px;height:15px;accent-color:var(--accent);cursor:pointer">`:''}</td>
         <td class="name">${esc(l.name)}${notes.length?`<div class="sub">${esc(notes[notes.length-1].text).slice(0,60)}</div>`:''}</td>
-        <td class="contact">${esc(l.email)}${l.email&&l.tel?'<br>':''}${esc(l.tel)}</td>
+        <td class="contact">${esc(l.email)}${l.email&&l.tel?'<br>':''}${telHtml(l.tel)}</td>
         <td>${esc(l.closer)||'<span style="color:var(--faint)">–</span>'}</td>
         <td><select class="stagesel ${ {win:'s-close',lose:'s-noclose',noshow:'s-noshow'}[typeOf(l)]||'' }" onchange="App.setStage('${l.id}',this.value)">
           ${stagesFor(pipeline).map(s=>`<option value="${s.key}" ${l.stage===s.key?'selected':''}>${esc(s.label)}</option>`).join('')}
@@ -938,7 +948,7 @@ const App = (() => {
             ondragstart="event.dataTransfer.setData('text/plain','${l.id}');this.classList.add('dragging')"
             ondragend="this.classList.remove('dragging')">
             <div class="n"><span>${esc(l.name)}${l.closed&&typeOf(l)!=='win'?' <span class="pill p-green" style="font-size:10px;padding:1px 7px">Gecloset</span>':''}</span><span class="w">${(Number(l.wert)||0)?eur(l.wert):''}</span></div>
-            <div class="m">${esc(l.email)||''}${l.email&&l.tel?' · ':''}${esc(l.tel)||''}</div>
+            <div class="m">${esc(l.email)||''}${l.email&&l.tel?' · ':''}${esc(l.tel)||''}${localPhone(l.tel)?' · '+esc(localPhone(l.tel)):''}</div>
             ${l.termin1||l.termin2||l.ob_termin?`<div class="m">1: ${fmtDate(l.termin1)} · 2: ${fmtDate(l.termin2)} · OB: ${fmtDate(l.ob_termin)}</div>`:''}
             <div class="foot">
               <span class="cl">${esc(l.closer)||''}</span>
@@ -1077,7 +1087,7 @@ const App = (() => {
       const rest = (Number(l.wert)||0)-(Number(l.bezahlt)||0);
       return `<tr>
         <td class="name">${esc(l.name)} <span class="pill p-green" style="margin-left:4px">Gecloset</span>${obDone(l)?' <span class="pill p-accent" style="margin-left:2px">Fertig</span>':''}<div class="sub">${ {evergreen:'Evergreen',coldcalls:'Cold Calls'}[l.pipeline]||'Webinar' }${l.closer?' · Closer: '+esc(l.closer):''}${l.produkt?' · '+PROD_LABEL[l.produkt]:''}${l.stage&&stageOf(l)?' · Schritt: '+esc(labelOf(l)):''}</div></td>
-        <td class="contact">${esc(l.email)}${l.email&&l.tel?'<br>':''}${esc(l.tel)}</td>
+        <td class="contact">${esc(l.email)}${l.email&&l.tel?'<br>':''}${telHtml(l.tel)}</td>
         <td style="max-width:220px"><div style="font-size:12.5px;line-height:1.5;color:var(--muted);white-space:pre-wrap">${esc(l.onboarding_info)||'<i>Noch keine Infos</i>'}</div></td>
         <td style="max-width:220px"><div style="font-size:12.5px;line-height:1.5;color:var(--muted);white-space:pre-wrap">${esc(l.ob_notizen)||'<i>Noch nichts eingetragen</i>'}</div></td>
         <td class="money ${(Number(l.bezahlt)||0)>0?'win':''}">${eur(l.bezahlt)}<div class="sub">von ${eur(l.wert)}</div>${rest>0?`<div class="sub" style="color:var(--amber)">offen: ${eur(rest)}</div>`:''}<div style="margin-top:4px">${payPill(l)}</div></td>
