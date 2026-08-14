@@ -274,6 +274,7 @@
     <button class="tab active" id="tab_dash" onclick="App.setTab('dash')">Dashboard</button>
     <button class="tab" id="tab_webinar" onclick="App.setTab('webinar')">Webinar-Leads</button>
     <button class="tab" id="tab_evergreen" onclick="App.setTab('evergreen')">Evergreen-Leads</button>
+    <button class="tab" id="tab_coldcalls" onclick="App.setTab('coldcalls')">Cold Calls</button>
     <button class="tab" id="tab_onboarding" onclick="App.setTab('onboarding')">Onboarding</button>
   </div>
   <div class="wrap">
@@ -313,6 +314,7 @@
       <div class="dashsplit">
         <div class="panel"><h3>Pipeline Webinar</h3><div class="stagebar" id="funnel_webinar"></div></div>
         <div class="panel"><h3>Pipeline Evergreen</h3><div class="stagebar" id="funnel_evergreen"></div></div>
+        <div class="panel"><h3>Pipeline Cold Calls</h3><div class="stagebar" id="funnel_coldcalls"></div></div>
       </div>
     </div>
 
@@ -442,7 +444,7 @@
       <div class="field"><label>E-Mail</label><input id="f_email" type="email" placeholder="max@mail.de"></div>
       <div class="field"><label>Telefonnummer</label><input id="f_tel" placeholder="+49 …"></div>
       <div class="field"><label>Pipeline</label>
-        <select id="f_pipeline" onchange="App.fillStageSelects()"><option value="webinar">Webinar</option><option value="evergreen">Evergreen</option></select>
+        <select id="f_pipeline" onchange="App.fillStageSelects()"><option value="webinar">Webinar</option><option value="evergreen">Evergreen</option><option value="coldcalls">Cold Calls</option></select>
       </div>
       <div class="field"><label>Pipeline-Schritt</label><select id="f_stage"></select></div>
       <div class="field"><label>Closer (wer betreut den Kontakt)</label>
@@ -585,8 +587,17 @@ const App = (() => {
     {key:'noclose',label:'No Close',type:'lose'},
     {key:'onboarding',label:'Onboarding-Termin gelegt',type:'win'},
   ];
-  let stageDefs = {webinar:null, evergreen:null};
-  const stagesFor = p => stageDefs[p==='evergreen'?'evergreen':'webinar'] || DEFAULT_STAGES;
+  const DEFAULT_STAGES_CC = [
+    {key:'neuer_lead',label:'Neuer Lead',type:'normal'},
+    {key:'rangegangen',label:'Rangegangen',type:'normal'},
+    {key:'gespraech',label:'Gespräch stattgefunden',type:'normal'},
+    {key:'termin',label:'Termin vereinbart',type:'normal'},
+    {key:'nicht_erreicht',label:'Nicht erreicht',type:'noshow'},
+    {key:'kein_interesse',label:'Kein Interesse',type:'lose'},
+  ];
+  let stageDefs = {webinar:null, evergreen:null, coldcalls:null};
+  const PIPES = ['webinar','evergreen','coldcalls'];
+  const stagesFor = p => stageDefs[PIPES.includes(p)?p:'webinar'] || (p==='coldcalls'?DEFAULT_STAGES_CC:DEFAULT_STAGES);
   const stageOf = l => stagesFor(l.pipeline).find(s=>s.key===l.stage);
   const typeOf = l => (stageOf(l)||{}).type || 'normal';
   const labelOf = l => (stageOf(l)||{}).label || l.stage;
@@ -596,19 +607,21 @@ const App = (() => {
 
   async function fetchStages(){
     if(!CLOUD){
-      try{ const s = JSON.parse(localStorage.getItem(STAGES_KEY)); if(s) stageDefs = s; }catch(e){}
-      if(!stageDefs.webinar){ stageDefs={webinar:structuredClone(DEFAULT_STAGES), evergreen:structuredClone(DEFAULT_STAGES)}; localStorage.setItem(STAGES_KEY, JSON.stringify(stageDefs)); }
+      try{ const s = JSON.parse(localStorage.getItem(STAGES_KEY)); if(s) stageDefs = {...stageDefs, ...s}; }catch(e){}
+      for(const p of PIPES) if(!stageDefs[p]) stageDefs[p]=structuredClone(p==='coldcalls'?DEFAULT_STAGES_CC:DEFAULT_STAGES);
+      localStorage.setItem(STAGES_KEY, JSON.stringify(stageDefs));
       return;
     }
     const {data,error} = await sb.from('stages').select('*').order('pos');
     if(error) return; // Tabelle fehlt evtl. noch — Fallback: DEFAULT_STAGES
-    for(const p of ['webinar','evergreen']){
+    for(const p of PIPES){
       const rows = data.filter(s=>s.pipeline===p);
+      const defaults = p==='coldcalls'?DEFAULT_STAGES_CC:DEFAULT_STAGES;
       if(rows.length) stageDefs[p] = rows.map(s=>({key:s.key,label:s.label,type:s.type}));
       else { // einmalig mit Standard befüllen
-        const seed = DEFAULT_STAGES.map((s,i)=>({pipeline:p,key:s.key,label:s.label,type:s.type,pos:i}));
+        const seed = defaults.map((s,i)=>({pipeline:p,key:s.key,label:s.label,type:s.type,pos:i}));
         const {error:e2} = await sb.from('stages').insert(seed);
-        if(!e2) stageDefs[p] = structuredClone(DEFAULT_STAGES);
+        if(!e2) stageDefs[p] = structuredClone(defaults);
       }
     }
   }
@@ -716,12 +729,12 @@ const App = (() => {
   /* ---------- Tabs & Zeitraum ---------- */
   function setTab(t){
     tab = t;
-    if(t==='webinar'||t==='evergreen') pipeline = t;
-    ['dash','webinar','evergreen','onboarding'].forEach(x=>$('tab_'+x).classList.toggle('active', x===t));
+    if(PIPES.includes(t)) pipeline = t;
+    ['dash','webinar','evergreen','coldcalls','onboarding'].forEach(x=>$('tab_'+x).classList.toggle('active', x===t));
     $('view_dash').style.display = t==='dash' ? 'block':'none';
-    $('view_pipe').style.display = (t==='webinar'||t==='evergreen') ? 'block':'none';
+    $('view_pipe').style.display = PIPES.includes(t) ? 'block':'none';
     $('view_onboarding').style.display = t==='onboarding' ? 'block':'none';
-    if(t==='webinar'||t==='evergreen') $('pipeTitle').textContent = t==='webinar' ? 'Webinar-Leads' : 'Evergreen-Leads';
+    if(PIPES.includes(t)) $('pipeTitle').textContent = {webinar:'Webinar-Leads',evergreen:'Evergreen-Leads',coldcalls:'Cold Calls'}[t];
     render();
   }
   function quickRange(q){
@@ -761,7 +774,7 @@ const App = (() => {
     const noclose = rows.filter(l=>typeOf(l)==='lose').length;
     const rate = rows.length ? Math.round(closes.length/rows.length*100) : 0;
     $('dash_kpis').innerHTML = [
-      ['','Leads gesamt', rows.length, `Webinar ${rows.filter(l=>l.pipeline==='webinar').length} · Evergreen ${rows.filter(l=>l.pipeline!=='webinar').length}`],
+      ['','Leads gesamt', rows.length, `Webinar ${rows.filter(l=>(l.pipeline||'webinar')==='webinar').length} · Evergreen ${rows.filter(l=>l.pipeline==='evergreen').length} · Cold Calls ${rows.filter(l=>l.pipeline==='coldcalls').length}`],
       ['good','Closes', closes.length, rate+'% Close-Rate'],
       ['bad','No Close', noclose, ''],
       ['','Umsatz (Lead-Wert)', eur(wert), 'aus Closes'],
@@ -793,7 +806,7 @@ const App = (() => {
         <td style="color:var(--faint)">Ohne Closer</td>
         <td class="money" style="color:var(--muted)">${rows.filter(l=>!l.closer).length}</td>
         <td colspan="6"></td></tr>` : '');
-    for(const p of ['webinar','evergreen']){
+    for(const p of PIPES){
       const pr = rows.filter(l=>(l.pipeline||'webinar')===p);
       const defs = stagesFor(p);
       const max = Math.max(1,...defs.map(s=>pr.filter(l=>l.stage===s.key).length));
@@ -1015,7 +1028,7 @@ const App = (() => {
     $('ob_tbody').innerHTML = rows.map(l=>{
       const rest = (Number(l.wert)||0)-(Number(l.bezahlt)||0);
       return `<tr>
-        <td class="name">${esc(l.name)} <span class="pill p-green" style="margin-left:4px">Gecloset</span>${obDone(l)?' <span class="pill p-accent" style="margin-left:2px">Fertig</span>':''}<div class="sub">${l.pipeline==='evergreen'?'Evergreen':'Webinar'}${l.closer?' · Closer: '+esc(l.closer):''}${l.produkt?' · '+PROD_LABEL[l.produkt]:''}${l.stage&&stageOf(l)?' · Schritt: '+esc(labelOf(l)):''}</div></td>
+        <td class="name">${esc(l.name)} <span class="pill p-green" style="margin-left:4px">Gecloset</span>${obDone(l)?' <span class="pill p-accent" style="margin-left:2px">Fertig</span>':''}<div class="sub">${ {evergreen:'Evergreen',coldcalls:'Cold Calls'}[l.pipeline]||'Webinar' }${l.closer?' · Closer: '+esc(l.closer):''}${l.produkt?' · '+PROD_LABEL[l.produkt]:''}${l.stage&&stageOf(l)?' · Schritt: '+esc(labelOf(l)):''}</div></td>
         <td class="contact">${esc(l.email)}${l.email&&l.tel?'<br>':''}${esc(l.tel)}</td>
         <td style="max-width:220px"><div style="font-size:12.5px;line-height:1.5;color:var(--muted);white-space:pre-wrap">${esc(l.onboarding_info)||'<i>Noch keine Infos</i>'}</div></td>
         <td style="max-width:220px"><div style="font-size:12.5px;line-height:1.5;color:var(--muted);white-space:pre-wrap">${esc(l.ob_notizen)||'<i>Noch nichts eingetragen</i>'}</div></td>
@@ -1063,7 +1076,7 @@ const App = (() => {
       <div class="sub">ClosePilot · The Identity Atelier · Kunden-Infoblatt</div>
       <table>
       ${row('E-Mail',l.email)}${row('Telefon',l.tel)}
-      ${row('Pipeline',l.pipeline==='evergreen'?'Evergreen':'Webinar')}
+      ${row('Pipeline',{evergreen:'Evergreen',coldcalls:'Cold Calls'}[l.pipeline]||'Webinar')}
       ${row('Status',labelOf(l)+(l.closed?' · GECLOSET':''))}
       ${row('Closer',l.closer)}
       ${row('Produkt',PROD_LABEL[l.produkt])}
@@ -1197,21 +1210,70 @@ const App = (() => {
     a.download='closepilot-'+pipeline+'.csv'; a.click(); URL.revokeObjectURL(a.href);
     toast('CSV exportiert');
   }
+  const IMPORT_ALIASES = {
+    name:['name','vorname und nachname','kunde','kundin','lead','vollständiger name','full name'],
+    email:['e-mail','email','mail','e-mail-adresse','email address'],
+    tel:['telefon','telefonnummer','tel','phone','handy','mobil','mobile','phone number'],
+    pipeline:['pipeline'],stage:['schritt','pipeline-schritt','stage','status'],
+    closer:['closer'],wert:['lead-wert','wert','summe','betrag','value','deal'],
+    bezahlt:['bezahlt','paid'],zahlungsart:['zahlungsart','zahlung','payment'],
+    produkt:['produkt','product'],kosten:['kosten','cost'],
+    termin1:['termin erstgespräch','erstgespräch','termin 1'],termin2:['termin zweitgespräch','zweitgespräch','termin 2'],
+    ob_termin:['termin onboarding','onboarding-termin'],onboarding_info:['onboarding-infos','onboarding-infos (closer)','infos'],
+    ob_notizen:['onboarding-ergebnis','onboarding-ergebnis (khatuna)'],
+    rate1_bezahlt:['rate 1 bezahlt'],rate2_bezahlt:['rate 2 bezahlt'],rate3_bezahlt:['rate 3 bezahlt'],closed:['gecloset','closed'],
+  };
+  function detectDelimiter(line){
+    const counts = [[';',(line.match(/;/g)||[]).length],[',',(line.match(/,/g)||[]).length],['\t',(line.match(/\t/g)||[]).length]];
+    counts.sort((a,b)=>b[1]-a[1]);
+    return counts[0][1]>0 ? counts[0][0] : ';';
+  }
   function importCSV(ev){
     const file=ev.target.files[0]; if(!file) return;
     const r=new FileReader();
     r.onload=async ()=>{
-      const rows=parseCSV(r.result.replace(/^﻿/,''));
-      if(rows.length<2) return toast('Keine Daten in der CSV gefunden');
-      const items=rows.slice(1).filter(c=>c[0]).map(c=>{
-        const o={}; COLS.forEach(([k],j)=>o[k]=c[j]??'');
-        ['wert','bezahlt','kosten'].forEach(k=>o[k]=Number(String(o[k]).replace(',','.'))||0);
-        if(!o.pipeline) o.pipeline=pipeline;
-        if(!o.stage||!stagesFor(o.pipeline).some(s=>s.key===o.stage)){ const byLabel=stagesFor(o.pipeline).find(s=>s.label===o.stage); o.stage = byLabel?byLabel.key:stagesFor(o.pipeline)[0].key; }
-        ['termin1','termin2','ob_termin'].forEach(k=>{ if(!o[k]) o[k]=null; });
-        ['ob_termin_gemacht','ob_stattgefunden','ob_zugaenge','rate1_bezahlt','rate2_bezahlt','rate3_bezahlt','closed'].forEach(k=>o[k]=/^(true|ja|1|x)$/i.test(String(o[k]).trim()));
+      const text = r.result.replace(/^\ufeff/,'');
+      const delim = detectDelimiter(text.split(/\r?\n/)[0]||'');
+      const rows=parseCSV(text, delim).filter(c=>c.some(x=>String(x).trim()));
+      if(rows.length<1) return toast('Die Datei ist leer');
+      // Kopfzeile den Feldern zuordnen
+      const header = rows[0].map(c=>String(c).trim().toLowerCase().replace(/"/g,''));
+      const map = {};
+      header.forEach((hcell,idx)=>{
+        for(const [field,aliases] of Object.entries(IMPORT_ALIASES))
+          if(aliases.includes(hcell) && !(field in map)) map[field]=idx;
+      });
+      let dataRows;
+      if('name' in map){ dataRows = rows.slice(1); }
+      else { // keine erkennbare Kopfzeile: Spalte 1=Name, 2=E-Mail, 3=Telefon
+        map.name=0; map.email=1; map.tel=2;
+        const looksLikeHeader = /name|mail|tel/i.test(rows[0].join(' '));
+        dataRows = looksLikeHeader ? rows.slice(1) : rows;
+      }
+      const items = dataRows.filter(c=>String(c[map.name]||'').trim()).map(c=>{
+        const o={};
+        for(const [field,idx] of Object.entries(map)) o[field]=String(c[idx]??'').trim();
+        ['wert','bezahlt','kosten'].forEach(k=>o[k]=Number(String(o[k]||'').replace(/[€\s.]/g,'').replace(',','.'))||0);
+        ['rate1_bezahlt','rate2_bezahlt','rate3_bezahlt','closed'].forEach(k=>o[k]=/^(true|ja|1|x|wahr)$/i.test(String(o[k]||'').trim()));
+        if(!PIPES.includes(o.pipeline)){ const pl=String(o.pipeline||'').toLowerCase(); o.pipeline = pl.includes('ever')?'evergreen':pl.includes('cold')?'coldcalls':pipeline; }
+        if(!o.stage||!stagesFor(o.pipeline).some(s=>s.key===o.stage)){
+          const byLabel=stagesFor(o.pipeline).find(s=>s.label.toLowerCase()===String(o.stage||'').toLowerCase());
+          o.stage = byLabel?byLabel.key:stagesFor(o.pipeline)[0].key;
+        }
+        if(!o.closed && (stagesFor(o.pipeline).find(s=>s.key===o.stage)||{}).type==='win') o.closed=true;
+        ['termin1','termin2','ob_termin'].forEach(k=>{
+          let v=String(o[k]||'').trim();
+          const m=v.match(/^(\d{1,2})\.(\d{1,2})\.(\d{2,4})$/);
+          if(m) v=`${m[3].length===2?'20'+m[3]:m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;
+          o[k]=/^\d{4}-\d{2}-\d{2}$/.test(v)?v:null;
+        });
+        const payMap={'einmalzahlung':'komplett','voll bezahlt':'komplett','komplett':'komplett','klarna':'klarna','3 raten':'raten3','raten':'raten3','raten3':'raten3','rechnung':'rechnung','rechnung & vertrag':'rechnung','vip':'rechnung'};
+        o.zahlungsart = payMap[String(o.zahlungsart||'').toLowerCase()]||'';
+        const prodMap={'normaler kurs':'kurs','kurs':'kurs','selbstlernkurs':'selbstlernkurs','vip':'vip'};
+        o.produkt = prodMap[String(o.produkt||'').toLowerCase()]||'';
         return o;
       });
+      if(!items.length) return toast('Keine Leads mit Namen in der Datei gefunden');
       if(CLOUD){
         const {error}=await sb.from('leads').insert(items.map(o=>({...o, created_by_email:user?.email||''})));
         if(error) return toast('Import-Fehler: '+error.message);
@@ -1224,13 +1286,13 @@ const App = (() => {
     };
     r.readAsText(file,'utf-8');
   }
-  function parseCSV(text){
+  function parseCSV(text, delim=';'){
     const rows=[]; let row=[],cur='',inQ=false;
     for(let i=0;i<text.length;i++){
       const ch=text[i];
       if(inQ){ if(ch==='"'){ if(text[i+1]==='"'){cur+='"';i++;} else inQ=false; } else cur+=ch; }
       else if(ch==='"') inQ=true;
-      else if(ch===';'){ row.push(cur); cur=''; }
+      else if(ch===delim){ row.push(cur); cur=''; }
       else if(ch==='\n'||ch==='\r'){ if(cur||row.length){row.push(cur);rows.push(row);row=[];cur='';} }
       else cur+=ch;
     }
