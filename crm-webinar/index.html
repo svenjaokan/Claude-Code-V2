@@ -593,15 +593,19 @@ const App = (() => {
   const $ = id => document.getElementById(id);
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const eur = n => (Number(n)||0).toLocaleString('de-DE',{style:'currency',currency:'EUR'});
-  const localPhone = t => {
-    const s = String(t||'').trim();
-    const m = s.replace(/[()\s\/-]/g,'').match(/^(?:\+49|0049)(\d+)$/);
-    return m ? '0'+m[1] : '';
+  const altPhone = t => {
+    const s = String(t||'').replace(/[()\s\/-]/g,'').trim();
+    let m = s.match(/^(?:\+49|0049)(\d+)$/);
+    if(m) return '0'+m[1];                    // +49… → 0…
+    m = s.match(/^0(\d+)$/);
+    if(m) return '+49'+m[1];                  // 0… → +49…
+    return '';
   };
+  const localPhone = altPhone; // Alias (PDF-Blatt)
   const telHtml = t => {
     if(!t) return '';
-    const lp = localPhone(t);
-    return esc(t) + (lp ? `<br><span style="color:var(--faint)">${esc(lp)}</span>` : '');
+    const ap = altPhone(t);
+    return esc(t) + (ap ? `<br><span style="color:var(--faint)">${esc(ap)}</span>` : '');
   };
   const fmtDate = d => d ? new Date(d+'T00:00:00').toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'}) : '–';
 
