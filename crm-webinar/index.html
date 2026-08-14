@@ -360,6 +360,10 @@
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
           Export
         </button>
+        <button id="bulkDeleteBtn" style="display:none;border-color:rgba(255,92,114,.5);color:var(--red)" onclick="App.deleteSelected()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>
+          <span id="bulkDeleteLabel">Löschen</span>
+        </button>
         <button onclick="document.getElementById('importFile').click()">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
           Import
@@ -372,6 +376,7 @@
           <table id="tbl">
             <thead>
               <tr>
+                <th id="selHead" style="width:34px"><input type="checkbox" id="selAll" onchange="App.toggleSelectAll(this.checked)" style="width:15px;height:15px;accent-color:var(--accent);cursor:pointer"></th>
                 <th class="sortable" onclick="App.sortBy('name')">Name<span class="arrow" id="ar_name"></span></th>
                 <th>Kontakt</th>
                 <th>Closer</th>
@@ -489,6 +494,20 @@
     <div class="actions">
       <button onclick="App.closeModal()">Abbrechen</button>
       <button class="btn-primary" onclick="App.save()">Speichern</button>
+    </div>
+  </div>
+</div>
+
+<!-- Import-Zuordnung -->
+<div class="overlay" id="importOverlay" onclick="if(event.target===this)App.closeImport()">
+  <div class="modal">
+    <h2>Import: Spalten zuordnen</h2>
+    <p class="hint" style="margin-bottom:6px">Lege fest, welche Spalte aus deiner Datei in welches CRM-Feld soll. Spalten auf „Nicht importieren" werden übersprungen.</p>
+    <p class="hint" style="margin-bottom:14px;color:var(--accent)" id="importCount"></p>
+    <div id="importMapList" style="max-height:46vh;overflow-y:auto"></div>
+    <div class="actions">
+      <button onclick="App.closeImport()">Abbrechen</button>
+      <button class="btn-primary" onclick="App.confirmImport()">Importieren</button>
     </div>
   </div>
 </div>
@@ -728,7 +747,7 @@ const App = (() => {
 
   /* ---------- Tabs & Zeitraum ---------- */
   function setTab(t){
-    tab = t;
+    tab = t; selected.clear();
     if(PIPES.includes(t)) pipeline = t;
     ['dash','webinar','evergreen','coldcalls','onboarding'].forEach(x=>$('tab_'+x).classList.toggle('active', x===t));
     $('view_dash').style.display = t==='dash' ? 'block':'none';
@@ -847,13 +866,15 @@ const App = (() => {
     fillStageSelects();
     $('board').style.display = view==='board' ? 'flex':'none';
     $('tablecard').style.display = view==='board' ? 'none':'block';
-    if(view==='board'){ renderBoard(rows); return; }
+    if(view==='board'){ lastShownRows=rows; renderBoard(rows); updateBulkUI(rows); return; }
+    lastShownRows=rows;
     ['name','stage','wert','bezahlt'].forEach(k=>{ $('ar_'+k).textContent = sort.key===k ? (sort.dir==='asc'?'▲':'▼') : ''; });
     $('empty').style.display = rows.length ? 'none':'block';
     $('tbl').style.display = rows.length ? 'table':'none';
     $('tbody').innerHTML = rows.map(l=>{
       const notes = Array.isArray(l.notes) ? l.notes : [];
       return `<tr>
+        <td>${isAdmin?`<input type="checkbox" ${selected.has(l.id)?'checked':''} onchange="App.toggleSelect('${l.id}',this.checked)" style="width:15px;height:15px;accent-color:var(--accent);cursor:pointer">`:''}</td>
         <td class="name">${esc(l.name)}${notes.length?`<div class="sub">${esc(notes[notes.length-1].text).slice(0,60)}</div>`:''}</td>
         <td class="contact">${esc(l.email)}${l.email&&l.tel?'<br>':''}${esc(l.tel)}</td>
         <td>${esc(l.closer)||'<span style="color:var(--faint)">–</span>'}</td>
@@ -884,8 +905,9 @@ const App = (() => {
     const wert = rows.reduce((a,l)=>a+(Number(l.wert)||0),0);
     const bez = rows.reduce((a,l)=>a+(Number(l.bezahlt)||0),0);
     const kos = rows.reduce((a,l)=>a+(Number(l.kosten)||0),0);
+    updateBulkUI(rows);
     $('tfoot').innerHTML = `<tr>
-      <td colspan="4" style="text-align:right;color:var(--muted);font-weight:500">Summe (Auswahl)</td>
+      <td colspan="5" style="text-align:right;color:var(--muted);font-weight:500">Summe (Auswahl)</td>
       <td class="money">${eur(wert)}</td><td class="money" style="color:var(--green)">${eur(bez)}</td>
       <td colspan="2"></td><td class="money" style="color:var(--amber)">${eur(kos)}</td><td colspan="2"></td></tr>`;
   }
@@ -991,6 +1013,32 @@ const App = (() => {
     render();
   }
   function closeStageEditor(){ $('stageOverlay').classList.remove('open'); }
+
+  function updateBulkUI(rowsShown){
+    const btn=$('bulkDeleteBtn');
+    if(!isAdmin || view!=='table'){ btn.style.display='none'; return; }
+    btn.style.display = selected.size ? 'inline-flex':'none';
+    $('bulkDeleteLabel').textContent = 'Löschen ('+selected.size+')';
+    const all = rowsShown && rowsShown.length && rowsShown.every(l=>selected.has(l.id));
+    const sa=$('selAll'); if(sa) sa.checked=!!all;
+  }
+  let lastShownRows = [];
+  function toggleSelect(id, on){ on?selected.add(id):selected.delete(id); updateBulkUI(lastShownRows); }
+  function toggleSelectAll(on){
+    lastShownRows.forEach(l=>on?selected.add(l.id):selected.delete(l.id));
+    render();
+  }
+  async function deleteSelected(){
+    if(!selected.size) return;
+    if(!confirm(selected.size+' Leads wirklich endgültig löschen?')) return;
+    const ids=[...selected];
+    if(CLOUD){
+      const {error}=await sb.from('leads').delete().in('id',ids);
+      if(error) return toast('Fehler: '+error.message);
+      await fetchLeads();
+    } else { leads=leads.filter(l=>!ids.includes(l.id)); localSave(); }
+    selected.clear(); render(); toast(ids.length+' Leads gelöscht');
+  }
 
   function render(){
     if(tab==='dash') renderDash();
@@ -1228,63 +1276,92 @@ const App = (() => {
     counts.sort((a,b)=>b[1]-a[1]);
     return counts[0][1]>0 ? counts[0][0] : ';';
   }
+  const FIELD_OPTS = [
+    ['','Nicht importieren'],['name','Name'],['email','E-Mail'],['tel','Telefonnummer'],
+    ['closer','Closer'],['stage','Pipeline-Schritt'],['wert','Lead-Wert (€)'],['bezahlt','Bezahlt (€)'],
+    ['zahlungsart','Zahlungsart'],['produkt','Produkt'],['kosten','Lead-Kosten (€)'],
+    ['termin1','Termin Erstgespräch'],['termin2','Termin Zweitgespräch'],['ob_termin','Termin Onboarding'],
+    ['onboarding_info','Onboarding-Infos'],['ob_notizen','Onboarding-Ergebnis'],['pipeline','Pipeline'],
+  ];
+  let importPending = null;
+  const selected = new Set();
   function importCSV(ev){
     const file=ev.target.files[0]; if(!file) return;
     const r=new FileReader();
-    r.onload=async ()=>{
+    r.onload=()=>{
       const text = r.result.replace(/^\ufeff/,'');
       const delim = detectDelimiter(text.split(/\r?\n/)[0]||'');
       const rows=parseCSV(text, delim).filter(c=>c.some(x=>String(x).trim()));
+      ev.target.value='';
       if(rows.length<1) return toast('Die Datei ist leer');
-      // Kopfzeile den Feldern zuordnen
-      const header = rows[0].map(c=>String(c).trim().toLowerCase().replace(/"/g,''));
-      const map = {};
-      header.forEach((hcell,idx)=>{
+      // Vorbelegung über Kopfzeile
+      const headerCells = rows[0].map(c=>String(c).trim().toLowerCase().replace(/"/g,''));
+      const prefill = {};
+      headerCells.forEach((hc,idx)=>{
         for(const [field,aliases] of Object.entries(IMPORT_ALIASES))
-          if(aliases.includes(hcell) && !(field in map)) map[field]=idx;
+          if(aliases.includes(hc) && !Object.values(prefill).includes(field)) { prefill[idx]=field; break; }
       });
-      let dataRows;
-      if('name' in map){ dataRows = rows.slice(1); }
-      else { // keine erkennbare Kopfzeile: Spalte 1=Name, 2=E-Mail, 3=Telefon
-        map.name=0; map.email=1; map.tel=2;
-        const looksLikeHeader = /name|mail|tel/i.test(rows[0].join(' '));
-        dataRows = looksLikeHeader ? rows.slice(1) : rows;
-      }
-      const items = dataRows.filter(c=>String(c[map.name]||'').trim()).map(c=>{
-        const o={};
-        for(const [field,idx] of Object.entries(map)) o[field]=String(c[idx]??'').trim();
-        ['wert','bezahlt','kosten'].forEach(k=>o[k]=Number(String(o[k]||'').replace(/[€\s.]/g,'').replace(',','.'))||0);
-        ['rate1_bezahlt','rate2_bezahlt','rate3_bezahlt','closed'].forEach(k=>o[k]=/^(true|ja|1|x|wahr)$/i.test(String(o[k]||'').trim()));
-        if(!PIPES.includes(o.pipeline)){ const pl=String(o.pipeline||'').toLowerCase(); o.pipeline = pl.includes('ever')?'evergreen':pl.includes('cold')?'coldcalls':pipeline; }
-        if(!o.stage||!stagesFor(o.pipeline).some(s=>s.key===o.stage)){
-          const byLabel=stagesFor(o.pipeline).find(s=>s.label.toLowerCase()===String(o.stage||'').toLowerCase());
-          o.stage = byLabel?byLabel.key:stagesFor(o.pipeline)[0].key;
-        }
-        if(!o.closed && (stagesFor(o.pipeline).find(s=>s.key===o.stage)||{}).type==='win') o.closed=true;
-        ['termin1','termin2','ob_termin'].forEach(k=>{
-          let v=String(o[k]||'').trim();
-          const m=v.match(/^(\d{1,2})\.(\d{1,2})\.(\d{2,4})$/);
-          if(m) v=`${m[3].length===2?'20'+m[3]:m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;
-          o[k]=/^\d{4}-\d{2}-\d{2}$/.test(v)?v:null;
-        });
-        const payMap={'einmalzahlung':'komplett','voll bezahlt':'komplett','komplett':'komplett','klarna':'klarna','3 raten':'raten3','raten':'raten3','raten3':'raten3','rechnung':'rechnung','rechnung & vertrag':'rechnung','vip':'rechnung'};
-        o.zahlungsart = payMap[String(o.zahlungsart||'').toLowerCase()]||'';
-        const prodMap={'normaler kurs':'kurs','kurs':'kurs','selbstlernkurs':'selbstlernkurs','vip':'vip'};
-        o.produkt = prodMap[String(o.produkt||'').toLowerCase()]||'';
-        return o;
-      });
-      if(!items.length) return toast('Keine Leads mit Namen in der Datei gefunden');
-      if(CLOUD){
-        const {error}=await sb.from('leads').insert(items.map(o=>({...o, created_by_email:user?.email||''})));
-        if(error) return toast('Import-Fehler: '+error.message);
-        await fetchLeads();
-      } else {
-        items.forEach((o,i)=>leads.unshift({id:'imp'+i+'_'+o.name.length+'_'+leads.length, created_at:new Date().toISOString(), notes:[], ...o}));
-        localSave();
-      }
-      render(); toast(`${items.length} Leads importiert`); ev.target.value='';
+      const hasHeader = Object.keys(prefill).length>0 || /name|mail|tel/i.test(rows[0].join(' '));
+      if(!hasHeader){ prefill[0]='name'; if(rows[0].length>1) prefill[1]='email'; if(rows[0].length>2) prefill[2]='tel'; }
+      importPending = {rows, hasHeader};
+      const sample = (hasHeader ? rows[1] : rows[0]) || [];
+      $('importMapList').innerHTML = rows[0].map((cell,idx)=>`
+        <div class="stageitem" style="grid-template-columns:1fr auto">
+          <div style="min-width:0">
+            <div style="font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${hasHeader?esc(String(cell).replace(/"/g,'')):'Spalte '+(idx+1)}</div>
+            <div class="hint" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">z. B. „${esc(String(sample[idx]??'').slice(0,40))}"</div>
+          </div>
+          <select data-col="${idx}" style="min-width:190px">
+            ${FIELD_OPTS.map(([k,lab])=>`<option value="${k}" ${prefill[idx]===k?'selected':''}>${lab}</option>`).join('')}
+          </select>
+        </div>`).join('');
+      $('importCount').textContent = (hasHeader ? rows.length-1 : rows.length)+' Zeilen gefunden. Ziel-Pipeline: '+({webinar:'Webinar',evergreen:'Evergreen',coldcalls:'Cold Calls'}[pipeline]);
+      $('importOverlay').classList.add('open');
     };
     r.readAsText(file,'utf-8');
+  }
+  function closeImport(){ $('importOverlay').classList.remove('open'); importPending=null; }
+  async function confirmImport(){
+    if(!importPending) return;
+    const map={};
+    document.querySelectorAll('#importMapList select').forEach(s=>{
+      if(s.value && !(s.value in map)) map[s.value]=Number(s.dataset.col);
+    });
+    if(!('name' in map)) return toast('Bitte einer Spalte das Feld „Name" zuordnen');
+    const dataRows = importPending.hasHeader ? importPending.rows.slice(1) : importPending.rows;
+    const items = dataRows.filter(c=>String(c[map.name]||'').trim()).map(c=>{
+      const o={};
+      for(const [field,idx] of Object.entries(map)) o[field]=String(c[idx]??'').trim();
+      ['wert','bezahlt','kosten'].forEach(k=>o[k]=Number(String(o[k]||'').replace(/[€\s.]/g,'').replace(',','.'))||0);
+      if(!PIPES.includes(o.pipeline)){ const pl=String(o.pipeline||'').toLowerCase(); o.pipeline = pl.includes('ever')?'evergreen':pl.includes('cold')?'coldcalls':pipeline; }
+      if(!o.stage||!stagesFor(o.pipeline).some(s=>s.key===o.stage)){
+        const byLabel=stagesFor(o.pipeline).find(s=>s.label.toLowerCase()===String(o.stage||'').toLowerCase());
+        o.stage = byLabel?byLabel.key:stagesFor(o.pipeline)[0].key;
+      }
+      if((stagesFor(o.pipeline).find(s=>s.key===o.stage)||{}).type==='win') o.closed=true;
+      ['termin1','termin2','ob_termin'].forEach(k=>{
+        if(!(k in o)) return;
+        let v=String(o[k]||'').trim();
+        const m=v.match(/^(\d{1,2})\.(\d{1,2})\.(\d{2,4})$/);
+        if(m) v=`${m[3].length===2?'20'+m[3]:m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;
+        o[k]=/^\d{4}-\d{2}-\d{2}$/.test(v)?v:null;
+      });
+      const payMap={'einmalzahlung':'komplett','voll bezahlt':'komplett','komplett':'komplett','klarna':'klarna','3 raten':'raten3','raten':'raten3','raten3':'raten3','rechnung':'rechnung','rechnung & vertrag':'rechnung','vip':'rechnung'};
+      if('zahlungsart' in o) o.zahlungsart = payMap[String(o.zahlungsart||'').toLowerCase()]||'';
+      const prodMap={'normaler kurs':'kurs','kurs':'kurs','selbstlernkurs':'selbstlernkurs','vip':'vip'};
+      if('produkt' in o) o.produkt = prodMap[String(o.produkt||'').toLowerCase()]||'';
+      return o;
+    });
+    if(!items.length) return toast('Keine Leads mit Namen in der Datei gefunden');
+    if(CLOUD){
+      const {error}=await sb.from('leads').insert(items.map(o=>({...o, created_by_email:user?.email||''})));
+      if(error) return toast('Import-Fehler: '+error.message);
+      await fetchLeads();
+    } else {
+      items.forEach((o,i)=>leads.unshift({id:'imp'+i+'_'+o.name.length+'_'+leads.length, created_at:new Date().toISOString(), notes:[], ...o}));
+      localSave();
+    }
+    closeImport(); render(); toast(`${items.length} Leads importiert`);
   }
   function parseCSV(text, delim=';'){
     const rows=[]; let row=[],cur='',inQ=false;
@@ -1303,6 +1380,7 @@ const App = (() => {
   fillStageSelects();
   initAuth();
   return {setTab,quickRange,customRange,openModal,closeModal,save,del,setStage,setObField,mailAssistant,printLead,toggleRaten,setView,dropCard,fillStageSelects,
+    closeImport,confirmImport,toggleSelect,toggleSelectAll,deleteSelected,
     openStageEditor,closeStageEditor,saveStages,addStageRow,moveStage,editStageLabel,editStageType,removeStage,
     openNotes,closeNotes,addNote,exportCSV,importCSV,render,sortBy,setSortFromSelect,auth,logout,toggleAuthMode};
 })();
